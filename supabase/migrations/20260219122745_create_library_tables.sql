@@ -1,5 +1,5 @@
 
-
+-- 1.enums for user roles, borrow status, and reservation status
 create type user_role as enum (
   'student',
   'instructor',
@@ -19,7 +19,7 @@ create type reservation_status as enum (
   'cancelled'
 );
 
-
+-- 2. tables for users, categories, books, borrow records, reservations, fines, and notifications
 create table public.users (
   id uuid primary key references auth.users(id),
   username text unique,
@@ -28,6 +28,7 @@ create table public.users (
   role user_role default 'student',
   created_at timestamptz default now()
 );
+
 
 create table public.categories (
   id uuid primary key default gen_random_uuid(),
@@ -86,7 +87,46 @@ create table public.notifications (
   created_at timestamptz default now()
 );
 
+-- 3. FUNCTION TO HANDLE NEW USER CREATION
+-- ========================================
+-- AUTO CREATE USER PROFILE AFTER SIGNUP
+-- ========================================
 
+create or replace function public.handle_new_user()
+returns trigger as $$
+begin
+  insert into public.users (id, email, role)
+  values (new.id, new.email, 'student');
+  return new;
+end;
+$$ language plpgsql security definer;
+
+create or replace function public.get_user_role()
+returns user_role as $$
+  select role from public.users
+  where id = auth.uid();
+$$ language sql stable;
+
+
+-- 4. TRIGGER TO AUTOMATICALLY CREATE USER PROFILES
+create trigger on_auth_user_created
+after insert on auth.users
+for each row execute procedure public.handle_new_user();
+
+create policy "user can view own profile"
+on public.users
+for select
+using (auth.uid() = id);
+
+create policy "admin full access"
+on public.users
+for all
+using (public.get_user_role() = 'admin');
+
+create policy "user borrow own"
+on public.borrow_records
+for select
+using (auth.uid() = user_id);
 
 
 alter table public.borrow_records enable row level security;
