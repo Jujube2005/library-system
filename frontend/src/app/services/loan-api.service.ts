@@ -16,8 +16,16 @@ export class LoanApiService {
     return this.api.get<LoanListResponse>('/api/loans/my')
   }
 
+  getAllLoans() {
+    return this.api.get<LoanListResponse>('/api/loans')
+  }
+
   renewLoan(id: string) {
     return this.api.post<{ data: Loan }>(`/api/loans/${id}/renew`, {})
+  }
+
+  returnLoan(id: string) {
+    return this.api.post<{ data: { loan: Loan } }>(`/api/loans/${id}/return`, {})
   }
 }
 

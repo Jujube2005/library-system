@@ -6,6 +6,7 @@
 <table *ngIf="!loading && !error && loans.length">
   <thead>
     <tr>
+      <th *ngIf="isStaff">User</th>
       <th>Book</th>
       <th>Loan Date</th>
       <th>Due Date</th>
@@ -16,6 +17,9 @@
   </thead>
   <tbody>
     <tr *ngFor="let l of loans">
+      <td *ngIf="isStaff">
+        {{ l.user?.full_name || l.user?.email || l.user_id }}
+      </td>
       <td>{{ l.book?.title || l.book_id }}</td>
       <td>{{ l.loan_date }}</td>
       <td>{{ l.due_date }}</td>
@@ -23,10 +27,16 @@
       <td>{{ l.current_fine || 0 }}</td>
       <td>
         <button
-          *ngIf="l.status === 'active'"
+          *ngIf="!isStaff && l.status === 'active'"
           (click)="renew(l)"
         >
           Renew
+        </button>
+        <button
+          *ngIf="isStaff && l.status === 'active'"
+          (click)="returnLoan(l)"
+        >
+          Return
         </button>
       </td>
     </tr>

@@ -15,5 +15,13 @@ export class FineApiService {
   getMyFines() {
     return this.api.get<FineListResponse>('/api/fines/my')
   }
+
+  getAllFines() {
+    return this.api.get<FineListResponse>('/api/fines')
+  }
+
+  markAsPaid(id: string) {
+    return this.api.patch<{ data: Fine }>(`/api/fines/${id}`, {})
+  }
 }
 
