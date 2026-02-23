@@ -1,0 +1,29 @@
+<h1>Reservations</h1>
+
+<p *ngIf="loading">กำลังโหลด...</p>
+<p *ngIf="!loading && error">{{ error }}</p>
+
+<table *ngIf="!loading && !error && reservations.length">
+  <thead>
+    <tr>
+      <th>Book</th>
+      <th>Status</th>
+      <th>Reserved At</th>
+      <th>Expires At</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let r of reservations">
+      <td>{{ r.book_id }}</td>
+      <td>{{ r.status }}</td>
+      <td>{{ r.reserved_at }}</td>
+      <td>{{ r.expires_at || '-' }}</td>
+      <td>
+        <button *ngIf="r.status === 'pending'" (click)="cancel(r)">ยกเลิก</button>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<p *ngIf="!loading && !error && !reservations.length">ยังไม่มีรายการจอง</p>

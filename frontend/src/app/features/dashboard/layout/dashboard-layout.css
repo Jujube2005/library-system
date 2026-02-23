@@ -1,0 +1,42 @@
+.layout {
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  min-height: 100vh;
+}
+
+.sidebar {
+  background: #111827;
+  color: #e5e7eb;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.logo {
+  font-size: 18px;
+  font-weight: 600;
+}
+
+nav {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+  padding: 6px 8px;
+  border-radius: 4px;
+}
+
+a.active {
+  background: #2563eb;
+  color: #f9fafb;
+}
+
+.content {
+  padding: 24px;
+}
+

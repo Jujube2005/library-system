@@ -1,0 +1,25 @@
+<h1>Book Detail</h1>
+
+<p *ngIf="loading">กำลังโหลด...</p>
+<p *ngIf="!loading && error">{{ error }}</p>
+
+<div *ngIf="!loading && !error && book">
+  <h2>{{ book.title }}</h2>
+  <p>Author: {{ book.author }}</p>
+  <p>Category: {{ book.category }}</p>
+  <p>Copies: {{ book.available_copies }} / {{ book.total_copies }}</p>
+  <p>Status: {{ book.status }}</p>
+
+  <div>
+    <button *ngIf="canReserve" (click)="reserve()" [disabled]="reserving">
+      {{ reserving ? 'กำลังจอง...' : 'Reserve this book' }}
+    </button>
+
+    <div *ngIf="hasActiveReservation">
+      <p>คุณมีการจองเล่มนี้อยู่แล้ว (สถานะ: {{ myReservation?.status }})</p>
+      <button (click)="cancelReservation()" [disabled]="reserving">
+        {{ reserving ? 'กำลังยกเลิก...' : 'Cancel reservation' }}
+      </button>
+    </div>
+  </div>
+</div>

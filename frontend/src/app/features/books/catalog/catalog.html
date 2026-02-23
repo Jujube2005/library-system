@@ -1,0 +1,39 @@
+<h1>Book Catalog</h1>
+
+<div>
+  <input [(ngModel)]="q" placeholder="ค้นหาหนังสือ" />
+  <input [(ngModel)]="category" placeholder="หมวดหมู่ (เช่น Computer Science)" />
+  <button (click)="onSearch()">Search</button>
+</div>
+
+<p *ngIf="loading">กำลังโหลด...</p>
+<p *ngIf="!loading && error">{{ error }}</p>
+
+<table *ngIf="!loading && !error && books.length">
+  <thead>
+    <tr>
+      <th>Title</th>
+      <th>Author</th>
+      <th>Category</th>
+      <th>Available</th>
+      <th>Status</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let b of books">
+      <td>{{ b.title }}</td>
+      <td>{{ b.author }}</td>
+      <td>{{ b.category }}</td>
+      <td>{{ b.available_copies }}/{{ b.total_copies }}</td>
+      <td>{{ b.status }}</td>
+    </tr>
+  </tbody>
+</table>
+
+<p *ngIf="!loading && !error && !books.length">ไม่พบหนังสือ</p>
+
+<div *ngIf="!loading && total > limit">
+  <button (click)="prevPage()" [disabled]="!canPrev()">Prev</button>
+  <span>Page {{ page }} / {{ totalPages() }}</span>
+  <button (click)="nextPage()" [disabled]="!canNext()">Next</button>
+</div>

@@ -1,0 +1,16 @@
+<h1>Dashboard Overview</h1>
+
+<p *ngIf="loading">กำลังโหลดการแจ้งเตือน...</p>
+<p *ngIf="!loading && error">{{ error }}</p>
+
+<section *ngIf="!loading && !error">
+  <h2>Notifications</h2>
+  <ul *ngIf="notifications.length; else empty">
+    <li *ngFor="let n of notifications">
+      {{ n.message }} ({{ n.created_at }})
+    </li>
+  </ul>
+  <ng-template #empty>
+    <p>ยังไม่มีการแจ้งเตือน</p>
+  </ng-template>
+</section>

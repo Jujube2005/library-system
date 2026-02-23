@@ -1,0 +1,20 @@
+<div class="layout">
+  <aside class="sidebar">
+    <h2 class="logo">RMUTI Library</h2>
+    <nav>
+      <a routerLink="/dashboard" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
+        Overview
+      </a>
+      <a routerLink="/dashboard/books" routerLinkActive="active">Books</a>
+      <a routerLink="/dashboard/loans" routerLinkActive="active">Loans</a>
+      <a routerLink="/dashboard/reservations" routerLinkActive="active">Reservations</a>
+      <a routerLink="/dashboard/fines" routerLinkActive="active">Fines</a>
+      <a *ngIf="isStaff" routerLink="/dashboard/members" routerLinkActive="active">Members</a>
+      <a *ngIf="isStaff" routerLink="/dashboard/reports" routerLinkActive="active">Reports</a>
+    </nav>
+  </aside>
+
+  <main class="content">
+    <router-outlet></router-outlet>
+  </main>
+</div>

@@ -1,0 +1,20 @@
+div {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-width: 320px;
+  margin: 40px auto;
+}
+
+input {
+  padding: 8px;
+}
+
+button {
+  padding: 8px;
+}
+
+p {
+  color: red;
+}
+

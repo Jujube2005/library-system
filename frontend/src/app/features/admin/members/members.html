@@ -1,0 +1,59 @@
+<h1>Members</h1>
+
+<p *ngIf="loading">กำลังโหลด...</p>
+<p *ngIf="!loading && error">{{ error }}</p>
+
+<section>
+  <h2>Invite new user</h2>
+  <div>
+    <input [(ngModel)]="inviteEmail" placeholder="Email" />
+    <input [(ngModel)]="inviteName" placeholder="Full name" />
+    <select [(ngModel)]="inviteRole">
+      <option value="student">Student</option>
+      <option value="instructor">Instructor</option>
+      <option value="staff">Staff</option>
+    </select>
+    <button (click)="invite()" [disabled]="inviting">
+      {{ inviting ? 'Inviting...' : 'Send invite' }}
+    </button>
+  </div>
+</section>
+
+<section>
+  <h2>Users</h2>
+
+  <input [(ngModel)]="search" (ngModelChange)="applyFilter()" placeholder="ค้นหาโดยชื่อ, email, รหัสนักศึกษา, role" />
+
+  <table *ngIf="!loading && filtered.length">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Email</th>
+        <th>Student ID</th>
+        <th>Role</th>
+        <th>Status</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let u of filtered">
+        <td>{{ u.full_name }}</td>
+        <td>{{ u.email }}</td>
+        <td>{{ u.student_id || '-' }}</td>
+        <td>
+          <select [ngModel]="u.role" (ngModelChange)="changeRole(u, $event)">
+            <option value="student">Student</option>
+            <option value="instructor">Instructor</option>
+            <option value="staff">Staff</option>
+          </select>
+        </td>
+        <td>
+          <button (click)="toggleActive(u)">
+            {{ u.is_active ? 'Deactivate' : 'Activate' }}
+          </button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <p *ngIf="!loading && !filtered.length">ไม่พบผู้ใช้</p>
+</section>
