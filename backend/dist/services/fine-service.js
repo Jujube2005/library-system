@@ -1,30 +1,52 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.calculateCurrentFine = exports.processPayment = void 0;
-const supabase_1 = require("../config/supabase");
-const processPayment = async (borrowId, userId) => {
-    const { data: loan, error } = await supabase_1.supabase
-        .from('borrowings')
-        .select('id, due_date, fine_amount, status')
-        .eq('id', borrowId)
-        .eq('user_id', userId)
-        .single();
-    if (error || !loan)
-        throw new Error("ไม่พบข้อมูลรายการค้างชำระ");
-    if (loan.status === 'paid')
-        throw new Error("รายการนี้ชำระเงินเรียบร้อยแล้ว");
-    const paymentSuccess = true;
-    if (paymentSuccess) {
-        const { data: updatedLoan } = await supabase_1.supabase
-            .from('borrowings')
-            .update({
-            status: 'returned_and_paid',
-            fine_paid_date: new Date()
-        })
-            .eq('id', borrowId)
-            .select();
-        return updatedLoan;
+exports.calculateCurrentFine = exports.processPayment = exports.getAllFines = exports.getMyFines = void 0;
+const getMyFines = async (supabase, userId) => {
+    const { data, error } = await supabase
+        .from('fines')
+        .select('id, loan_id, amount, status, created_at, updated_at, paid_at')
+        .eq('user_id', userId);
+    if (error) {
+        throw new Error('ไม่สามารถดึงข้อมูลค่าปรับได้');
     }
+    return data;
+};
+exports.getMyFines = getMyFines;
+const getAllFines = async (supabase) => {
+    const { data, error } = await supabase
+        .from('fines')
+        .select('id, loan_id, user_id, amount, status, created_at, updated_at, paid_at');
+    if (error) {
+        throw new Error('ไม่สามารถดึงข้อมูลค่าปรับทั้งหมดได้');
+    }
+    return data;
+};
+exports.getAllFines = getAllFines;
+const processPayment = async (supabase, fineId) => {
+    const { data: fine, error } = await supabase
+        .from('fines')
+        .select('id, status')
+        .eq('id', fineId)
+        .single();
+    if (error || !fine) {
+        throw new Error('ไม่พบข้อมูลค่าปรับ');
+    }
+    if (fine.status === 'paid') {
+        throw new Error('รายการนี้ชำระเงินเรียบร้อยแล้ว');
+    }
+    const { data: updatedFine, error: updateError } = await supabase
+        .from('fines')
+        .update({
+        status: 'paid',
+        paid_at: new Date()
+    })
+        .eq('id', fineId)
+        .select()
+        .single();
+    if (updateError) {
+        throw new Error('ไม่สามารถอัปเดตสถานะค่าปรับได้');
+    }
+    return updatedFine;
 };
 exports.processPayment = processPayment;
 const calculateCurrentFine = (dueDate, dailyRate = 10) => {

@@ -1,23 +1,43 @@
 import { Router } from 'express'
-import { viewMyLoans } from '../controllers/loan-controller'
+import { createLoan, viewMyLoans, viewAllLoans, returnLoan, renewLoanHandler } from '../controllers/loan-controller'
 import { protect } from '../middleware/auth-middleware'
 import { authorize } from '../middleware/role-middleware'
-import { returnBook } from '../controllers/book-controller'
 
 const router = Router()
 
 router.post(
-    '/renew/:loanId',
-    protect,
-    authorize('user'),
-    returnBook
+  '/',
+  protect,
+  authorize('staff'),
+  createLoan
 )
 
 router.get(
-    '/my-loans',
-    protect,
-    authorize('user'),
-    viewMyLoans
+  '/my',
+  protect,
+  authorize('student', 'instructor'),
+  viewMyLoans
+)
+
+router.get(
+  '/',
+  protect,
+  authorize('staff'),
+  viewAllLoans
+)
+
+router.post(
+  '/:id/return',
+  protect,
+  authorize('staff'),
+  returnLoan
+)
+
+router.post(
+  '/:id/renew',
+  protect,
+  authorize('instructor'),
+  renewLoanHandler
 )
 
 export default router

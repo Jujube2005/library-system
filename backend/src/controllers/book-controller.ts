@@ -3,15 +3,47 @@ import * as bookService from '../services/book-service'
 
 export async function searchBooks(req: Request, res: Response): Promise<void> {
   try {
-    const query = typeof req.query.q === 'string' ? req.query.q.trim() : ''
+    const supabase = (req as any).supabase
 
-    if (!query) {
-      res.status(400).json({ message: 'Query is required' })
+    if (!supabase) {
+      res.status(500).json({ error: 'Supabase client not available' })
       return
     }
 
-    const books = await bookService.searchBooksFromAPI(query)
-    res.json(books)
+    const q = typeof req.query.q === 'string' ? req.query.q.trim() : ''
+    const category = typeof req.query.category === 'string' ? req.query.category.trim() : ''
+    const page = Number(req.query.page ?? 1) || 1
+    const limit = Number(req.query.limit ?? 10) || 10
+    const from = (page - 1) * limit
+    const to = from + limit - 1
+
+    let query = supabase
+      .from('books')
+      .select('id, title, author, category, available_copies, total_copies, status', { count: 'exact' })
+
+    if (q) {
+      query = query.ilike('title', `%${q}%`)
+    }
+
+    if (category) {
+      query = query.eq('category', category)
+    }
+
+    const { data, error, count } = await query.range(from, to)
+
+    if (error) {
+      res.status(500).json({ error: error.message })
+      return
+    }
+
+    res.json({
+      data: data ?? [],
+      pagination: {
+        page,
+        limit,
+        total: count ?? data?.length ?? 0
+      }
+    })
   } catch (_error) {
     res.status(500).json({ error: 'Search failed' })
   }
@@ -19,12 +51,29 @@ export async function searchBooks(req: Request, res: Response): Promise<void> {
 
 export const getStatus = async (req: Request, res: Response) => {
   try {
-    const { id } = req.params
-    const bookStatus = await bookService.getBookStatusById(id)
+    const supabase = (req as any).supabase
 
-    res.status(200).json(bookStatus)
-  } catch (error: any) {
-    res.status(404).json({ message: 'Book not found', error: error.message })
+    if (!supabase) {
+      res.status(500).json({ error: 'Supabase client not available' })
+      return
+    }
+
+    const { id } = req.params
+
+    const { data, error } = await supabase
+      .from('books')
+      .select('id, title, author, category, shelf_location, available_copies, total_copies, status')
+      .eq('id', id)
+      .single()
+
+    if (error || !data) {
+      res.status(404).json({ error: 'BOOK_NOT_FOUND' })
+      return
+    }
+
+    res.status(200).json({ data })
+  } catch (_error) {
+    res.status(500).json({ error: 'Failed to load book' })
   }
 }
 
