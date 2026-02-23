@@ -74,7 +74,7 @@ router.get(
 
       const { data, error } = await supabase
         .from('reservations')
-        .select('id, status, reserved_at, expires_at, books ( title )')
+        .select('id, book_id, status, reserved_at, expires_at, books ( title )')
         .eq('user_id', userId)
 
       if (error) {
