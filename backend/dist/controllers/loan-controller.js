@@ -32,25 +32,39 @@ var __importStar = (this && this.__importStar) || (function () {
         return result;
     };
 })();
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.env = void 0;
-const dotenv = __importStar(require("dotenv"));
-const path_1 = __importDefault(require("path"));
-const rootEnvPath = path_1.default.resolve(__dirname, '../../../.env');
-const backendEnvPath = path_1.default.resolve(__dirname, '../../.env');
-dotenv.config({ path: rootEnvPath });
-dotenv.config({ path: backendEnvPath });
-const requiredEnv = ['SUPABASE_URL', 'SUPABASE_ANON_KEY'];
-requiredEnv.forEach((key) => {
-    if (!process.env[key]) {
-        throw new Error(`Missing env: ${key}`);
+exports.viewAllLoans = exports.viewMyLoans = void 0;
+const loanService = __importStar(require("../services/loan-service"));
+const fine_service_1 = require("../services/fine-service");
+const viewMyLoans = async (req, res) => {
+    try {
+        const userId = req.user.id;
+        const loans = await loanService.getLoansByUser(userId);
+        const updatedLoans = loans.map((loan) => ({
+            ...loan,
+            current_fine: loan.due_date ? (0, fine_service_1.calculateCurrentFine)(loan.due_date) : 0
+        }));
+        res.status(200).json({
+            success: true,
+            count: updatedLoans.length,
+            data: updatedLoans
+        });
     }
-});
-exports.env = {
-    supabaseUrl: process.env.SUPABASE_URL,
-    supabaseAnonKey: process.env.SUPABASE_ANON_KEY,
-    port: Number(process.env.PORT ?? 4000)
+    catch (error) {
+        res.status(500).json({ error: error.message });
+    }
 };
+exports.viewMyLoans = viewMyLoans;
+const viewAllLoans = async (req, res) => {
+    try {
+        const allLoans = await loanService.getAllLoansInSystem();
+        res.json({
+            success: true,
+            data: allLoans
+        });
+    }
+    catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
+exports.viewAllLoans = viewAllLoans;

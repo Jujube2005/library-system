@@ -33,52 +33,46 @@ var __importStar = (this && this.__importStar) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getMyProfile = getMyProfile;
-exports.updateMyProfile = updateMyProfile;
-const userService = __importStar(require("../services/user-service"));
-async function getMyProfile(req, res) {
+exports.recordReturn = exports.recordBorrow = void 0;
+const staffService = __importStar(require("../services/staff-service"));
+const recordBorrow = async (req, res) => {
     try {
-        const userId = req.user?.id;
-        const supabase = req.supabase;
-        if (!userId) {
-            res.status(401).json({ error: 'UNAUTHENTICATED' });
+        const staffId = req.user?.id;
+        const { targetUserId, bookId } = req.body;
+        if (!staffId) {
+            res.status(401).json({ message: 'UNAUTHENTICATED' });
             return;
         }
-        if (!supabase) {
-            res.status(500).json({ error: 'Supabase client not available' });
+        if (!targetUserId || !bookId) {
+            res.status(400).json({ message: 'targetUserId and bookId are required' });
             return;
         }
-        const profile = await userService.getUserProfile(supabase, userId);
-        res.json(profile);
+        const result = await staffService.recordBorrowByStaff(staffId, targetUserId, bookId);
+        res.status(201).json({
+            message: 'บันทึกการยืมโดย Staff สำเร็จ',
+            data: result
+        });
     }
     catch (error) {
-        res.status(404).json({
-            error: error instanceof Error ? error.message : 'Profile not found'
-        });
+        res.status(400).json({ error: error.message });
     }
-}
-async function updateMyProfile(req, res) {
+};
+exports.recordBorrow = recordBorrow;
+const recordReturn = async (req, res) => {
     try {
-        const userId = req.user?.id;
-        const supabase = req.supabase;
-        const { full_name, phone } = req.body;
-        if (!userId) {
-            res.status(401).json({ error: 'UNAUTHENTICATED' });
+        const { borrowId } = req.body;
+        if (!borrowId) {
+            res.status(400).json({ message: 'borrowId is required' });
             return;
         }
-        if (!supabase) {
-            res.status(500).json({ error: 'Supabase client not available' });
-            return;
-        }
-        const profile = await userService.updateMyProfile(supabase, userId, {
-            full_name,
-            phone
+        const result = await staffService.recordReturnByStaff(borrowId);
+        res.status(200).json({
+            message: 'บันทึกการคืนโดย Staff สำเร็จ',
+            data: result
         });
-        res.json(profile);
     }
     catch (error) {
-        res.status(400).json({
-            error: error instanceof Error ? error.message : 'Unable to update profile'
-        });
+        res.status(400).json({ error: error.message });
     }
-}
+};
+exports.recordReturn = recordReturn;

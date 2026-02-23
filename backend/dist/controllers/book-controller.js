@@ -33,7 +33,7 @@ var __importStar = (this && this.__importStar) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.reserve = exports.checkBook = exports.getStatus = void 0;
+exports.returnBook = exports.borrow = exports.cancelMyReservation = exports.reserve = exports.checkBook = exports.getStatus = void 0;
 exports.searchBooks = searchBooks;
 const bookService = __importStar(require("../services/book-service"));
 async function searchBooks(req, res) {
@@ -93,3 +93,48 @@ const reserve = async (req, res) => {
     }
 };
 exports.reserve = reserve;
+const cancelMyReservation = async (req, res) => {
+    try {
+        const { bookId } = req.body; // หรือรับจาก req.params ก็ได้
+        const userId = req.user.id; // ได้มาจาก protect middleware
+        const result = await bookService.cancelReservation(bookId, userId);
+        res.json({
+            message: "ยกเลิกการจองสำเร็จ",
+            data: result
+        });
+    }
+    catch (error) {
+        res.status(400).json({ error: error.message });
+    }
+};
+exports.cancelMyReservation = cancelMyReservation;
+const borrow = async (req, res) => {
+    try {
+        const { bookId } = req.body;
+        const userId = req.user.id; // ดึงจาก protect middleware
+        const result = await bookService.borrowBook(bookId, userId);
+        res.status(201).json({
+            message: "ยืมหนังสือสำเร็จ กรุณาส่งคืนตามกำหนด",
+            data: result
+        });
+    }
+    catch (error) {
+        res.status(400).json({ error: error.message });
+    }
+};
+exports.borrow = borrow;
+const returnBook = async (req, res) => {
+    try {
+        const { borrowId } = req.body;
+        const userId = req.user.id;
+        const result = await bookService.returnBookLogic(borrowId, userId);
+        res.json({
+            message: "คืนหนังสือสำเร็จ",
+            data: result
+        });
+    }
+    catch (error) {
+        res.status(400).json({ error: error.message });
+    }
+};
+exports.returnBook = returnBook;

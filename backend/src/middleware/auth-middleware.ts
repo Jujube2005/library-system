@@ -1,30 +1,57 @@
 import { Request, Response, NextFunction } from 'express'
-import { supabase } from '../config/supabase'
+import { createClient } from '@supabase/supabase-js'
+import { env } from '../config/env'
 import { UserRole } from '../types/user'
-// สมมติใช้ supabase.auth.getUser(token) หรือ jwt.verify()
-export const protect = async (req: Request, res: Response, next: NextFunction) => {
-  const token = req.headers.authorization?.split(' ')[1]
-  if (!token) return res.status(401).json({ message: 'Unauthorized' })
 
+export const protect = async (req: Request, res: Response, next: NextFunction) => {
+  const authHeader = req.headers.authorization
+  const token = authHeader?.startsWith('Bearer ') ? authHeader.slice(7).trim() : null
+
+  if (!token) {
+    res.status(401).json({ message: 'Unauthorized' })
+    return
+  }
+
+  const supabase = createClient(env.supabaseUrl, env.supabaseAnonKey, {
+    global: {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    }
+  })
 
   const {
     data: { user },
     error
-  } = await supabase.auth.getUser(token)
-  if (error || !user) return res.status(401).json({ message: 'Invalid token' })
+  } = await supabase.auth.getUser()
 
+  if (error || !user) {
+    res.status(401).json({ message: 'Invalid token' })
+    return
+  }
 
-  const { data: userRow, error: roleError } = await supabase
-    .from('users')
-    .select('role')
+  const { data: profile, error: profileError } = await supabase
+    .from('profiles')
+    .select('id, role, is_active')
     .eq('id', user.id)
     .single()
 
-  if (roleError || !userRow?.role) {
-    return res.status(403).json({ message: 'Access denied: No role assigned' })
+  if (profileError || !profile) {
+    res.status(403).json({ message: 'Access denied: Profile not found' })
+    return
   }
 
+  if (profile.is_active === false) {
+    res.status(403).json({ message: 'Account is inactive' })
+    return
+  }
 
-  ; (req as any).user = { ...user, role: userRow.role as UserRole }
+  ;(req as any).user = {
+    id: profile.id,
+    role: profile.role as UserRole
+  }
+
+  ;(req as any).supabase = supabase
+
   next()
 }
