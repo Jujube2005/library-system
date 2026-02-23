@@ -49,7 +49,7 @@ const processPayment = async (supabase, fineId) => {
     return updatedFine;
 };
 exports.processPayment = processPayment;
-const calculateCurrentFine = (dueDate, dailyRate = 10) => {
+const calculateCurrentFine = (dueDate, dailyRate = 5) => {
     const now = new Date();
     const due = new Date(dueDate);
     // ถ้ายังไม่เลยกำหนด ค่าปรับเป็น 0

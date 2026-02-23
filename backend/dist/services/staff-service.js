@@ -2,38 +2,76 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.updateBookInfo = exports.deleteBookSafely = exports.createBook = exports.confirmReservationByStaff = exports.recordReturnByStaff = exports.recordBorrowByStaff = void 0;
 const supabase_1 = require("../config/supabase");
+const getLoanRulesForRole = (role) => {
+    if (role === 'instructor') {
+        return { maxLoans: 10, loanDays: 30 };
+    }
+    if (role === 'student') {
+        return { maxLoans: 5, loanDays: 7 };
+    }
+    return { maxLoans: 5, loanDays: 7 };
+};
 const recordBorrowByStaff = async (staffId, targetUserId, bookId) => {
-    // 1. ตรวจสอบว่า targetUserId (นักเรียน/อาจารย์) มีตัวตนอยู่จริงไหม
-    // 2. ตรวจสอบว่าหนังสือว่างไหม
-    // 3. บันทึกรายการยืม โดยระบุเพิ่มว่าใครเป็น Staff ที่ทำรายการให้ (เพื่อตรวจสอบย้อนหลัง)
+    const { data: profile, error: profileError } = await supabase_1.supabase
+        .from('profiles')
+        .select('id, role')
+        .eq('id', targetUserId)
+        .single();
+    if (profileError || !profile) {
+        throw new Error('ไม่พบข้อมูลผู้ใช้เป้าหมาย');
+    }
+    const rules = getLoanRulesForRole(profile.role);
+    const { count, error: countError } = await supabase_1.supabase
+        .from('loans')
+        .select('id', { count: 'exact', head: true })
+        .eq('user_id', targetUserId)
+        .in('status', ['active', 'overdue']);
+    if (countError) {
+        throw new Error('ไม่สามารถตรวจสอบจำนวนการยืมได้');
+    }
+    if ((count ?? 0) >= rules.maxLoans) {
+        throw new Error('ถึงจำนวนการยืมสูงสุดตามสิทธิ์แล้ว');
+    }
+    const today = new Date();
+    const dueDate = new Date(today);
+    dueDate.setDate(dueDate.getDate() + rules.loanDays);
     const { data, error } = await supabase_1.supabase
-        .from('borrowings')
+        .from('loans')
         .insert([{
             user_id: targetUserId,
             book_id: bookId,
-            staff_id: staffId, // เก็บ ID ของ staff ผู้บันทึก
-            borrow_date: new Date(),
+            issued_by: staffId,
+            loan_date: today.toISOString().slice(0, 10),
+            due_date: dueDate.toISOString().slice(0, 10),
             status: 'active'
-        }]);
-    if (error)
-        throw new Error("ไม่สามารถบันทึกการยืมได้");
+        }])
+        .select();
+    if (error) {
+        throw new Error('ไม่สามารถบันทึกการยืมได้');
+    }
     return data;
 };
 exports.recordBorrowByStaff = recordBorrowByStaff;
-const recordReturnByStaff = async (borrowId) => {
-    // 1. คำนวณค่าปรับอัตโนมัติ (Calculate Fine - AUTO) ก่อนปิดยอด
-    // 2. อัปเดตสถานะหนังสือเป็น Available
-    // 3. อัปเดตรายการยืมเป็น Returned
-    const { data, error } = await supabase_1.supabase
-        .from('borrowings')
-        .update({
-        status: 'returned',
-        return_date: new Date()
-    })
-        .eq('id', borrowId);
-    if (error)
-        throw new Error("ไม่สามารถบันทึกการคืนหนังสือได้");
-    return data;
+const recordReturnByStaff = async (loanId) => {
+    const { error: rpcError } = await supabase_1.supabase
+        .rpc('process_return', { p_loan_id: loanId });
+    if (rpcError) {
+        throw new Error('ไม่สามารถประมวลผลการคืนหนังสือได้');
+    }
+    const { data: loan, error: loanError } = await supabase_1.supabase
+        .from('loans')
+        .select('*')
+        .eq('id', loanId)
+        .single();
+    if (loanError || !loan) {
+        throw new Error('ไม่พบข้อมูลการยืมหลังคืนหนังสือ');
+    }
+    const { data: fine } = await supabase_1.supabase
+        .from('fines')
+        .select('*')
+        .eq('loan_id', loanId)
+        .single();
+    return { loan, fine };
 };
 exports.recordReturnByStaff = recordReturnByStaff;
 const confirmReservationByStaff = async (reservationId, staffId) => {

@@ -57,7 +57,7 @@ export const processPayment = async (supabase: SupabaseClient, fineId: string) =
   return updatedFine
 }
 
-export const calculateCurrentFine = (dueDate: string, dailyRate: number = 10) => {
+export const calculateCurrentFine = (dueDate: string, dailyRate: number = 5) => {
   const now = new Date();
   const due = new Date(dueDate);
   
