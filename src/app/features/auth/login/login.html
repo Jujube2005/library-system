@@ -1,0 +1,80 @@
+<div class="min-h-screen flex items-center justify-center bg-[#161316]">
+  <div class="absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(255,213,86,0.35),_transparent_55%),radial-gradient(circle_at_bottom,_rgba(40,40,40,0.9),_transparent_55%)]"></div>
+
+  <div class="relative z-10 mx-4 grid w-full max-w-4xl gap-10 rounded-3xl border border-[#282828] bg-[#161316]/90 p-8 text-slate-100 shadow-[0_30px_80px_rgba(0,0,0,0.75)] md:grid-cols-[1.2fr_1fr] md:p-10">
+    <div class="space-y-6">
+      <div class="inline-flex items-center gap-2 rounded-full bg-black/40 px-3 py-1 text-xs text-[#FFD556]">
+        <span class="inline-flex h-6 w-6 items-center justify-center rounded-full bg-[#FFD556] text-xs font-semibold text-[#161316]">
+          LS
+        </span>
+        <span>RMUTI Library Management System</span>
+      </div>
+
+      <div>
+        <h1 class="text-2xl font-semibold text-white">เข้าสู่ระบบห้องสมุด</h1>
+        <p class="mt-2 text-sm text-slate-300">
+          สำหรับเจ้าหน้าที่และผู้ใช้ที่ได้รับสิทธิ์จากห้องสมุด RMUTI ใช้อีเมลและรหัสผ่านที่ลงทะเบียนไว้เพื่อเข้าสู่ระบบจัดการยืมคืนหนังสือ
+        </p>
+      </div>
+
+      <div class="space-y-3 rounded-2xl border border-[#282828] bg-black/40 p-4 text-xs text-slate-300">
+        <div class="font-semibold text-slate-100">คำแนะนำ</div>
+        <ul class="space-y-1">
+          <li>บัญชีผู้ใช้จะถูกสร้างโดยเจ้าหน้าที่ห้องสมุดเท่านั้น</li>
+          <li>หากลืมรหัสผ่าน ให้ติดต่อเจ้าหน้าที่เพื่อทำการรีเซ็ต</li>
+          <li>การเข้าสู่ระบบทุกครั้งจะถูกบันทึกเพื่อตรวจสอบความปลอดภัย</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="space-y-6 rounded-2xl border border-[#282828] bg-black/50 p-6">
+      <div class="space-y-1">
+        <div class="text-sm font-semibold text-white">login</div>
+        <div class="text-xs text-slate-400">
+          กรอกอีเมลและรหัสผ่าน Supabase ที่กำหนดไว้
+        </div>
+      </div>
+
+      <div
+        *ngIf="errorMessage"
+        class="rounded-xl border border-red-500/50 bg-red-500/10 px-3 py-2 text-xs text-red-200"
+      >
+        {{ errorMessage }}
+      </div>
+
+      <div class="space-y-4 text-sm">
+        <div class="space-y-1.5">
+          <label class="block text-xs font-medium text-slate-200">email</label>
+          <input
+            [(ngModel)]="email"
+            type="email"
+            class="h-10 w-full rounded-xl border border-[#333333] bg-[#161316] px-3 text-sm text-slate-100 placeholder:text-slate-500 focus:border-[#FFD556] focus:outline-none focus:ring-1 focus:ring-[#FFD556]"
+            placeholder="example@rmuti.ac.th"
+          />
+        </div>
+
+        <div class="space-y-1.5">
+          <label class="block text-xs font-medium text-slate-200">password</label>
+          <input
+            [(ngModel)]="password"
+            type="password"
+            class="h-10 w-full rounded-xl border border-[#333333] bg-[#161316] px-3 text-sm text-slate-100 placeholder:text-slate-500 focus:border-[#FFD556] focus:outline-none focus:ring-1 focus:ring-[#FFD556]"
+            placeholder="password"
+          />
+        </div>
+
+        <button
+          (click)="login()"
+          [disabled]="isSubmitting"
+          class="mt-2 inline-flex h-10 w-full items-center justify-center rounded-xl bg-gradient-to-r from-[#f97316] via-[#f97316] to-[#FFD556] text-sm font-semibold text-[#161316] shadow-[0_16px_40px_rgba(0,0,0,0.8)] transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-60"
+        >
+          {{ isSubmitting ? 'กำลังเข้าสู่ระบบ...' : 'เข้าสู่ระบบ' }}
+        </button>
+
+        <div class="pt-2 text-[11px] text-slate-500">
+          ระบบต้นแบบสำหรับใช้ทดสอบ ยังไม่เชื่อมต่อ Supabase จริงในสภาพแวดล้อมนี้
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
