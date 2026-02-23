@@ -10,6 +10,7 @@ import fineRouter from './routers/fine-router'
 import staffRouter from './routers/staff-router'
 import adminRouter from './routers/admin-router'
 import reportRouter from './routers/report-router'
+import notificationRouter from './routers/notification-router'
 
 const app = express()
 
@@ -24,6 +25,7 @@ app.use('/api/users', userRouter)
 app.use('/api/staff', staffRouter)
 app.use('/api/admin', adminRouter)
 app.use('/api/reports', reportRouter)
+app.use('/api/notifications', notificationRouter)
 app.get('/health', (_req, res) => {
   res.json({ status: 'ok' })
 })

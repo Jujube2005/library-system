@@ -39,6 +39,31 @@ export const recordBorrowByStaff = async (staffId: string, targetUserId: string,
     throw new Error('ถึงจำนวนการยืมสูงสุดตามสิทธิ์แล้ว')
   }
 
+  const { data: book, error: bookError } = await supabase
+    .from('books')
+    .select('id, available_copies')
+    .eq('id', bookId)
+    .single()
+
+  if (bookError || !book) {
+    throw new Error('ไม่พบข้อมูลหนังสือ')
+  }
+
+  if ((book as any).available_copies <= 0) {
+    throw new Error('หนังสือไม่เหลือให้ยืม')
+  }
+
+  const { error: updateBookError } = await supabase
+    .from('books')
+    .update({
+      available_copies: (book as any).available_copies - 1
+    })
+    .eq('id', bookId)
+
+  if (updateBookError) {
+    throw new Error('ไม่สามารถอัปเดตจำนวนคงเหลือของหนังสือได้')
+  }
+
   const today = new Date()
   const dueDate = new Date(today)
   dueDate.setDate(dueDate.getDate() + rules.loanDays)
@@ -151,7 +176,20 @@ export const createBook = async (bookData: any) => {
 
 // services/staffService.ts
 export const deleteBookSafely = async (bookId: string) => {
-  // แทนที่จะ .delete() เราใช้ .update() เพื่อเปลี่ยนสถานะแทน
+  const { count, error: loanError } = await supabase
+    .from('loans')
+    .select('id', { count: 'exact', head: true })
+    .eq('book_id', bookId)
+    .in('status', ['active', 'overdue'])
+
+  if (loanError) {
+    throw new Error("ไม่สามารถตรวจสอบสถานะการยืมของหนังสือได้")
+  }
+
+  if ((count ?? 0) > 0) {
+    throw new Error("ไม่สามารถลบหนังสือได้เนื่องจากยังมีรายการยืมค้างอยู่")
+  }
+
   const { data, error } = await supabase
     .from('books')
     .update({ 
