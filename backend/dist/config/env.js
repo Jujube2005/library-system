@@ -1,4 +1,5 @@
 "use strict";
+<<<<<<< HEAD
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     var desc = Object.getOwnPropertyDescriptor(m, k);
@@ -32,11 +33,14 @@ var __importStar = (this && this.__importStar) || (function () {
         return result;
     };
 })();
+=======
+>>>>>>> 5ca0ff5f5837a9afd664b560f1769471e2f3f5ab
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.env = void 0;
+<<<<<<< HEAD
 const dotenv = __importStar(require("dotenv"));
 const path_1 = __importDefault(require("path"));
 const rootEnvPath = path_1.default.resolve(__dirname, '../../../.env');
@@ -44,6 +48,14 @@ const backendEnvPath = path_1.default.resolve(__dirname, '../../.env');
 dotenv.config({ path: rootEnvPath });
 dotenv.config({ path: backendEnvPath });
 const requiredEnv = ['SUPABASE_URL', 'SUPABASE_ANON_KEY'];
+=======
+const dotenv_1 = __importDefault(require("dotenv"));
+dotenv_1.default.config();
+const requiredEnv = [
+    'SUPABASE_URL',
+    'SUPABASE_ANON_KEY'
+];
+>>>>>>> 5ca0ff5f5837a9afd664b560f1769471e2f3f5ab
 requiredEnv.forEach((key) => {
     if (!process.env[key]) {
         throw new Error(`Missing env: ${key}`);

@@ -6,6 +6,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const cors_1 = __importDefault(require("cors"));
 const env_1 = require("./config/env");
+<<<<<<< HEAD
 const auth_router_1 = __importDefault(require("./routers/auth-router"));
 const book_router_1 = __importDefault(require("./routers/book-router"));
 const user_router_1 = __importDefault(require("./routers/user-router"));
@@ -19,6 +20,14 @@ app.get('/health', (_req, res) => {
 });
 app.use('/api/books', book_router_1.default);
 app.use('/api/users', user_router_1.default);
+=======
+const app = (0, express_1.default)();
+app.use((0, cors_1.default)());
+app.use(express_1.default.json());
+app.get('/health', (_req, res) => {
+    res.json({ status: 'ok' });
+});
+>>>>>>> 5ca0ff5f5837a9afd664b560f1769471e2f3f5ab
 const port = env_1.env.port;
 app.listen(port, () => {
     console.log(`API server listening on http://localhost:${port}`);

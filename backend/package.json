@@ -9,7 +9,10 @@
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.97.0",
+<<<<<<< HEAD
     "axios": "^1.13.5",
+=======
+>>>>>>> 5ca0ff5f5837a9afd664b560f1769471e2f3f5ab
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
     "express": "^4.21.2"
@@ -17,8 +20,16 @@
   "devDependencies": {
     "@types/cors": "^2.8.17",
     "@types/express": "^4.17.21",
+<<<<<<< HEAD
     "@types/node": "^22.19.11",
+=======
+    "@types/node": "^22.10.2",
+>>>>>>> 5ca0ff5f5837a9afd664b560f1769471e2f3f5ab
     "ts-node-dev": "^2.0.0",
     "typescript": "~5.9.2"
   }
 }
+<<<<<<< HEAD
+=======
+
+>>>>>>> 5ca0ff5f5837a9afd664b560f1769471e2f3f5ab

@@ -1,13 +1,11 @@
-import * as dotenv from 'dotenv'
-import path from 'path'
+import dotenv from 'dotenv'
 
-const rootEnvPath = path.resolve(__dirname, '../../../.env')
-const backendEnvPath = path.resolve(__dirname, '../../.env')
+dotenv.config()
 
-dotenv.config({ path: rootEnvPath })
-dotenv.config({ path: backendEnvPath })
-
-const requiredEnv = ['SUPABASE_URL', 'SUPABASE_ANON_KEY']
+const requiredEnv = [
+  'SUPABASE_URL',
+  'SUPABASE_ANON_KEY'
+]
 
 requiredEnv.forEach((key) => {
   if (!process.env[key]) {
