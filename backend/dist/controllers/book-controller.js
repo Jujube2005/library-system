@@ -33,9 +33,10 @@ var __importStar = (this && this.__importStar) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.returnBook = exports.borrow = exports.cancelMyReservation = exports.reserve = exports.checkBook = exports.getStatus = void 0;
+exports.deleteBook = exports.updateBook = exports.createBook = exports.returnBook = exports.borrow = exports.cancelMyReservation = exports.reserve = exports.checkBook = exports.getStatus = void 0;
 exports.searchBooks = searchBooks;
 const bookService = __importStar(require("../services/book-service"));
+const staffService = __importStar(require("../services/staff-service"));
 async function searchBooks(req, res) {
     try {
         const supabase = req.supabase;
@@ -45,6 +46,7 @@ async function searchBooks(req, res) {
         }
         const q = typeof req.query.q === 'string' ? req.query.q.trim() : '';
         const category = typeof req.query.category === 'string' ? req.query.category.trim() : '';
+        const sort = typeof req.query.sort === 'string' ? req.query.sort.trim() : '';
         const page = Number(req.query.page ?? 1) || 1;
         const limit = Number(req.query.limit ?? 10) || 10;
         const from = (page - 1) * limit;
@@ -57,6 +59,21 @@ async function searchBooks(req, res) {
         }
         if (category) {
             query = query.eq('category', category);
+        }
+        if (sort === 'title_desc') {
+            query = query.order('title', { ascending: false });
+        }
+        else if (sort === 'author_asc') {
+            query = query.order('author', { ascending: true });
+        }
+        else if (sort === 'author_desc') {
+            query = query.order('author', { ascending: false });
+        }
+        else if (sort === 'newest') {
+            query = query.order('created_at', { ascending: false });
+        }
+        else {
+            query = query.order('title', { ascending: true });
         }
         const { data, error, count } = await query.range(from, to);
         if (error) {
@@ -177,3 +194,51 @@ const returnBook = async (req, res) => {
     }
 };
 exports.returnBook = returnBook;
+const createBook = async (req, res) => {
+    try {
+        const bookData = req.body;
+        const result = await staffService.createBook(bookData);
+        res.status(201).json({
+            data: result
+        });
+    }
+    catch (error) {
+        res.status(400).json({ error: error.message });
+    }
+};
+exports.createBook = createBook;
+const updateBook = async (req, res) => {
+    try {
+        const { id } = req.params;
+        if (!id) {
+            res.status(400).json({ error: 'MISSING_BOOK_ID' });
+            return;
+        }
+        const updateData = req.body;
+        const result = await staffService.updateBookInfo(id, updateData);
+        res.status(200).json({
+            data: result
+        });
+    }
+    catch (error) {
+        res.status(400).json({ error: error.message });
+    }
+};
+exports.updateBook = updateBook;
+const deleteBook = async (req, res) => {
+    try {
+        const { id } = req.params;
+        if (!id) {
+            res.status(400).json({ error: 'MISSING_BOOK_ID' });
+            return;
+        }
+        const result = await staffService.deleteBookSafely(id);
+        res.status(200).json({
+            data: result
+        });
+    }
+    catch (error) {
+        res.status(400).json({ error: error.message });
+    }
+};
+exports.deleteBook = deleteBook;

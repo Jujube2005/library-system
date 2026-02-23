@@ -1,5 +1,6 @@
 import { Request, Response } from 'express'
 import * as bookService from '../services/book-service'
+import * as staffService from '../services/staff-service'
 
 export async function searchBooks(req: Request, res: Response): Promise<void> {
   try {
@@ -12,6 +13,7 @@ export async function searchBooks(req: Request, res: Response): Promise<void> {
 
     const q = typeof req.query.q === 'string' ? req.query.q.trim() : ''
     const category = typeof req.query.category === 'string' ? req.query.category.trim() : ''
+    const sort = typeof req.query.sort === 'string' ? req.query.sort.trim() : ''
     const page = Number(req.query.page ?? 1) || 1
     const limit = Number(req.query.limit ?? 10) || 10
     const from = (page - 1) * limit
@@ -27,6 +29,18 @@ export async function searchBooks(req: Request, res: Response): Promise<void> {
 
     if (category) {
       query = query.eq('category', category)
+    }
+
+    if (sort === 'title_desc') {
+      query = query.order('title', { ascending: false })
+    } else if (sort === 'author_asc') {
+      query = query.order('author', { ascending: true })
+    } else if (sort === 'author_desc') {
+      query = query.order('author', { ascending: false })
+    } else if (sort === 'newest') {
+      query = query.order('created_at', { ascending: false })
+    } else {
+      query = query.order('title', { ascending: true })
     }
 
     const { data, error, count } = await query.range(from, to)
@@ -152,6 +166,58 @@ export const returnBook = async (req: any, res: Response) => {
 
     res.json({
       message: "คืนหนังสือสำเร็จ",
+      data: result
+    })
+  } catch (error: any) {
+    res.status(400).json({ error: error.message })
+  }
+}
+
+export const createBook = async (req: Request, res: Response) => {
+  try {
+    const bookData = req.body
+    const result = await staffService.createBook(bookData)
+
+    res.status(201).json({
+      data: result
+    })
+  } catch (error: any) {
+    res.status(400).json({ error: error.message })
+  }
+}
+
+export const updateBook = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params
+
+    if (!id) {
+      res.status(400).json({ error: 'MISSING_BOOK_ID' })
+      return
+    }
+
+    const updateData = req.body
+    const result = await staffService.updateBookInfo(id, updateData)
+
+    res.status(200).json({
+      data: result
+    })
+  } catch (error: any) {
+    res.status(400).json({ error: error.message })
+  }
+}
+
+export const deleteBook = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params
+
+    if (!id) {
+      res.status(400).json({ error: 'MISSING_BOOK_ID' })
+      return
+    }
+
+    const result = await staffService.deleteBookSafely(id)
+
+    res.status(200).json({
       data: result
     })
   } catch (error: any) {

@@ -9,4 +9,5 @@ const router = (0, express_1.Router)();
 router.get('/all-loans', auth_middleware_1.protect, (0, role_middleware_1.authorize)('staff'), loan_controller_1.viewAllLoans);
 router.post('/record-borrow', auth_middleware_1.protect, (0, role_middleware_1.authorize)('staff'), staff_controller_1.recordBorrow);
 router.post('/record-return', auth_middleware_1.protect, (0, role_middleware_1.authorize)('staff'), staff_controller_1.recordReturn);
+router.post('/users/invite', auth_middleware_1.protect, (0, role_middleware_1.authorize)('staff'), staff_controller_1.inviteUser);
 exports.default = router;
