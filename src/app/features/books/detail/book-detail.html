@@ -1,0 +1,118 @@
+<div class="space-y-6">
+  <div class="flex items-center justify-between gap-3">
+    <div>
+      <h1 class="text-xl font-semibold text-slate-900">รายละเอียดหนังสือ</h1>
+      <p class="mt-1 text-sm text-slate-600">
+        หน้านี้จะแสดงข้อมูลจากฐานข้อมูลจริงเมื่อเชื่อมต่อ API แล้ว
+      </p>
+    </div>
+    <a
+      routerLink="/dashboard/books"
+      class="inline-flex items-center rounded-full border border-slate-200 px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-50"
+    >
+      ← กลับไปหน้าค้นหาหนังสือ
+    </a>
+  </div>
+
+  <div class="grid gap-6 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]">
+    <div class="space-y-4 rounded-xl border border-slate-200 bg-white p-4">
+      <div class="text-xs uppercase tracking-wide text-slate-500">ข้อมูลหนังสือ</div>
+      <div class="space-y-1">
+        <div class="text-lg font-semibold text-slate-900">
+          การเขียนโปรแกรมด้วย TypeScript
+        </div>
+        <div class="text-sm text-slate-600">
+          โดย ภาควิชาวิทยาการคอมพิวเตอร์
+        </div>
+      </div>
+      <div class="grid gap-3 text-sm sm:grid-cols-2">
+        <div>
+          <div class="text-xs text-slate-500">รหัสหนังสือ</div>
+          <div class="font-medium text-slate-900">IT-001-2567</div>
+        </div>
+        <div>
+          <div class="text-xs text-slate-500">ISBN</div>
+          <div class="font-medium text-slate-900">978-616-000-0000</div>
+        </div>
+        <div>
+          <div class="text-xs text-slate-500">หมวดหมู่</div>
+          <div class="font-medium text-slate-900">เทคโนโลยี / Programming</div>
+        </div>
+        <div>
+          <div class="text-xs text-slate-500">ชั้นวาง</div>
+          <div class="font-medium text-slate-900">ห้องสมุดชั้น 3 โซน IT</div>
+        </div>
+      </div>
+      <div class="text-sm text-slate-700">
+        คำอธิบายสั้นๆ ของหนังสือจะแสดงในส่วนนี้ เช่น เนื้อหาครอบคลุม TypeScript
+        พื้นฐานไปจนถึงการใช้งานกับ Angular
+      </div>
+    </div>
+
+    <div class="space-y-4">
+      <div class="rounded-2xl border border-[#282828] bg-[#161316] p-4 text-sm text-slate-100">
+        <div class="flex flex-col items-center gap-4">
+          <div class="flex flex-col items-center gap-3">
+            <div class="flex h-32 w-24 items-center justify-center rounded-xl bg-gradient-to-b from-[#FFD556] to-[#c54800] text-xs font-medium text-[#161316] shadow-lg shadow-black/60">
+              ปกหนังสือ
+            </div>
+            <div class="text-center text-xs text-slate-400">
+              เลขที่คงเหลือ <span class="font-semibold text-white">3</span> จาก 5 เล่ม
+            </div>
+            <div class="mt-1 inline-flex items-center gap-2">
+              <span
+                *ngIf="hasAvailableCopy"
+                class="inline-flex rounded-full bg-[#FFD556]/10 px-3 py-1 text-[11px] font-semibold text-[#FFD556]"
+              >
+                พร้อมให้ยืม
+              </span>
+              <span
+                *ngIf="!hasAvailableCopy"
+                class="inline-flex rounded-full bg-amber-500/10 px-3 py-1 text-[11px] font-semibold text-amber-300"
+              >
+                ถูกยืมทั้งหมด
+              </span>
+              <span
+                *ngIf="isReserved"
+                class="inline-flex rounded-full bg-sky-500/10 px-3 py-1 text-[11px] font-semibold text-sky-300"
+              >
+                มีคิวจอง
+              </span>
+            </div>
+          </div>
+
+          <button
+            class="flex w-full items-center justify-between rounded-2xl bg-[#FFD556] px-4 py-3 text-sm font-semibold text-[#161316] shadow-[0_15px_40px_rgba(0,0,0,0.7)] hover:bg-[#FFE27A]"
+          >
+            <span class="inline-flex h-6 w-6 items-center justify-center rounded-full bg-[#161316] text-xs text-[#FFD556]">
+              <svg viewBox="0 0 24 24" class="h-4 w-4" aria-hidden="true">
+                <path
+                  d="M5 4.5h7.5c1.4 0 2.5 1.1 2.5 2.5v12H7.5C6.1 19 5 17.9 5 16.5V4.5Z"
+                  fill="currentColor"
+                />
+                <path
+                  d="M11.5 4.5H19v12c0 1.4-1.1 2.5-2.5 2.5H15V7c0-1.4-1.1-2.5-2.5-2.5Z"
+                  fill="currentColor"
+                  opacity="0.7"
+                />
+              </svg>
+            </span>
+            <span>ยืมหนังสือเล่มนี้</span>
+            <span class="text-xs text-[#161316]/70">→</span>
+          </button>
+
+          <button
+            class="flex w-full items-center justify-center rounded-2xl border border-white/20 bg-transparent px-4 py-3 text-xs font-semibold text-slate-100 hover:bg-white/10"
+          >
+            จองหนังสือ
+          </button>
+        </div>
+      </div>
+
+      <div class="rounded-2xl border border-[#282828] bg-black/40 p-4 text-xs text-slate-300">
+        ในเวอร์ชันจริง ส่วนนี้จะเชื่อมกับข้อมูลการยืมและคิวจองเพื่อคำนวณปุ่มที่กดได้
+        และแสดงกำหนดส่งที่แนะนำตามประเภทผู้ใช้
+      </div>
+    </div>
+  </div>
+</div>

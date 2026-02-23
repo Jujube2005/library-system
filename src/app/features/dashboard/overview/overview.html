@@ -1,0 +1,83 @@
+<div class="space-y-6 text-slate-100">
+  <div>
+    <h1 class="text-xl font-semibold text-white">แดชบอร์ดภาพรวม</h1>
+    <p class="mt-1 text-sm text-slate-300">
+      สรุปจำนวนหนังสือ สมาชิก และสถานะการยืม–คืนล่าสุดของระบบห้องสมุด
+    </p>
+  </div>
+
+  <div
+    *ngIf="alerts.length"
+    class="flex items-center gap-3 rounded-2xl border border-rose-500/40 bg-gradient-to-r from-rose-600/70 via-rose-500/60 to-amber-500/60 px-4 py-3 text-sm text-rose-50 shadow-[0_18px_40px_rgba(0,0,0,0.8)]"
+  >
+    <div class="flex h-8 w-8 items-center justify-center rounded-full bg-black/30 text-xs font-semibold">
+      !
+    </div>
+    <div class="flex-1">
+      <div class="font-semibold">
+        {{ alerts[0].title }}
+      </div>
+      <div class="text-[11px] text-rose-100/90">
+        {{ alerts[0].detail }}
+      </div>
+    </div>
+  </div>
+
+  <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+    <div
+      *ngFor="let s of stats"
+      class="rounded-xl border border-white/10 bg-black/40 px-4 py-3"
+    >
+      <div class="text-[11px] font-medium text-slate-400">
+        {{ s.label }}
+      </div>
+      <div class="mt-1 inline-flex rounded-full px-3 py-1 text-sm font-semibold" [ngClass]="s.tone">
+        {{ s.value }}
+      </div>
+    </div>
+  </div>
+
+  <div class="grid gap-4 lg:grid-cols-3">
+    <div class="space-y-3 lg:col-span-2">
+      <h2 class="text-sm font-semibold text-white">รายการยืมที่ยังไม่คืน</h2>
+
+      <div class="space-y-2 rounded-xl border border-white/10 bg-black/40 px-4 py-3">
+        <div class="flex items-center justify-between">
+          <div class="text-sm font-semibold text-white">ActiveLoansTable</div>
+          <div class="text-[11px] text-slate-400">ตัวอย่างข้อมูลจาก FR-003/FR-004</div>
+        </div>
+        <div class="overflow-hidden rounded-lg border border-white/5">
+          <table class="min-w-full border-collapse text-xs">
+            <thead class="bg-white/5 text-[11px] uppercase text-slate-300">
+              <tr>
+                <th class="px-3 py-2 text-left font-medium">รหัสยืม</th>
+                <th class="px-3 py-2 text-left font-medium">สมาชิก</th>
+                <th class="px-3 py-2 text-left font-medium">หนังสือ</th>
+                <th class="px-3 py-2 text-left font-medium">กำหนดส่ง</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let l of activeLoans" class="border-t border-white/5">
+                <td class="px-3 py-2 text-slate-100">{{ l.id }}</td>
+                <td class="px-3 py-2 text-slate-300">{{ l.member }}</td>
+                <td class="px-3 py-2 text-slate-300">{{ l.book }}</td>
+                <td class="px-3 py-2 text-slate-300">{{ l.due }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="space-y-3">
+      <h2 class="text-sm font-semibold text-white">โน้ตจากระบบ</h2>
+      <div class="rounded-xl border border-amber-500/40 bg-amber-500/10 px-4 py-3 text-xs text-amber-100">
+        หากมีรายการค้างส่งเกิน 7 วัน ระบบจะแสดงแถบเตือนสีแดงด้านบน (OverdueAlertBanner)
+        และสะท้อนในหน้าค่าปรับด้วย
+      </div>
+      <div class="rounded-xl border border-white/10 bg-black/40 px-4 py-3 text-xs text-slate-300">
+        ข้อมูลทั้งหมดในหน้านี้จะถูกดึงจาก API รายงานและการยืมจริงเมื่อเชื่อมต่อ backend แล้ว
+      </div>
+    </div>
+  </div>
+</div>

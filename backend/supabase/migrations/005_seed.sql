@@ -1,19 +1,9 @@
+INSERT INTO public.books (title, author, isbn, category, shelf_location, total_copies, available_copies)
+VALUES
+  ('Database Systems', 'Elmasri', '9780000000011', 'Computer Science', 'CS-001', 5, 5),
+  ('Operating Systems', 'Silberschatz', '9780000000012', 'Computer Science', 'CS-002', 3, 3),
+  ('Linear Algebra', 'Gilbert Strang', '9780000000013', 'Mathematics', 'MATH-001', 4, 4);
 
-
-insert into public.categories (name)
-values
-('Computer Science'),
-('Mathematics'),
-('History'),
-('Engineering');
-
-
-insert into public.books (title, author, category_id, total_copies, available_copies)
-values
-('Database Systems', 'Elmasri', 1, 5, 5),
-('Operating Systems', 'Silberschatz', 1, 3, 3),
-('Linear Algebra', 'Gilbert Strang', 2, 4, 4);
-
-update public.users
-set role = 'admin'
-where email = 'admin@library.com';
+UPDATE public.profiles
+SET role = 'staff'
+WHERE email = 'admin@library.com';

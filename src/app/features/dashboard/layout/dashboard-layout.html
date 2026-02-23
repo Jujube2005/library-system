@@ -1,0 +1,122 @@
+<div class="flex min-h-screen bg-[#161316]">
+  <aside
+    class="fixed inset-y-0 left-0 z-30 w-64 transform border-r border-[#282828] bg-[#161316] transition-transform duration-200 ease-out lg:static lg:translate-x-0"
+    [ngClass]="{ '-translate-x-full': !sidebarOpen, 'translate-x-0': sidebarOpen }"
+  >
+    <div class="flex h-14 items-center gap-2 border-b border-[#282828] px-4 text-slate-100">
+      <div class="flex h-9 w-9 items-center justify-center rounded-full bg-[#FFD556] text-sm font-semibold text-[#161316]">
+        LS
+      </div>
+      <div class="flex flex-col leading-tight">
+        <span class="text-sm font-semibold text-white">Library Space</span>
+        <span class="text-[11px] text-slate-400">Dashboard</span>
+      </div>
+    </div>
+
+    <nav class="mt-2 space-y-1 px-3 text-sm text-slate-200">
+      <a
+        routerLink="/dashboard"
+        routerLinkActive="bg-[#FFD556]/10 text-[#FFD556] border-[#FFD556]"
+        [routerLinkActiveOptions]="{ exact: true }"
+        class="flex items-center gap-2 rounded-lg border border-transparent px-3 py-2 text-slate-200 hover:bg-white/5"
+      >
+        <span class="inline-flex h-5 w-5 items-center justify-center rounded bg-[#282828] text-[11px] font-semibold text-[#FFD556]">D</span>
+        <span>ภาพรวมระบบ</span>
+      </a>
+
+      <div class="mt-3 text-[11px] font-semibold uppercase tracking-wide text-slate-500">
+        การใช้งานทั่วไป
+      </div>
+
+      <a
+        routerLink="/dashboard/books"
+        routerLinkActive="bg-[#FFD556]/10 text-[#FFD556] border-[#FFD556]"
+        class="flex items-center gap-2 rounded-lg border border-transparent px-3 py-2 text-slate-200 hover:bg-white/5"
+      >
+        <span class="inline-flex h-5 w-5 items-center justify-center rounded bg-[#282828] text-[11px] font-semibold text-[#FFD556]">B</span>
+        <span>ค้นหาหนังสือ</span>
+      </a>
+
+      <a
+        routerLink="/dashboard/loans"
+        routerLinkActive="bg-[#FFD556]/10 text-[#FFD556] border-[#FFD556]"
+        class="flex items-center gap-2 rounded-lg border border-transparent px-3 py-2 text-slate-200 hover:bg-white/5"
+      >
+        <span class="inline-flex h-5 w-5 items-center justify-center rounded bg-[#282828] text-[11px] font-semibold text-[#FFD556]">L</span>
+        <span>การยืมหนังสือ</span>
+      </a>
+
+      <a
+        routerLink="/dashboard/reservations"
+        routerLinkActive="bg-[#FFD556]/10 text-[#FFD556] border-[#FFD556]"
+        class="flex items-center gap-2 rounded-lg border border-transparent px-3 py-2 text-slate-200 hover:bg-white/5"
+      >
+        <span class="inline-flex h-5 w-5 items-center justify-center rounded bg-[#282828] text-[11px] font-semibold text-[#FFD556]">R</span>
+        <span>การจองหนังสือ</span>
+      </a>
+
+      <a
+        routerLink="/dashboard/fines"
+        routerLinkActive="bg-[#FFD556]/10 text-[#FFD556] border-[#FFD556]"
+        class="flex items-center gap-2 rounded-lg border border-transparent px-3 py-2 text-slate-200 hover:bg-white/5"
+      >
+        <span class="inline-flex h-5 w-5 items-center justify-center rounded bg-[#282828] text-[11px] font-semibold text-[#FFD556]">F</span>
+        <span>ค่าปรับ</span>
+      </a>
+
+      <div class="mt-4 text-[11px] font-semibold uppercase tracking-wide text-slate-500">
+        สำหรับเจ้าหน้าที่
+      </div>
+
+      <a
+        routerLink="/dashboard/members"
+        routerLinkActive="bg-[#FFD556]/10 text-[#FFD556] border-[#FFD556]"
+        class="flex items-center gap-2 rounded-lg border border-transparent px-3 py-2 text-slate-200 hover:bg-white/5"
+      >
+        <span class="inline-flex h-5 w-5 items-center justify-center rounded bg-[#282828] text-[11px] font-semibold text-[#FFD556]">M</span>
+        <span>สมาชิก</span>
+      </a>
+
+      <a
+        routerLink="/dashboard/reports"
+        routerLinkActive="bg-[#FFD556]/10 text-[#FFD556] border-[#FFD556]"
+        class="flex items-center gap-2 rounded-lg border border-transparent px-3 py-2 text-slate-200 hover:bg-white/5"
+      >
+        <span class="inline-flex h-5 w-5 items-center justify-center rounded bg-[#FFD556] text-[11px] font-semibold text-[#161316]">Rp</span>
+        <span>รายงาน</span>
+      </a>
+    </nav>
+  </aside>
+
+  <div class="flex min-h-screen flex-1 flex-col lg:pl-64">
+    <header class="sticky top-0 z-20 border-b border-black/40 bg-[#161316]/95 backdrop-blur">
+      <div class="mx-auto flex max-w-6xl items-center justify-between px-4 py-2 text-slate-100">
+        <div class="flex items-center gap-2">
+          <button
+            type="button"
+            class="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-white/10 bg-white/5 text-slate-100 hover:bg-white/10 lg:hidden"
+            (click)="toggleSidebar()"
+          >
+            ☰
+          </button>
+          <div class="text-sm font-semibold text-white">
+            RMUTI Library Management
+          </div>
+        </div>
+        <div class="flex items-center gap-3 text-xs">
+          <div class="hidden flex-col text-right sm:flex">
+            <span class="font-medium text-white">Demo User</span>
+            <span class="text-[11px] text-slate-400">Staff</span>
+          </div>
+          <span class="inline-flex items-center rounded-full bg-[#FFD556]/10 px-3 py-1 text-[11px] font-medium text-[#FFD556]">
+            กำลังทดสอบระบบ
+          </span>
+        </div>
+      </div>
+    </header>
+
+    <main class="mx-auto flex w-full max-w-6xl flex-1 flex-col px-4 py-4 text-slate-100">
+      <router-outlet></router-outlet>
+    </main>
+  </div>
+</div>

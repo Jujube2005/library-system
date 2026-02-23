@@ -1,0 +1,49 @@
+<div class="space-y-6 text-slate-100">
+  <div>
+    <h1 class="text-xl font-semibold text-white">การจองหนังสือ</h1>
+    <p class="mt-1 text-sm text-slate-300">
+      แสดงรายการจองหนังสือและคิวลำดับสำหรับการเตรียมหนังสือ
+    </p>
+  </div>
+
+  <div class="overflow-hidden rounded-xl border border-white/10 bg-black/40">
+    <table class="min-w-full border-collapse text-sm">
+      <thead class="bg-white/5 text-xs uppercase text-slate-300">
+        <tr>
+          <th class="px-4 py-2 text-left font-medium">สมาชิก</th>
+          <th class="px-4 py-2 text-left font-medium">หนังสือ</th>
+          <th class="px-4 py-2 text-left font-medium">ลำดับคิว</th>
+          <th class="px-4 py-2 text-left font-medium">สถานะ</th>
+          <th class="px-4 py-2 text-right font-medium">การทำงาน</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let r of reservations" class="border-t border-white/5">
+          <td class="px-4 py-2 text-slate-300">{{ r.member }}</td>
+          <td class="px-4 py-2 text-slate-300">{{ r.book }}</td>
+          <td class="px-4 py-2 text-slate-300">คิวที่ {{ r.position }}</td>
+          <td class="px-4 py-2 text-slate-300">
+            <span
+              class="inline-flex rounded-full px-3 py-1 text-[11px] font-medium"
+              [ngClass]="{
+                'bg-amber-500/10 text-amber-300': r.status === 'active',
+                'bg-[#22c55e]/10 text-[#4ade80]': r.status === 'ready'
+              }"
+            >
+              {{ r.status === 'active' ? 'รอคิว' : 'พร้อมรับ' }}
+            </span>
+          </td>
+          <td class="px-4 py-2 text-right">
+            <button
+              type="button"
+              (click)="cancelReservation(r.id)"
+              class="inline-flex items-center rounded-full border border-white/20 px-3 py-1 text-xs font-medium text-slate-100 hover:bg-white/10"
+            >
+              ยกเลิกการจอง
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
