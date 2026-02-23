@@ -1,103 +1,154 @@
-<div class="space-y-8">
-  <div class="space-y-3">
-    <h1 class="text-3xl font-semibold text-white">
-      <span class="text-[#EAFF00]">Book gallery</span> ที่ดูมีชีวิต
-    </h1>
-    <p class="max-w-xl text-sm text-slate-300">
-      เลือกดูปกหนังสือ แล้วกดยืมหรือจองได้ทันที คล้ายเพิ่มสินค้าในตะกร้า
-    </p>
+<div class="space-y-6 text-slate-100">
+  <div class="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+    <div class="space-y-1">
+      <h1 class="text-xl font-semibold text-white">
+        ค้นหาหนังสือในห้องสมุด
+      </h1>
+      <p class="text-sm text-slate-300">
+        เลือกดูหนังสือที่แนะนำ หมวดหมู่ยอดนิยม และค้นหาจากชื่อ ผู้แต่ง 
+      </p>
+    </div>
+    <div class="text-[11px] text-slate-400">
+      พบ {{ books.length }} รายการ (ตัวอย่างข้อมูล)
+    </div>
   </div>
 
-  <div class="space-y-3 rounded-2xl border border-white/10 bg-black/40 p-4">
+  <div class="space-y-4 rounded-3xl border border-white/10 bg-black/40 p-4">
     <div class="flex flex-col gap-3 md:flex-row md:items-center">
-      <input
-        [(ngModel)]="query"
-        type="text"
-        class="h-10 flex-1 rounded-xl border border-white/20 bg-[#161316] px-3 text-sm text-slate-100 placeholder:text-slate-500 focus:border-[#FFD556] focus:outline-none focus:ring-1 focus:ring-[#FFD556]"
-        placeholder="ค้นหาจากชื่อหนังสือ ผู้แต่ง หรือ ISBN"
-      />
-
-      <select
-        [(ngModel)]="category"
-        class="h-10 rounded-xl border border-white/20 bg-[#161316] px-3 text-sm text-slate-100 focus:border-[#FFD556] focus:outline-none"
-      >
-        <option value="all">ทุกหมวดหมู่</option>
-        <option value="prism">Prism</option>
-        <option value="youth">วัยรุ่น</option>
-      </select>
-
-      <select
-        [(ngModel)]="sort"
-        class="h-10 rounded-xl border border-white/20 bg-[#161316] px-3 text-sm text-slate-100 focus:border-[#FFD556] focus:outline-none"
-      >
-        <option value="title">เรียงตามชื่อ</option>
-        <option value="author">เรียงตามผู้แต่ง</option>
-        <option value="recent">เพิ่มล่าสุด</option>
-      </select>
-    </div>
-
-    <div class="flex justify-between text-xs text-slate-400">
-      <div>ข้อมูลหนังสือจริงจะถูกดึงจากฐานข้อมูลในขั้นต่อไป</div>
-      <div>พบ {{ books.length }} รายการ (ตัวอย่าง)</div>
-    </div>
-  </div>
-
-  <div class="grid gap-6 md:grid-cols-3">
-    <div
-      *ngFor="let book of books"
-      class="group relative overflow-hidden rounded-3xl border border-[#282828] bg-[#161316] shadow-[0_18px_45px_rgba(0,0,0,0.7)]"
-    >
-      <div class="relative aspect-[3/4] overflow-hidden bg-gradient-to-br from-[#282828] to-black">
-        <img
-          [src]="book.coverUrl"
-          [alt]="book.title"
-          class="h-full w-full object-cover transition duration-500 group-hover:scale-105 group-hover:translate-y-[-4px]"
+      <div class="flex flex-1 items-center gap-2 rounded-2xl bg-[#05060A] px-3 py-2">
+        <span class="inline-flex h-7 w-7 items-center justify-center rounded-full bg-[#161316] text-xs text-slate-300">
+          🔍
+        </span>
+        <input
+          [(ngModel)]="query"
+          type="text"
+          class="h-9 flex-1 bg-transparent text-sm text-slate-100 placeholder:text-slate-500 focus:outline-none"
+          placeholder="ค้นหาจากชื่อหนังสือ ผู้แต่ง"
         />
       </div>
+      <div class="flex gap-2 text-[11px] text-slate-400">
+        <span>เรียงตาม:</span>
+        <select
+          [(ngModel)]="sort"
+          class="h-8 rounded-full border border-white/20 bg-[#161316] px-3 text-[11px] text-slate-100 focus:border-[#FFD556] focus:outline-none"
+        >
+          <option value="title">ชื่อหนังสือ</option>
+          <option value="author">ผู้แต่ง</option>
+          <option value="recent">เพิ่มล่าสุด</option>
+        </select>
+      </div>
+    </div>
 
-      <div class="space-y-3 p-4">
-        <div class="flex items-start justify-between gap-2">
-          <div class="space-y-0.5">
-            <div class="text-sm font-semibold text-white line-clamp-2">
+    <div class="flex flex-wrap gap-2 text-xs">
+      <button
+        *ngFor="let c of categories"
+        (click)="category = c.id"
+        class="rounded-full px-3 py-1 font-medium"
+        [ngClass]="{
+          'bg-[#FFD556] text-[#161316]': category === c.id,
+          'bg-white/5 text-slate-100 hover:bg-white/10': category !== c.id
+        }"
+      >
+        {{ c.label }}
+      </button>
+    </div>
+  </div>
+
+  <div class="grid gap-6 lg:grid-cols-[minmax(0,2fr)_minmax(0,1.1fr)]">
+    <div class="space-y-4">
+      <div class="flex items-center justify-between">
+        <div class="text-sm font-semibold text-white">หนังสือแนะนำ</div>
+        <div class="text-[11px] text-slate-400">Recommended</div>
+      </div>
+
+      <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+        <button
+          *ngFor="let book of books"
+          type="button"
+          (click)="selectBook(book)"
+          class="group flex flex-col overflow-hidden rounded-3xl border border-[#282828] bg-[#161316] text-left shadow-[0_18px_45px_rgba(0,0,0,0.7)] transition hover:border-[#FFD556]/60 hover:shadow-[0_22px_55px_rgba(0,0,0,0.9)]"
+        >
+          <div class="relative aspect-[3/4] overflow-hidden bg-gradient-to-br from-[#282828] to-black">
+            <img
+              [src]="book.coverUrl"
+              [alt]="book.title"
+              class="h-full w-full object-cover transition duration-500 group-hover:scale-105 group-hover:translate-y-[-4px]"
+            />
+          </div>
+          <div class="space-y-2 p-3">
+            <div class="text-xs font-semibold text-white line-clamp-2">
               {{ book.title }}
             </div>
-            <div class="text-xs text-slate-400">
+            <div class="text-[11px] text-slate-400">
               {{ book.author }}
             </div>
+            <span
+              class="inline-flex rounded-full px-2.5 py-1 text-[10px] font-medium"
+              [ngClass]="statusClass(book.status)"
+            >
+              <ng-container [ngSwitch]="book.status">
+                <span *ngSwitchCase="'available'">พร้อมให้ยืม</span>
+                <span *ngSwitchCase="'borrowed'">กำลังถูกยืม</span>
+                <span *ngSwitchCase="'reserved'">ถูกจอง</span>
+                <span *ngSwitchDefault>เกินกำหนด</span>
+              </ng-container>
+            </span>
           </div>
-          <span
-            class="inline-flex rounded-full px-3 py-1 text-[11px] font-medium"
-            [ngClass]="statusClass(book.status)"
-          >
-            <ng-container [ngSwitch]="book.status">
-              <span *ngSwitchCase="'available'">พร้อมให้ยืม</span>
-              <span *ngSwitchCase="'borrowed'">กำลังถูกยืม</span>
-              <span *ngSwitchCase="'reserved'">ถูกจอง</span>
-              <span *ngSwitchDefault>เกินกำหนด</span>
-            </ng-container>
-          </span>
-        </div>
+        </button>
+      </div>
+    </div>
 
-        <div class="flex gap-2">
-          <button
-            class="flex-1 inline-flex items-center justify-center rounded-2xl bg-[#FFD556] px-3 py-2 text-xs font-semibold text-[#161316] hover:bg-[#FFE27A]"
+    <div class="space-y-3 rounded-3xl border border-white/10 bg-black/50 p-4">
+      <div class="text-xs font-medium text-slate-300 uppercase tracking-wide">
+        รายละเอียดหนังสือ
+      </div>
+      <div class="rounded-2xl bg-[#05060A] p-3">
+        <div class="flex gap-3">
+          <div class="h-28 w-20 overflow-hidden rounded-xl bg-[#161316]">
+            <img
+              [src]="selectedBook.coverUrl"
+              [alt]="selectedBook.title"
+              class="h-full w-full object-cover"
+            />
+          </div>
+          <div class="flex-1 space-y-1">
+            <div class="text-sm font-semibold text-white line-clamp-2">
+              {{ selectedBook.title }}
+            </div>
+            <div class="text-xs text-slate-400">
+              {{ selectedBook.author }}
+            </div>
+            <span
+              class="inline-flex rounded-full px-3 py-1 text-[11px] font-medium"
+              [ngClass]="statusClass(selectedBook.status)"
+            >
+              สถานะ:
+              <ng-container [ngSwitch]="selectedBook.status">
+                <span *ngSwitchCase="'available'">พร้อมให้ยืม</span>
+                <span *ngSwitchCase="'borrowed'">กำลังถูกยืม</span>
+                <span *ngSwitchCase="'reserved'">ถูกจอง</span>
+                <span *ngSwitchDefault>เกินกำหนด</span>
+              </ng-container>
+            </span>
+          </div>
+        </div>
+        <div class="mt-3 flex gap-2 text-xs">
+          <a
+            [routerLink]="['/dashboard/books', selectedBook.id]"
+            class="inline-flex flex-1 items-center justify-center rounded-full bg-[#FFD556] px-3 py-2 font-semibold text-[#161316] hover:bg-[#FFE27A]"
           >
-            ยืมหนังสือ
-          </button>
+            ดูรายละเอียด
+          </a>
           <button
-            class="flex-1 inline-flex items-center justify-center rounded-2xl border border-white/20 bg-transparent px-3 py-2 text-xs font-semibold text-slate-100 hover:bg-white/10"
+            class="inline-flex flex-1 items-center justify-center rounded-full border border-white/20 bg-transparent px-3 py-2 font-semibold text-slate-100 hover:bg-white/10"
           >
-            จอง
+            ยืมหรือจอง
           </button>
         </div>
-
-        <a
-          [routerLink]="['/dashboard/books', book.id]"
-          class="inline-flex items-center text-[11px] font-medium text-slate-400 hover:text-slate-100"
-        >
-          ดูรายละเอียดเพิ่มเติม
-          <span class="ml-1">→</span>
-        </a>
+      </div>
+      <div class="text-[11px] text-slate-400">
+        เมื่อเชื่อมต่อกับ backend จริง ช่องนี้จะดึงรายละเอียดเพิ่มเติม เช่น หมวดหมู่, ISBN,
+        จำนวนเล่มที่เหลือ และรีวิวจากผู้ใช้
       </div>
     </div>
   </div>

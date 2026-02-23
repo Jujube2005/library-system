@@ -17,26 +17,80 @@ export class BookCatalogComponent {
   books = [
     {
       id: 1,
-      title: 'อย่า!',
+      title: 'I Decided to Live as Myself',
       author: 'ผู้เขียนตัวอย่าง',
       status: 'available',
-      coverUrl: '/assets/books/ya.jpg'
+      coverUrl: '/assets/i-decided-to-live-as-myself.jpg'
     },
     {
       id: 2,
-      title: 'ภาพวาดปริศนากับการตามหาฆาตกร',
+      title: 'ก็แค่ปล่อยมันไป',
       author: 'ผู้เขียนตัวอย่าง',
-      status: 'reserved',
-      coverUrl: '/assets/books/mystery-painting.jpg'
+      status: 'available',
+      coverUrl: '/assets/ก็แค่ปล่อยมันไป-Dont-Break-Apart.jpg'
     },
     {
       id: 3,
+      title: 'กล้าที่จะถูกเกลียด',
+      author: 'ผู้เขียนตัวอย่าง',
+      status: 'available',
+      coverUrl: '/assets/กล้าที่จะถูกเกลียด.jpg'
+    },
+    {
+      id: 4,
+      title: 'คัมภีร์การลงทุนแบบคุ้มค่า',
+      author: 'ผู้เขียนตัวอย่าง',
+      status: 'available',
+      coverUrl: '/assets/คัมภีร์การลงทุนแบบคุ้มค่า.jpg'
+    },
+    {
+      id: 5,
+      title: 'เจ้าชายน้อย Le Petit Prince',
+      author: 'ผู้เขียนตัวอย่าง',
+      status: 'available',
+      coverUrl: '/assets/เจ้าชายน้อย-Le-Petit-Prince.jpg'
+    },
+    {
+      id: 6,
+      title: 'เซเปียนส์ ประวัติย่อมนุษยชาติ',
+      author: 'ผู้เขียนตัวอย่าง',
+      status: 'available',
+      coverUrl: '/assets/เซเปียนส์-ประวัติย่อมนุษยชาติ.jpg'
+    },
+    {
+      id: 7,
+      title: 'ต้นส้มแสนรัก',
+      author: 'ผู้เขียนตัวอย่าง',
+      status: 'available',
+      coverUrl: '/assets/ต้นส้มแสนรัก.jpg'
+    },
+    {
+      id: 8,
       title: 'เพราะเป็นวัยรุ่นจึงเจ็บปวด',
       author: 'ผู้เขียนตัวอย่าง',
-      status: 'borrowed',
-      coverUrl: '/assets/books/youth-pain.jpg'
+      status: 'available',
+      coverUrl: '/assets/เพราะเป็นวัยรุ่นจึงเจ็บปวด.jpg'
+    },
+    {
+      id: 9,
+      title: 'อยากตาย แต่ก็อยากกินต๊อกบกกี',
+      author: 'ผู้เขียนตัวอย่าง',
+      status: 'available',
+      coverUrl: '/assets/อยากตาย-แต่ก็อยากกินต๊อกบกกี.jpg'
     }
   ];
+
+  categories = [
+    { id: 'all', label: 'ทั้งหมด' },
+    { id: 'prism', label: 'Prism' },
+    { id: 'youth', label: 'วัยรุ่น' }
+  ];
+
+  selectedBook = this.books[0];
+
+  selectBook(book: any) {
+    this.selectedBook = book;
+  }
 
   statusClass(status: string) {
     if (status === 'available') return 'bg-[#22c55e]/10 text-[#4ade80]';

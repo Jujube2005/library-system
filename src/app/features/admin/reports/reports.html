@@ -13,12 +13,21 @@
     </button>
   </div>
 
-  <div class="grid gap-4 lg:grid-cols-2">
-    <div class="space-y-3 rounded-xl border border-white/10 bg-black/40 p-4">
-      <div class="flex items-center justify-between">
+  <div class="grid gap-4 lg:grid-cols-[minmax(0,2fr)_minmax(0,1.5fr)]">
+    <div class="space-y-4 rounded-xl border border-white/10 bg-black/40 p-4">
+      <div class="flex flex-wrap items-center justify-between gap-3">
         <div>
           <div class="text-sm font-semibold text-white">หนังสือยอดนิยม</div>
-          <div class="text-xs text-slate-300">ข้อมูลตัวอย่างสำหรับออกแบบหน้าจอ</div>
+          <div class="text-xs text-slate-300">ตัวอย่าง PopularBooksChart + ตัวกรองช่วงวันที่</div>
+        </div>
+        <div class="inline-flex items-center gap-2 rounded-full border border-white/20 bg-[#161316] px-2 py-1 text-[11px] text-slate-200">
+          <span>ช่วงวันที่</span>
+          <button class="rounded-full bg-[#FFD556] px-2 py-0.5 text-[10px] font-semibold text-[#161316]">
+            30 วันล่าสุด
+          </button>
+          <button class="rounded-full px-2 py-0.5 text-[10px] text-slate-200 hover:bg-white/10">
+            ทั้งหมด
+          </button>
         </div>
       </div>
       <div class="space-y-2">
@@ -35,8 +44,33 @@
     </div>
 
     <div class="space-y-3 rounded-xl border border-white/10 bg-black/40 p-4 text-xs text-slate-300">
-      ในเวอร์ชันจริง หน้านี้จะเชื่อมกับ endpoint รายงานเพื่อดึงข้อมูลตามช่วงวันที่ที่เลือก
-      และแสดงกราฟเพิ่มเติม เช่น จำนวนการยืมต่อเดือน หรือสัดส่วนหมวดหมู่หนังสือที่ถูกยืม
+      <div class="text-sm font-semibold text-white">รายการยืมค้างส่ง (ตัวอย่าง)</div>
+      <div class="mt-2 overflow-hidden rounded-lg border border-white/10">
+        <table class="min-w-full border-collapse text-[11px]">
+          <thead class="bg-white/5 text-slate-300">
+            <tr>
+              <th class="px-3 py-2 text-left font-medium">สมาชิก</th>
+              <th class="px-3 py-2 text-left font-medium">หนังสือ</th>
+              <th class="px-3 py-2 text-left font-medium">สถานะ</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="border-t border-white/5">
+              <td class="px-3 py-2 text-slate-200">Student 001</td>
+              <td class="px-3 py-2 text-slate-200">เพราะเป็นวัยรุ่นจึงเจ็บปวด</td>
+              <td class="px-3 py-2 text-rose-300">เกินกำหนด</td>
+            </tr>
+            <tr class="border-t border-white/5">
+              <td class="px-3 py-2 text-slate-200">Student 002</td>
+              <td class="px-3 py-2 text-slate-200">อย่า!</td>
+              <td class="px-3 py-2 text-rose-300">เกินกำหนด</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div>
+        ในเวอร์ชันจริง หน้านี้จะเชื่อมกับ endpoint รายงานตาม FR-010 เพื่อดึงข้อมูลช่วงวันที่และสร้างกราฟ/ตารางจริง
+      </div>
     </div>
   </div>
 </div>

@@ -29,38 +29,46 @@
 
     <div class="space-y-6 rounded-2xl border border-[#282828] bg-black/50 p-6">
       <div class="space-y-1">
-        <div class="text-sm font-semibold text-white">เข้าสู่ระบบ</div>
+        <div class="text-sm font-semibold text-white">login</div>
         <div class="text-xs text-slate-400">
           กรอกอีเมลและรหัสผ่าน Supabase ที่กำหนดไว้
         </div>
       </div>
 
+      <div
+        *ngIf="errorMessage"
+        class="rounded-xl border border-red-500/50 bg-red-500/10 px-3 py-2 text-xs text-red-200"
+      >
+        {{ errorMessage }}
+      </div>
+
       <div class="space-y-4 text-sm">
         <div class="space-y-1.5">
-          <label class="block text-xs font-medium text-slate-200">อีเมล</label>
+          <label class="block text-xs font-medium text-slate-200">email</label>
           <input
             [(ngModel)]="email"
             type="email"
             class="h-10 w-full rounded-xl border border-[#333333] bg-[#161316] px-3 text-sm text-slate-100 placeholder:text-slate-500 focus:border-[#FFD556] focus:outline-none focus:ring-1 focus:ring-[#FFD556]"
-            placeholder="you@example.ac.th"
+            placeholder="example@rmuti.ac.th"
           />
         </div>
 
         <div class="space-y-1.5">
-          <label class="block text-xs font-medium text-slate-200">รหัสผ่าน</label>
+          <label class="block text-xs font-medium text-slate-200">password</label>
           <input
             [(ngModel)]="password"
             type="password"
             class="h-10 w-full rounded-xl border border-[#333333] bg-[#161316] px-3 text-sm text-slate-100 placeholder:text-slate-500 focus:border-[#FFD556] focus:outline-none focus:ring-1 focus:ring-[#FFD556]"
-            placeholder="••••••••"
+            placeholder="password"
           />
         </div>
 
         <button
           (click)="login()"
-          class="mt-2 inline-flex h-10 w-full items-center justify-center rounded-xl bg-[#FFD556] text-sm font-semibold text-[#161316] transition hover:bg-[#FFE27A]"
+          [disabled]="isSubmitting"
+          class="mt-2 inline-flex h-10 w-full items-center justify-center rounded-xl bg-gradient-to-r from-[#f97316] via-[#f97316] to-[#FFD556] text-sm font-semibold text-[#161316] shadow-[0_16px_40px_rgba(0,0,0,0.8)] transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-60"
         >
-          เข้าสู่ระบบ
+          {{ isSubmitting ? 'กำลังเข้าสู่ระบบ...' : 'เข้าสู่ระบบ' }}
         </button>
 
         <div class="pt-2 text-[11px] text-slate-500">
