@@ -30,16 +30,16 @@ exports.getBookStatusById = getBookStatusById;
 const checkAvailability = async (bookId) => {
     const { data, error } = await supabase_1.supabase
         .from('books')
-        .select('status, stock_count')
+        .select('status, available_copies, total_copies')
         .eq('id', bookId)
         .single();
     if (error || !data)
         throw new Error('Book not found');
-    const isAvailable = data.status === 'available' && data.stock_count > 0;
+    const isAvailable = data.status === 'available' && data.available_copies > 0;
     return {
         bookId,
         isAvailable,
-        remaining: data.stock_count,
+        remaining: data.available_copies,
         message: isAvailable ? 'Ready to borrow' : 'Currently unavailable'
     };
 };
@@ -47,13 +47,13 @@ exports.checkAvailability = checkAvailability;
 const reserveBook = async (userId, bookId) => {
     const { data: availability } = await supabase_1.supabase
         .from('books')
-        .select('status, stock_count')
+        .select('status, available_copies')
         .eq('id', bookId)
         .single();
     if (!availability) {
         throw new Error('Book not found');
     }
-    if (!(availability.status === 'available' && availability.stock_count > 0)) {
+    if (!(availability.status === 'available' && availability.available_copies > 0)) {
         throw new Error('Book is not available for reservation');
     }
     const { data, error } = await supabase_1.supabase
@@ -71,89 +71,32 @@ const reserveBook = async (userId, bookId) => {
 };
 exports.reserveBook = reserveBook;
 const cancelReservation = async (bookId, userId) => {
-    const { data: book, error: fetchError } = await supabase_1.supabase
-        .from('books')
-        .select('reserved_by, status')
-        .eq('id', bookId)
+    const { data: reservation, error } = await supabase_1.supabase
+        .from('reservations')
+        .select('id, user_id')
+        .eq('book_id', bookId)
+        .eq('user_id', userId)
+        .eq('status', 'pending')
         .single();
-    if (fetchError || !book)
-        throw new Error("ไม่พบข้อมูลหนังสือ");
-    if (book.status !== 'reserved' || book.reserved_by !== userId) {
-        throw new Error("คุณไม่มีสิทธิ์ยกเลิกการจองนี้ หรือหนังสือไม่ได้อยู่ในสถานะถูกจอง");
+    if (error || !reservation) {
+        throw new Error("ไม่พบการจองที่สามารถยกเลิกได้");
     }
-    const { data, error: updateError } = await supabase_1.supabase
-        .from('books')
-        .update({
-        status: 'available',
-        reserved_by: null,
-        reserved_at: null
-    })
-        .eq('id', bookId)
-        .select()
-        .single();
-    if (updateError)
-        throw new Error(updateError.message);
-    return data;
+    const { error: deleteError } = await supabase_1.supabase
+        .from('reservations')
+        .delete()
+        .eq('id', reservation.id);
+    if (deleteError) {
+        throw new Error("ไม่สามารถยกเลิกการจองได้");
+    }
+    return { deleted: true };
 };
 exports.cancelReservation = cancelReservation;
 const borrowBook = async (bookId, userId) => {
-    const { data: book, error: bookError } = await supabase_1.supabase
-        .from('books')
-        .select('status, stock_count, title')
-        .eq('id', bookId)
-        .single();
-    if (bookError || !book)
-        throw new Error("ไม่พบข้อมูลหนังสือ");
-    if (book.status !== 'available' || book.stock_count <= 0) {
-        throw new Error("ขออภัย หนังสือเล่มนี้ไม่พร้อมให้ยืมในขณะนี้");
-    }
-    const { error: updateError } = await supabase_1.supabase
-        .from('books')
-        .update({
-        status: book.stock_count === 1 ? 'borrowed' : 'available',
-        stock_count: book.stock_count - 1
-    })
-        .eq('id', bookId);
-    if (updateError)
-        throw new Error("ไม่สามารถอัปเดตสถานะหนังสือได้");
-    const { data: borrowing, error: borrowError } = await supabase_1.supabase
-        .from('borrowings')
-        .insert([{
-            user_id: userId,
-            book_id: bookId,
-            borrow_date: new Date(),
-            due_date: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // กำหนดส่งใน 7 วัน
-            status: 'active'
-        }])
-        .select()
-        .single();
-    if (borrowError)
-        throw new Error("ไม่สามารถบันทึกข้อมูลการยืมได้");
-    return borrowing;
+    throw new Error("borrowBook is deprecated. กรุณาใช้ /api/loans ผ่าน Staff แทน");
 };
 exports.borrowBook = borrowBook;
 const returnBookLogic = async (borrowId, userId) => {
-    const { data: borrowing, error } = await supabase_1.supabase
-        .from('borrowings')
-        .select('*')
-        .eq('id', borrowId)
-        .eq('user_id', userId) // ตรวจสอบความเป็นเจ้าของ
-        .eq('status', 'active')
-        .single();
-    if (error || !borrowing)
-        throw new Error("ไม่พบรายการยืมที่ถูกต้อง");
-    await supabase_1.supabase.from('books')
-        .update({ status: 'available' }) // หรือเพิ่ม stock_count: +1
-        .eq('id', borrowing.book_id);
-    const { data: result } = await supabase_1.supabase
-        .from('borrowings')
-        .update({
-        status: 'returned',
-        return_date: new Date()
-    })
-        .eq('id', borrowId)
-        .select();
-    return result;
+    throw new Error("returnBookLogic is deprecated. กรุณาใช้ /api/loans/:id/return ผ่าน Staff แทน");
 };
 exports.returnBookLogic = returnBookLogic;
 const calculateDueDate = (role) => {

@@ -1,6 +1,7 @@
 import { Router, Request, Response } from 'express'
 import { protect } from '../middleware/auth-middleware'
 import { authorize } from '../middleware/role-middleware'
+import * as staffService from '../services/staff-service'
 
 const router = Router()
 
@@ -138,13 +139,6 @@ router.patch(
   authorize('staff'),
   async (req: any, res: Response) => {
     try {
-      const supabase = req.supabase
-
-      if (!supabase) {
-        res.status(500).json({ error: 'Supabase client not available' })
-        return
-      }
-
       const { id } = req.params
       const { status } = req.body as { status?: string }
 
@@ -155,6 +149,26 @@ router.patch(
 
       if (!status) {
         res.status(400).json({ error: 'MISSING_STATUS' })
+        return
+      }
+
+      const staffId = req.user?.id as string | undefined
+
+      if (!staffId) {
+        res.status(401).json({ error: 'UNAUTHENTICATED' })
+        return
+      }
+
+      if (status === 'completed') {
+        const result = await staffService.confirmReservationByStaff(id, staffId)
+        res.json({ data: result })
+        return
+      }
+
+      const supabase = req.supabase
+
+      if (!supabase) {
+        res.status(500).json({ error: 'Supabase client not available' })
         return
       }
 
@@ -178,4 +192,3 @@ router.patch(
 )
 
 export default router
-

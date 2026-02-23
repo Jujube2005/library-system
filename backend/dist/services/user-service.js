@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.updateMyProfile = exports.updateUserRole = exports.getUserProfile = void 0;
+exports.updateMyProfile = exports.updateUserStatus = exports.listUsers = exports.updateUserRole = exports.getUserProfile = void 0;
 const getUserProfile = async (supabase, userId) => {
     const { data, error } = await supabase
         .from('profiles')
@@ -13,8 +13,6 @@ const getUserProfile = async (supabase, userId) => {
 };
 exports.getUserProfile = getUserProfile;
 const updateUserRole = async (supabase, targetUserId, newRole) => {
-    // 1. ตรวจสอบว่า User ที่จะแก้ไขมีตัวตนอยู่จริง
-    // 2. อัปเดต Role ในตาราง Profiles
     const { data, error } = await supabase
         .from('profiles')
         .update({
@@ -28,6 +26,33 @@ const updateUserRole = async (supabase, targetUserId, newRole) => {
     return data;
 };
 exports.updateUserRole = updateUserRole;
+const listUsers = async (supabase) => {
+    const { data, error } = await supabase
+        .from('profiles')
+        .select('id, full_name, email, student_id, phone, role, is_active, created_at, updated_at')
+        .order('created_at', { ascending: false });
+    if (error) {
+        throw new Error('ไม่สามารถดึงรายการผู้ใช้ได้');
+    }
+    return data;
+};
+exports.listUsers = listUsers;
+const updateUserStatus = async (supabase, targetUserId, isActive) => {
+    const { data, error } = await supabase
+        .from('profiles')
+        .update({
+        is_active: isActive,
+        updated_at: new Date()
+    })
+        .eq('id', targetUserId)
+        .select('id, full_name, email, student_id, phone, role, is_active, created_at, updated_at')
+        .single();
+    if (error) {
+        throw new Error('ไม่สามารถเปลี่ยนสถานะผู้ใช้ได้');
+    }
+    return data;
+};
+exports.updateUserStatus = updateUserStatus;
 const updateMyProfile = async (supabase, userId, updates) => {
     const payload = {};
     if (typeof updates.full_name === 'string') {
