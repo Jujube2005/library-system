@@ -1,0 +1,54 @@
+<div class="space-y-6 text-slate-100">
+  <div>
+    <h1 class="text-xl font-semibold text-white">ภาพรวมระบบห้องสมุด</h1>
+    <p class="mt-1 text-sm text-slate-300">
+      แดชบอร์ดแสดงภาพรวมการใช้งานระบบ ยอดการยืมหนังสือ และสถานะสำคัญต่างๆ
+    </p>
+  </div>
+
+  <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+    <div
+      *ngFor="let s of stats"
+      class="rounded-xl border border-white/10 bg-black/40 px-4 py-3"
+    >
+      <div class="text-[11px] font-medium text-slate-400">
+        {{ s.label }}
+      </div>
+      <div class="mt-1 inline-flex rounded-full px-3 py-1 text-sm font-semibold" [ngClass]="s.tone">
+        {{ s.value }}
+      </div>
+    </div>
+  </div>
+
+  <div class="grid gap-4 lg:grid-cols-3">
+    <div class="space-y-3 lg:col-span-2">
+      <h2 class="text-sm font-semibold text-white">สถานะล่าสุด</h2>
+
+      <div
+        *ngFor="let a of alerts"
+        class="flex items-start gap-3 rounded-xl border border-white/10 bg-black/40 px-4 py-3"
+        [ngClass]="a.tone"
+      >
+        <div class="mt-1 h-2 w-2 rounded-full bg-current"></div>
+        <div class="space-y-0.5 text-sm">
+          <div class="font-semibold">
+            {{ a.title }}
+          </div>
+          <div class="text-xs text-slate-300">
+            {{ a.detail }}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="space-y-3">
+      <h2 class="text-sm font-semibold text-white">การแจ้งเตือนด่วน</h2>
+      <div class="rounded-xl border border-amber-500/40 bg-amber-500/10 px-4 py-3 text-xs text-amber-100">
+        หากมีรายการค้างส่งเกิน 7 วัน ระบบจะแสดงเตือนสีแดงในหน้านี้และในหน้าค่าปรับ
+      </div>
+      <div class="rounded-xl border border-white/10 bg-black/40 px-4 py-3 text-xs text-slate-300">
+        ส่วนนี้จะเชื่อมกับข้อมูลจริงจากฐานข้อมูลเมื่อพัฒนาฝั่ง backend เสร็จ
+      </div>
+    </div>
+  </div>
+</div>

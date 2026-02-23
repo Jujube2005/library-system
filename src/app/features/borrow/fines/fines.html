@@ -1,0 +1,46 @@
+<div class="space-y-6 text-slate-100">
+  <div>
+    <h1 class="text-xl font-semibold text-white">ค่าปรับ</h1>
+    <p class="mt-1 text-sm text-slate-300">
+      แสดงรายการค่าปรับที่ยังไม่ชำระและประวัติการชำระเงิน
+    </p>
+  </div>
+
+  <div class="overflow-hidden rounded-xl border border-white/10 bg-black/40">
+    <table class="min-w-full border-collapse text-sm">
+      <thead class="bg-white/5 text-xs uppercase text-slate-300">
+        <tr>
+          <th class="px-4 py-2 text-left font-medium">สมาชิก</th>
+          <th class="px-4 py-2 text-left font-medium">จำนวนเงิน (บาท)</th>
+          <th class="px-4 py-2 text-left font-medium">สถานะ</th>
+          <th class="px-4 py-2 text-right font-medium">การทำงาน</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let f of fines" class="border-t border-white/5">
+          <td class="px-4 py-2 text-slate-300">{{ f.member }}</td>
+          <td class="px-4 py-2 text-slate-300">{{ f.amount | number:'1.0-2' }}</td>
+          <td class="px-4 py-2">
+            <span
+              class="inline-flex rounded-full px-3 py-1 text-xs font-medium"
+              [ngClass]="{
+                'bg-rose-500/10 text-rose-300': f.status === 'unpaid',
+                'bg-[#22c55e]/10 text-[#4ade80]': f.status === 'paid'
+              }"
+            >
+              {{ f.status === 'unpaid' ? 'ยังไม่ชำระ' : 'ชำระแล้ว' }}
+            </span>
+          </td>
+          <td class="px-4 py-2 text-right">
+            <button
+              *ngIf="f.status === 'unpaid'"
+              class="inline-flex items-center rounded-full bg-[#FFD556] px-3 py-1 text-xs font-semibold text-[#161316] hover:bg-[#FFE27A]"
+            >
+              บันทึกการชำระเงิน
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

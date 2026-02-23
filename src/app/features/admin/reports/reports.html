@@ -1,0 +1,42 @@
+<div class="space-y-6 text-slate-100">
+  <div class="flex flex-wrap items-center justify-between gap-3">
+    <div>
+      <h1 class="text-xl font-semibold text-white">รายงานและสถิติ</h1>
+      <p class="mt-1 text-sm text-slate-300">
+        ใช้สำหรับดูหนังสือยอดนิยมและสถิติการใช้งานห้องสมุด
+      </p>
+    </div>
+    <button
+      class="inline-flex items-center rounded-full border border-white/20 px-3 py-1.5 text-xs font-medium text-slate-100 hover:bg-white/10"
+    >
+      ส่งออกเป็นไฟล์
+    </button>
+  </div>
+
+  <div class="grid gap-4 lg:grid-cols-2">
+    <div class="space-y-3 rounded-xl border border-white/10 bg-black/40 p-4">
+      <div class="flex items-center justify-between">
+        <div>
+          <div class="text-sm font-semibold text-white">หนังสือยอดนิยม</div>
+          <div class="text-xs text-slate-300">ข้อมูลตัวอย่างสำหรับออกแบบหน้าจอ</div>
+        </div>
+      </div>
+      <div class="space-y-2">
+        <div *ngFor="let b of popularBooks" class="space-y-1">
+          <div class="flex items-center justify-between text-xs">
+            <span class="font-medium text-slate-100">{{ b.title }}</span>
+            <span class="text-slate-300">{{ b.count }} ครั้ง</span>
+          </div>
+          <div class="h-1.5 overflow-hidden rounded-full bg-white/10">
+            <div class="h-full rounded-full bg-[#FFD556]" [style.width.%]="b.count"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="space-y-3 rounded-xl border border-white/10 bg-black/40 p-4 text-xs text-slate-300">
+      ในเวอร์ชันจริง หน้านี้จะเชื่อมกับ endpoint รายงานเพื่อดึงข้อมูลตามช่วงวันที่ที่เลือก
+      และแสดงกราฟเพิ่มเติม เช่น จำนวนการยืมต่อเดือน หรือสัดส่วนหมวดหมู่หนังสือที่ถูกยืม
+    </div>
+  </div>
+</div>

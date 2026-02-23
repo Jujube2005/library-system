@@ -1,0 +1,198 @@
+<div class="min-h-screen flex flex-col bg-[#161316]">
+  <header class="w-full border-b border-black/40 bg-black/40 backdrop-blur">
+    <div class="mx-auto flex max-w-6xl items-center justify-between px-6 py-3 text-white">
+      <div class="flex items-center gap-2">
+        <div class="flex h-9 w-9 items-center justify-center rounded-full bg-[#FFD556] text-[#161316] text-lg font-semibold">
+          LS
+        </div>
+        <div class="flex flex-col leading-tight">
+          <span class="text-base font-semibold">Library Space</span>
+          <span class="text-xs text-slate-300">ระบบห้องสมุดดิจิทัล</span>
+        </div>
+      </div>
+      <nav class="hidden items-center gap-6 text-sm font-medium text-slate-200 md:flex">
+        <a class="hover:text-[#FFD556]" href="#">ห้องสมุด</a>
+        <a class="hover:text-[#FFD556]" href="#">หนังสือ</a>
+        <a class="hover:text-[#FFD556]" href="#">กิจกรรม</a>
+        <a class="hover:text-[#FFD556]" href="#">บริการ</a>
+        <a class="hover:text-[#FFD556]" href="#">เกี่ยวกับเรา</a>
+      </nav>
+      <div class="flex items-center gap-3">
+        <button class="hidden rounded-full border border-white/10 px-4 py-1.5 text-sm font-medium text-slate-200 hover:bg-white/10 md:inline-flex">
+          สมัครสมาชิก
+        </button>
+        <a
+          routerLink="/login"
+          class="inline-flex items-center rounded-full bg-[#FFD556] px-4 py-1.5 text-sm font-semibold text-[#161316] hover:bg-[#FFE27A]"
+        >
+          เข้าสู่ระบบ
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <main class="flex-1">
+    <section class="relative overflow-hidden border-b border-black/40 bg-[#161316]">
+      <div class="absolute inset-0 opacity-80">
+        <div class="h-full w-full bg-gradient-to-br from-[#161316] via-[#c54800] to-[#161316]"></div>
+      </div>
+      <div class="relative mx-auto flex max-w-6xl flex-col gap-8 px-6 py-12 text-white lg:flex-row lg:items-center lg:py-16">
+        <div class="flex-1 space-y-5">
+          <div class="text-sm font-semibold tracking-wide text-[#FFD556]">
+            ห้องสมุดออนไลน์ของคุณ
+          </div>
+          <h1 class="text-3xl font-bold leading-tight sm:text-4xl">
+            ห้องสมุด Library Space
+          </h1>
+          <p class="max-w-xl text-sm text-slate-100/90 sm:text-base">
+            ค้นหาหนังสือ สื่อการเรียนรู้ และทรัพยากรดิจิทัลจากห้องสมุด Library Space
+            และเครือข่ายห้องสมุดพันธมิตร
+          </p>
+
+          <div class="mt-4 space-y-3 rounded-2xl bg-black/20 p-4 backdrop-blur">
+            <div class="flex flex-wrap gap-2 text-xs sm:text-sm">
+              <button
+                *ngFor="let tab of tabs"
+                (click)="setTab(tab.id)"
+                class="rounded-full border px-3 py-1 font-medium transition"
+                [ngClass]="{
+                  'border-[#FFD556] bg-[#FFD556] text-[#161316]': activeTab === tab.id,
+                  'border-white/30 bg-white/5 text-slate-100 hover:bg-white/10': activeTab !== tab.id
+                }"
+              >
+                {{ tab.label }}
+              </button>
+            </div>
+
+            <div class="flex flex-col gap-2 sm:flex-row sm:items-center">
+              <input
+                [(ngModel)]="query"
+                type="text"
+                class="h-11 flex-1 rounded-full border border-white/20 bg-white/95 px-4 text-sm text-slate-900 placeholder:text-slate-400 focus:border-[#FFD556] focus:outline-none"
+                placeholder="คำค้นหา, ชื่อหนังสือ, ผู้แต่ง"
+              />
+              <button
+                (click)="search()"
+                class="inline-flex h-11 items-center justify-center rounded-full bg-[#FFD556] px-6 text-sm font-semibold text-[#161316] hover:bg-[#FFE27A]"
+              >
+                ค้นหา
+              </button>
+            </div>
+
+            <p class="text-xs text-slate-200">
+              ตัวอย่าง: การเขียนโปรแกรม, จิตวิทยา, การบริหารจัดการ, ทักษะอาชีพ
+            </p>
+          </div>
+        </div>
+
+        <div class="mt-6 flex-1 lg:mt-0">
+          <div class="relative h-56 w-full overflow-hidden rounded-3xl bg-slate-800 sm:h-64 lg:h-72">
+            <div class="absolute inset-0 bg-gradient-to-tr from-emerald-500/40 via-sky-500/30 to-violet-500/40"></div>
+            <div class="relative flex h-full w-full items-end justify-between p-5 text-xs text-slate-100">
+              <div>
+                <div class="text-sm font-semibold">หนังสือมากกว่า 10,000 เล่ม</div>
+                <div class="text-[11px] text-slate-200">
+                  พร้อมสื่อดิจิทัลและคอร์สเรียนออนไลน์ในที่เดียว
+                </div>
+              </div>
+              <div class="rounded-2xl bg-slate-900/70 px-3 py-2 text-right">
+                <div class="text-[11px] text-slate-300">กำลังยืมใช้งาน</div>
+                <div class="text-sm font-semibold text-emerald-300">2,145 รายการ</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="bg-[#161316]">
+      <div class="mx-auto max-w-6xl px-6 py-10">
+        <h2 class="text-2xl font-semibold text-white">
+          ห้องสมุดดิจิทัล
+        </h2>
+        <p class="mt-2 max-w-2xl text-sm text-slate-300">
+          เลือกอ่าน ชม ฟัง หนังสือและสื่อดิจิทัลหลากหลายประเภท
+          เพื่อการเรียนรู้และพัฒนาตนเองอย่างต่อเนื่อง
+        </p>
+
+        <div class="mt-6 grid gap-4 sm:grid-cols-3">
+          <div class="rounded-2xl border border-white/10 bg-white/5 p-4 text-slate-100">
+            <div class="mb-3 inline-flex h-9 w-9 items-center justify-center rounded-full bg-[#FFD556] text-[#161316]">
+              A
+            </div>
+            <div class="text-sm font-semibold text-white">หนังสือเรียนรู้</div>
+            <div class="mt-1 text-xs text-slate-300">
+              หนังสือพัฒนาทักษะอาชีพ ภาษา เทคโนโลยี และการจัดการ
+            </div>
+          </div>
+
+          <div class="rounded-2xl border border-white/10 bg-white/5 p-4 text-slate-100">
+            <div class="mb-3 inline-flex h-9 w-9 items-center justify-center rounded-full bg-[#282828] text-[#FFD556]">
+              D
+            </div>
+            <div class="text-sm font-semibold text-white">สื่อดิจิทัล</div>
+            <div class="mt-1 text-xs text-slate-300">
+              วิดีโอ พอดแคสต์ และเนื้อหาออนไลน์ให้เลือกเรียนรู้ได้ทุกที่
+            </div>
+          </div>
+
+          <div class="rounded-2xl border border-white/10 bg-white/5 p-4 text-slate-100">
+            <div class="mb-3 inline-flex h-9 w-9 items-center justify-center rounded-full bg-[#161316] text-[#FFD556]">
+              E
+            </div>
+            <div class="text-sm font-semibold text-white">กิจกรรมการอ่าน</div>
+            <div class="mt-1 text-xs text-slate-300">
+              กิจกรรมออนไลน์และอีเวนต์จากห้องสมุดที่เข้าร่วมโครงการ
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="mt-auto bg-slate-950 text-slate-100">
+    <div class="border-t border-slate-800">
+      <div
+        class="mx-auto grid max-w-6xl gap-8 px-6 py-10 md:grid-cols-[minmax(0,2fr)_minmax(0,3fr)] md:items-start"
+      >
+        <div class="space-y-3 text-sm">
+          <h2 class="text-base font-semibold text-white">
+            ศูนย์วิทยบริการและเทคโนโลยีสารสนเทศ Library Space
+          </h2>
+          <p class="text-xs leading-relaxed text-slate-200">
+            อาคารห้องสมุดกลาง มหาวิทยาลัยตัวอย่าง ถนนการเรียนรู้ เขตการศึกษา
+            จังหวัดตัวอย่าง 40000
+          </p>
+          <div class="space-y-1 text-xs text-slate-300">
+            <div>โทรศัพท์: 0-0000-0000 ต่อ 1522</div>
+            <div>อีเมล: library@example.ac.th</div>
+          </div>
+          <div class="pt-2 text-xs text-slate-300">
+            <div>วันจันทร์ – ศุกร์: 8.30 – 18.30 น.</div>
+            <div>วันเสาร์: 8.30 – 15.00 น.</div>
+            <div>วันอาทิตย์และวันหยุดนักขัตฤกษ์: ปิดให้บริการ</div>
+          </div>
+        </div>
+
+        <div class="h-48 w-full overflow-hidden rounded-xl border border-slate-700 bg-slate-900 md:h-56">
+          <iframe
+            title="แผนที่ศูนย์วิทยบริการ Library Space"
+            class="h-full w-full border-0"
+            loading="lazy"
+            referrerpolicy="no-referrer-when-downgrade"
+            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3875.726962386773!2d100.52965057603604!3d13.737074897431994!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x30e29ed5c6f0e4d3%3A0x9a3e9d9e17e2b6b3!2z4LiB4Lij4Liw4LiV4Lij4Liw4Lie4Lij4Liw!5e0!3m2!1sth!2sth!4v1700000000000"
+          ></iframe>
+        </div>
+      </div>
+    </div>
+
+    <div class="border-t border-slate-800 bg-slate-950">
+      <div
+        class="mx-auto flex max-w-6xl flex-col items-center justify-between gap-2 px-6 py-3 text-[11px] text-slate-400 sm:flex-row"
+      >
+        <div>Copyright © 2026 Library Space | Powered by Library System</div>
+        <div>ต้นแบบส่วนติดต่อผู้ใช้สำหรับระบบห้องสมุดดิจิทัล</div>
+      </div>
+    </div>
+  </footer>
+</div>
