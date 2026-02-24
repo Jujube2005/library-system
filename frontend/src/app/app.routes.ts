@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router'
 import { LoginComponent } from './features/auth/login/login'
+import { HomeComponent } from './features/home/home'
 import { DashboardLayoutComponent } from './features/dashboard/layout/dashboard-layout'
 import { DashboardOverviewComponent } from './features/dashboard/overview/overview'
 import { BookCatalogComponent } from './features/books/catalog/catalog'
@@ -13,6 +14,10 @@ import { authGuard } from './guards/auth.guard'
 import { guestGuard } from './guards/guest.guard'
 
 export const routes: Routes = [
+  {
+    path: '',
+    component: HomeComponent
+  },
   {
     path: 'login',
     component: LoginComponent,
@@ -33,6 +38,5 @@ export const routes: Routes = [
       { path: 'reports', component: ReportsComponent }
     ]
   },
-  { path: '', redirectTo: 'login', pathMatch: 'full' },
-  { path: '**', redirectTo: 'login' }
+  { path: '**', redirectTo: '' }
 ]

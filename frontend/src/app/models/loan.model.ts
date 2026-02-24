@@ -11,5 +11,10 @@ export interface Loan {
   book?: {
     title?: string
   }
+  user?: {
+    full_name?: string
+    role?: string
+    email?: string
+  }
 }
 

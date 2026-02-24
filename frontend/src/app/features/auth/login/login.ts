@@ -1,13 +1,13 @@
 import { Component, inject } from '@angular/core'
 import { FormsModule } from '@angular/forms'
-import { NgIf } from '@angular/common'
+import { NgIf, NgClass } from '@angular/common'
 import { Router } from '@angular/router'
 import { AuthService } from '../../../core/auth.service'
 
 @Component({
-  selector: 'app-login',
+  selector: 'app-login-view',
   standalone: true,
-  imports: [FormsModule, NgIf],
+  imports: [FormsModule, NgIf, NgClass],
   templateUrl: './login.html',
   styleUrls: ['./login.css']
 })
@@ -16,9 +16,19 @@ export class LoginComponent {
   password = ''
   isSubmitting = false
   errorMessage = ''
+  isDarkMode = false
 
   private auth = inject(AuthService)
   private router = inject(Router)
+
+  constructor() {
+    const savedTheme = localStorage.getItem('theme')
+    this.isDarkMode = savedTheme === 'dark'
+  }
+
+  goBack() {
+    this.router.navigateByUrl('/')
+  }
 
   async login() {
     this.errorMessage = ''
