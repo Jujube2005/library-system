@@ -7,7 +7,7 @@ import { AuthService } from '../core/auth.service'
 export class ApiService {
   private baseUrl = 'http://localhost:4000'
 
-  constructor(private auth: AuthService) {}
+  constructor(private auth: AuthService) { }
 
   private buildUrl(path: string) {
     return `${this.baseUrl}${path}`
@@ -38,7 +38,9 @@ export class ApiService {
     })
 
     if (!res.ok) {
-      throw new Error(`Request failed: ${res.status}`)
+      const errorText = await res.text().catch(() => 'Unknown error')
+      console.error(`API Error: ${res.status} - ${path}`, errorText)
+      throw new Error(`Request failed: ${res.status} - ${errorText}`)
     }
 
     return res.json() as Promise<T>

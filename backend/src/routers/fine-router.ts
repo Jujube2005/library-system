@@ -29,7 +29,8 @@ router.get(
 
       res.json({ data: fines })
     } catch (error: any) {
-      res.status(400).json({ error: error.message })
+      console.error('Fines Query Error:', error)
+      res.status(400).json({ error: error.message, details: error.details })
     }
   }
 )

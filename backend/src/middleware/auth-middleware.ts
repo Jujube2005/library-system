@@ -8,9 +8,12 @@ export const protect = async (req: Request, res: Response, next: NextFunction) =
   const token = authHeader?.startsWith('Bearer ') ? authHeader.slice(7).trim() : null
 
   if (!token) {
+    console.log('No token found in request')
     res.status(401).json({ message: 'Unauthorized' })
     return
   }
+
+  console.log('Validating token...')
 
   const supabase = createClient(env.supabaseUrl, env.supabaseAnonKey, {
     global: {
@@ -46,12 +49,14 @@ export const protect = async (req: Request, res: Response, next: NextFunction) =
     return
   }
 
-  ;(req as any).user = {
+  ; (req as any).user = {
     id: profile.id,
     role: profile.role as UserRole
   }
 
-  ;(req as any).supabase = supabase
+  console.log(`Authenticated: ${profile.id} (${profile.role})`)
+
+    ; (req as any).supabase = supabase
 
   next()
 }

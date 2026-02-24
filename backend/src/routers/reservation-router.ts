@@ -74,11 +74,12 @@ router.get(
 
       const { data, error } = await supabase
         .from('reservations')
-        .select('id, book_id, status, reserved_at, expires_at, books ( title )')
+        .select('*')
         .eq('user_id', userId)
 
       if (error) {
-        res.status(400).json({ error: error.message })
+        console.error('Reservations Query Error:', error)
+        res.status(400).json({ error: error.message, details: error.details })
         return
       }
 

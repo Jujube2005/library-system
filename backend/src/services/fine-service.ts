@@ -7,7 +7,8 @@ export const getMyFines = async (supabase: SupabaseClient, userId: string) => {
     .eq('user_id', userId)
 
   if (error) {
-    throw new Error('ไม่สามารถดึงข้อมูลค่าปรับได้')
+    console.error('Supabase Fines Error:', error)
+    throw error // Throw the original error object
   }
 
   return data
@@ -60,7 +61,7 @@ export const processPayment = async (supabase: SupabaseClient, fineId: string) =
 export const calculateCurrentFine = (dueDate: string, dailyRate: number = 5) => {
   const now = new Date();
   const due = new Date(dueDate);
-  
+
   // ถ้ายังไม่เลยกำหนด ค่าปรับเป็น 0
   if (now <= due) return 0;
 

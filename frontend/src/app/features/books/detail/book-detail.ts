@@ -1,6 +1,6 @@
-import { Component, OnInit } from '@angular/core'
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core'
 import { NgIf } from '@angular/common'
-import { ActivatedRoute } from '@angular/router'
+import { ActivatedRoute, RouterLink } from '@angular/router'
 import { BookApiService } from '../../../services/book-api.service'
 import { ReservationApiService } from '../../../services/reservation-api.service'
 import { Book } from '../../../models/book.model'
@@ -9,8 +9,9 @@ import { Reservation } from '../../../models/reservation.model'
 @Component({
   selector: 'app-book-detail',
   standalone: true,
-  imports: [NgIf],
-  templateUrl: './book-detail.html'
+  imports: [NgIf, RouterLink],
+  templateUrl: './book-detail.html',
+  styleUrls: ['./book-detail.css']
 })
 export class BookDetailComponent implements OnInit {
   book: Book | null = null
@@ -23,8 +24,9 @@ export class BookDetailComponent implements OnInit {
   constructor(
     private route: ActivatedRoute,
     private bookApi: BookApiService,
-    private reservationApi: ReservationApiService
-  ) {}
+    private reservationApi: ReservationApiService,
+    private cdr: ChangeDetectorRef
+  ) { }
 
   ngOnInit() {
     void this.load()
@@ -58,6 +60,7 @@ export class BookDetailComponent implements OnInit {
       this.error = 'ไม่สามารถดึงข้อมูลหนังสือได้'
     } finally {
       this.loading = false
+      this.cdr.detectChanges()
     }
   }
 
@@ -104,5 +107,12 @@ export class BookDetailComponent implements OnInit {
     } finally {
       this.reserving = false
     }
+  }
+
+  getBookCover(id: string): string {
+    // This is a fallback if needed, but we should use a consistent logic
+    const num = (id.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0) % 9) + 1;
+    if (num === 8) return '/book8jpg.jpg';
+    return `/book${num}.jpg`;
   }
 }

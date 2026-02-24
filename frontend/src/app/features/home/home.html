@@ -8,7 +8,7 @@
     <header class="header-nav">
         <div class="brand-text">RMUTI</div>
         <nav class="nav-group">
-            <a href="#" class="nav-link">Resources</a>
+            <a href="#" class="nav-link" (click)="handleResourcesClick($event)">Resources</a>
             <a href="#" class="nav-link">Staff</a>
             <a routerLink="/login" class="nav-link">Member</a>
             <button class="nav-link" (click)="toggleDarkMode()">
@@ -24,7 +24,6 @@
         <div class="info-section">
             <div class="h-separator"></div>
 
-            <!-- Realistic Content for Students & Staff -->
             <div class="slide-up-content reveal-anim delay-h1">
                 <h1 class="main-title">Digital Gateway</h1>
             </div>
@@ -33,19 +32,20 @@
                 <p class="main-desc">
                     ศูนย์รวมทรัพยากรสารสนเทศและบริการห้องสมุดออนไลน์ มหาวิทยาลัยเทคโนโลยีราชมงคลอีสาน
                     ให้คุณเข้าถึงคลังหนังสือ งานวิจัย และฐานข้อมูลวิชาการได้ทุกที่ ทุกเวลา
-                    เพื่อความสำเร็จในทุกการเรียนรู้
                 </p>
             </div>
 
             <div class="slide-up-content reveal-anim delay-meta">
-                <a routerLink="/login" class="nav-link"
-                    style="border-bottom: 2px solid var(--accent); padding-bottom: 5px; opacity: 1; font-weight: 700;">
-                    เข้าสู่ระบบด้วย RMUTI Account
-                </a>
+                <div class="hero-cta">
+                    <button class="btn-primary" (click)="handleResourcesClick($event)">
+                        Explore Archive
+                    </button>
+                    <span class="cta-hint">Over 1,400+ volumes available</span>
+                </div>
             </div>
         </div>
 
-        <!-- Center-Focused Slider (Captures wheel only here) -->
+        <!-- Center-Focused Slider -->
         <div class="slider-stage" (wheel)="onScroll($event)">
             <div class="image-track" [style.transform]="getTrackTransform()">
                 <div *ngFor="let slide of slides; let i = index" class="image-card" [class.active]="i === currentIndex"
@@ -70,7 +70,7 @@
                     </button>
         </div>
 
-        <!-- Footer Address info (Separate block) -->
+        <!-- Footer -->
         <footer class="footer-info">
             <div class="address-text">
                 มหาวิทยาลัยเทคโนโลยีราชมงคลอีสาน<br>

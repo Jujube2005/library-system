@@ -1,7 +1,8 @@
-import { Component, inject } from '@angular/core'
-import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router'
+import { Component, inject, HostListener, ChangeDetectorRef } from '@angular/core'
+import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router'
 import { NgIf } from '@angular/common'
 import { UserApiService } from '../../../services/user-api.service'
+import { AuthService } from '../../../core/auth.service'
 import { Profile } from '../../../models/profile.model'
 
 @Component({
@@ -13,10 +14,31 @@ import { Profile } from '../../../models/profile.model'
 })
 export class DashboardLayoutComponent {
   profile: Profile | null = null
+  isDarkMode = false
+  showProfileMenu = false
   private userApi = inject(UserApiService)
+  private authService = inject(AuthService)
+  private router = inject(Router)
+  private cdr = inject(ChangeDetectorRef)
 
   constructor() {
     void this.loadProfile()
+    this.isDarkMode = localStorage.getItem('theme') === 'dark'
+    this.applyTheme()
+  }
+
+  toggleDarkMode() {
+    this.isDarkMode = !this.isDarkMode
+    localStorage.setItem('theme', this.isDarkMode ? 'dark' : 'light')
+    this.applyTheme()
+  }
+
+  private applyTheme() {
+    if (this.isDarkMode) {
+      document.body.classList.add('dark-mode')
+    } else {
+      document.body.classList.remove('dark-mode')
+    }
   }
 
   get isStaff() {
@@ -29,6 +51,23 @@ export class DashboardLayoutComponent {
       this.profile = profile
     } catch {
       this.profile = null
+    } finally {
+      this.cdr.detectChanges()
     }
+  }
+
+  async logout() {
+    await this.authService.signOut()
+    await this.router.navigateByUrl('/')
+  }
+
+  toggleProfileMenu(event: Event) {
+    event.stopPropagation()
+    this.showProfileMenu = !this.showProfileMenu
+  }
+
+  @HostListener('document:click')
+  closeProfileMenu() {
+    this.showProfileMenu = false
   }
 }

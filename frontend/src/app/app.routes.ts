@@ -24,13 +24,20 @@ export const routes: Routes = [
     canActivate: [guestGuard]
   },
   {
+    path: 'books',
+    component: DashboardLayoutComponent,
+    children: [
+      { path: '', component: BookCatalogComponent },
+      { path: ':id', component: BookDetailComponent }
+    ]
+  },
+  {
     path: 'dashboard',
     component: DashboardLayoutComponent,
     canActivate: [authGuard],
     children: [
       { path: '', component: DashboardOverviewComponent },
-      { path: 'books', component: BookCatalogComponent },
-      { path: 'books/:id', component: BookDetailComponent },
+      // Moved books to /books
       { path: 'loans', component: LoansComponent },
       { path: 'reservations', component: ReservationsComponent },
       { path: 'fines', component: FinesComponent },

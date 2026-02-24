@@ -12,8 +12,8 @@ import { authorize } from '../middleware/role-middleware'
 
 const router = Router()
 
-router.get('/', protect, searchBooks)
-router.get('/:id', protect, getStatus)
+router.get('/', searchBooks)
+router.get('/:id', getStatus)
 router.get('/:id/check', protect, checkBook)
 
 router.post('/', protect, authorize('staff'), createBook)

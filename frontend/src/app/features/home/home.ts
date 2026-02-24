@@ -1,6 +1,7 @@
-import { Component } from '@angular/core'
+import { Component, inject } from '@angular/core'
 import { NgFor, NgIf, NgClass } from '@angular/common'
-import { RouterLink } from '@angular/router'
+import { Router, RouterLink } from '@angular/router'
+import { AuthService } from '../../core/auth.service'
 
 interface HomeSlide {
   image: string
@@ -21,6 +22,9 @@ export class HomeComponent {
   bgOffset = 0
   isDarkMode = false
   readonly year = new Date().getFullYear()
+
+  private readonly router = inject(Router)
+  private readonly auth = inject(AuthService)
 
   constructor() {
     // Check for saved theme preference
@@ -44,6 +48,11 @@ export class HomeComponent {
     { image: '/book8jpg.jpg', context: 'Innovation' },
     { image: '/book9.jpg', context: 'Education' }
   ]
+
+  async handleResourcesClick(event: MouseEvent) {
+    event.preventDefault()
+    await this.router.navigateByUrl('/books')
+  }
 
   // Animation constants
   private readonly transitionDuration = 1200

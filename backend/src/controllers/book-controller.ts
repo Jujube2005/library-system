@@ -1,52 +1,44 @@
 import { Request, Response } from 'express'
+import { createClient } from '@supabase/supabase-js'
+import { env } from '../config/env'
 import * as bookService from '../services/book-service'
 import * as staffService from '../services/staff-service'
 
 export async function searchBooks(req: Request, res: Response): Promise<void> {
   try {
-    const supabase = (req as any).supabase
-
-    if (!supabase) {
-      res.status(500).json({ error: 'Supabase client not available' })
-      return
-    }
-
+    console.log('searchBooks: starting query...')
     const q = typeof req.query.q === 'string' ? req.query.q.trim() : ''
     const category = typeof req.query.category === 'string' ? req.query.category.trim() : ''
     const sort = typeof req.query.sort === 'string' ? req.query.sort.trim() : ''
     const page = Number(req.query.page ?? 1) || 1
     const limit = Number(req.query.limit ?? 10) || 10
+    console.log(`[Backend] Searching books: q="${q}", cat="${category}", page=${page}`)
+
+    const publicSupabase = createClient(env.supabaseUrl, env.supabaseAnonKey)
     const from = (page - 1) * limit
     const to = from + limit - 1
 
-    let query = supabase
+    let query = publicSupabase
       .from('books')
-      .select('id, title, author, category, available_copies, total_copies, status', { count: 'exact' })
+      .select('*', { count: 'exact' })
 
     if (q) {
-      query = query.ilike('title', `%${q}%`)
+      query = query.or(`title.ilike.%${q}%,author.ilike.%${q}%`)
     }
 
     if (category) {
       query = query.eq('category', category)
     }
 
-    if (sort === 'title_desc') {
-      query = query.order('title', { ascending: false })
-    } else if (sort === 'author_asc') {
-      query = query.order('author', { ascending: true })
-    } else if (sort === 'author_desc') {
-      query = query.order('author', { ascending: false })
-    } else if (sort === 'newest') {
-      query = query.order('created_at', { ascending: false })
-    } else {
-      query = query.order('title', { ascending: true })
-    }
+    const { data, error, count } = await query
+      .range(from, to)
+      .order('title', { ascending: true })
 
-    const { data, error, count } = await query.range(from, to)
+    console.log(`[Backend] Query finished. Found ${data?.length} results. Total count: ${count}`)
 
     if (error) {
-      res.status(500).json({ error: error.message })
+      console.error('Supabase Search Error:', error)
+      res.status(400).json({ error: error.message, details: error.details })
       return
     }
 
@@ -65,22 +57,17 @@ export async function searchBooks(req: Request, res: Response): Promise<void> {
 
 export const getStatus = async (req: Request, res: Response) => {
   try {
-    const supabase = (req as any).supabase
-
-    if (!supabase) {
-      res.status(500).json({ error: 'Supabase client not available' })
-      return
-    }
-
+    const publicSupabase = createClient(env.supabaseUrl, env.supabaseAnonKey)
     const { id } = req.params
 
-    const { data, error } = await supabase
+    const { data, error } = await publicSupabase
       .from('books')
       .select('id, title, author, category, shelf_location, available_copies, total_copies, status')
       .eq('id', id)
       .single()
 
     if (error || !data) {
+      console.error('Get Book Error:', error)
       res.status(404).json({ error: 'BOOK_NOT_FOUND' })
       return
     }
