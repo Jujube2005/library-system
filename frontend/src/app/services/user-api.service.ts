@@ -6,9 +6,13 @@ import { Profile } from '../models/profile.model'
   providedIn: 'root'
 })
 export class UserApiService {
-  constructor(private api: ApiService) {}
+  constructor(private api: ApiService) { }
 
   getMe() {
     return this.api.get<Profile>('/api/users/me')
+  }
+
+  updateMe(data: Partial<Profile>) {
+    return this.api.patch<Profile>('/api/users/me', data)
   }
 }

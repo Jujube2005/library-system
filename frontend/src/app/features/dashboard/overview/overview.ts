@@ -70,6 +70,6 @@ export class DashboardOverviewComponent implements OnInit {
       'เจ้าชายน้อย': '/book9.jpg'
     }
 
-    return coverByTitle[titleKey] || '/book1.jpg'
+    return coverByTitle[titleKey] || '/default-book-cover.svg'
   }
 }

@@ -1,5 +1,5 @@
 import { Component, inject } from '@angular/core'
-import { NgFor, NgIf, NgClass } from '@angular/common'
+import { NgFor } from '@angular/common'
 import { Router, RouterLink } from '@angular/router'
 import { AuthService } from '../../core/auth.service'
 
@@ -11,7 +11,7 @@ interface HomeSlide {
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [NgFor, NgIf, NgClass, RouterLink],
+  imports: [NgFor, RouterLink],
   templateUrl: './home.html',
   styleUrls: ['./home.css']
 })

@@ -1,13 +1,13 @@
 import { Component, inject } from '@angular/core'
 import { FormsModule } from '@angular/forms'
-import { NgIf, NgClass } from '@angular/common'
+import { NgIf } from '@angular/common'
 import { Router } from '@angular/router'
 import { AuthService } from '../../../core/auth.service'
 
 @Component({
   selector: 'app-login-view',
   standalone: true,
-  imports: [FormsModule, NgIf, NgClass],
+  imports: [FormsModule, NgIf],
   templateUrl: './login.html',
   styleUrls: ['./login.css']
 })

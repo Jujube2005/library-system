@@ -1,98 +1,12 @@
 <div class="dashboard-wrapper">
-  <!-- Top Bar -->
-  <header class="top-bar">
-    <div class="brand" routerLink="/">
-      <span class="brand-caps">RMUTI</span>
-      <span class="view-tag">Archive</span>
-    </div>
-
-    <div class="actions">
-      <button class="theme-toggle" (click)="toggleDarkMode()">
-        <span class="material-icons">{{ isDarkMode ? 'light_mode' : 'dark_mode' }}</span>
-      </button>
-
-      <div class="profile-menu-wrap" *ngIf="profile">
-        <div class="profile-chip" (click)="toggleProfileMenu($event)">
-          <span class="role-badge">{{ profile.role }}</span>
-          <span class="user-name">{{ profile.full_name || 'User' }}</span>
-          <span class="material-icons dropdown-arrow">expand_more</span>
-        </div>
-
-        <div class="profile-dropdown" [class.show]="showProfileMenu">
-          <div class="dropdown-header">
-            <p class="user-email">{{ profile.email }}</p>
-          </div>
-          <div class="dropdown-divider"></div>
-          <a routerLink="/dashboard/profile" class="dropdown-item">
-            <span class="material-icons">person_outline</span>
-            Profile Settings
-          </a>
-          <button (click)="logout()" class="dropdown-item logout-link">
-            <span class="material-icons">logout</span>
-            Sign Out
-          </button>
-        </div>
-      </div>
-    </div>
-  </header>
+  <!-- Extracted Navbar -->
+  <app-navbar [profile]="profile" [isDarkMode]="isDarkMode" (toggleTheme)="toggleDarkMode()" (logoutNeeded)="logout()">
+  </app-navbar>
 
   <div class="main-container">
-    <!-- Sophisticated Sidebar -->
-    <aside class="sidebar">
-      <nav class="side-nav">
-        <div class="nav-section">
-          <span class="section-label">General</span>
-          <a routerLink="/dashboard" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }"
-            class="nav-item">
-            <span class="material-icons">dashboard</span>
-            <span class="item-label">Overview</span>
-          </a>
-          <a routerLink="/books" routerLinkActive="active" class="nav-item">
-            <span class="material-icons">auto_stories</span>
-            <span class="item-label">Catalog</span>
-          </a>
-        </div>
-
-        <div class="nav-section">
-          <span class="section-label">Personal</span>
-          <a routerLink="/dashboard/loans" routerLinkActive="active" class="nav-item">
-            <span class="material-icons">history_edu</span>
-            <span class="item-label">My Loans</span>
-          </a>
-          <a routerLink="/dashboard/reservations" routerLinkActive="active" class="nav-item">
-            <span class="material-icons">bookmark_border</span>
-            <span class="item-label">Reservations</span>
-          </a>
-          <a routerLink="/dashboard/fines" routerLinkActive="active" class="nav-item">
-            <span class="material-icons">payments</span>
-            <span class="item-label">Fines</span>
-          </a>
-        </div>
-
-        <div class="nav-section" *ngIf="isStaff">
-          <span class="section-label">Management</span>
-          <a routerLink="/dashboard/members" routerLinkActive="active" class="nav-item">
-            <span class="material-icons">people_outline</span>
-            <span class="item-label">Members</span>
-          </a>
-          <a routerLink="/dashboard/reports" routerLinkActive="active" class="nav-item">
-            <span class="material-icons">insert_chart_outlined</span>
-            <span class="item-label">Reports</span>
-          </a>
-        </div>
-      </nav>
-
-      <div class="sidebar-footer">
-        <a routerLink="/" class="footer-btn">
-          <span class="material-icons">home</span>
-          <span>Home</span>
-        </a>
-        <button (click)="logout()" class="footer-btn logout-action">
-          <span class="material-icons">logout</span>
-          <span>Sign Out</span>
-        </button>
-      </div>
-    </aside>
+    <!-- Extracted Sidebar -->
+    <app-sidebar [isStaff]="isStaff" (logoutNeeded)="logout()">
+    </app-sidebar>
 
     <!-- Content Area -->
     <main class="content-stage">

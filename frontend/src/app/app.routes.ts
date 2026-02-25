@@ -42,7 +42,11 @@ export const routes: Routes = [
       { path: 'reservations', component: ReservationsComponent },
       { path: 'fines', component: FinesComponent },
       { path: 'members', component: MembersComponent },
-      { path: 'reports', component: ReportsComponent }
+      { path: 'reports', component: ReportsComponent },
+      {
+        path: 'profile',
+        loadComponent: () => import('./features/profile/profile').then(m => m.ProfileComponent)
+      }
     ]
   },
   { path: '**', redirectTo: '' }

@@ -1,8 +1,13 @@
+.detail-stage {
+    min-height: 100%;
+}
+
 .detail-container {
     display: grid;
     grid-template-columns: 400px 1fr;
     gap: 5rem;
     padding: 2rem 0;
+    pointer-events: auto;
 }
 
 .cover-side {

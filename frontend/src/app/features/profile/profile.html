@@ -1,0 +1,58 @@
+<div class="profile-stage">
+    <header class="profile-header">
+        <span class="view-tag">Account</span>
+        <h1 class="page-title">Profile <br>Settings</h1>
+    </header>
+
+    <div class="status-indicator" *ngIf="loading">
+        <p>Synchronizing Profile...</p>
+    </div>
+
+    <div class="profile-card" *ngIf="!loading && profile">
+        <div class="profile-form">
+            <div class="form-group">
+                <label>Full Name</label>
+                <input [(ngModel)]="profile.full_name" placeholder="Name cannot be empty" class="form-input" />
+            </div>
+
+            <div class="form-group">
+                <label>Email Address</label>
+                <input [(ngModel)]="profile.email" placeholder="email@example.com" class="form-input" />
+            </div>
+
+            <div class="form-group">
+                <label>Student / Staff ID</label>
+                <input [(ngModel)]="profile.student_id" placeholder="Identification ID" class="form-input" />
+            </div>
+
+            <div class="form-group">
+                <label>Phone Number</label>
+                <input [(ngModel)]="profile.phone" placeholder="08x-xxxxxxx" class="form-input" />
+            </div>
+
+            <div class="form-group">
+                <label>Role</label>
+                <input [value]="profile.role" disabled class="form-input disabled-input" />
+                <span class="hint-text">Role changes must be authorized by administration.</span>
+            </div>
+
+            <div class="form-actions">
+                <p class="success-msg" *ngIf="message">{{ message }}</p>
+                <p class="error-msg" *ngIf="error">{{ error }}</p>
+
+                <button class="save-btn" (click)="saveProfile()" [disabled]="saving">
+                    <span class="material-icons" *ngIf="!saving">save</span>
+                    <span>{{ saving ? 'UPDATING...' : 'SAVE CHANGES' }}</span>
+                </button>
+            </div>
+        </div>
+
+        <div class="profile-meta">
+            <div class="meta-section">
+                <h3 class="brand-caps">Security</h3>
+                <p class="notify-meta">Account was created on {{ profile.created_at | date:'mediumDate' }}</p>
+                <button class="text-btn">Reset Password Request →</button>
+            </div>
+        </div>
+    </div>
+</div>

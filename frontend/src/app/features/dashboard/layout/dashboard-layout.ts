@@ -1,21 +1,22 @@
-import { Component, inject, HostListener, ChangeDetectorRef } from '@angular/core'
-import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router'
+import { Component, inject, ChangeDetectorRef } from '@angular/core'
+import { Router, RouterOutlet } from '@angular/router'
 import { NgIf } from '@angular/common'
 import { UserApiService } from '../../../services/user-api.service'
 import { AuthService } from '../../../core/auth.service'
 import { Profile } from '../../../models/profile.model'
+import { NavbarComponent } from '../../../navbar/navbar'
+import { SidebarComponent } from '../../../shared/components/sidebar/sidebar'
 
 @Component({
   selector: 'app-dashboard-layout',
   standalone: true,
-  imports: [RouterLink, RouterLinkActive, RouterOutlet, NgIf],
+  imports: [RouterOutlet, NgIf, NavbarComponent, SidebarComponent],
   templateUrl: './dashboard-layout.html',
   styleUrls: ['./dashboard-layout.css']
 })
 export class DashboardLayoutComponent {
   profile: Profile | null = null
   isDarkMode = false
-  showProfileMenu = false
   private userApi = inject(UserApiService)
   private authService = inject(AuthService)
   private router = inject(Router)
@@ -60,14 +61,5 @@ export class DashboardLayoutComponent {
     await this.authService.signOut()
     await this.router.navigateByUrl('/')
   }
-
-  toggleProfileMenu(event: Event) {
-    event.stopPropagation()
-    this.showProfileMenu = !this.showProfileMenu
-  }
-
-  @HostListener('document:click')
-  closeProfileMenu() {
-    this.showProfileMenu = false
-  }
 }
+

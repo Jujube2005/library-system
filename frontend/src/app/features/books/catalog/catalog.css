@@ -99,10 +99,15 @@
 }
 
 /* Book Grid */
-.book-grid {
+.book-grid,
+.skeleton-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
     gap: 3.5rem;
+}
+
+.skeleton-card {
+    pointer-events: none;
 }
 
 .book-card {

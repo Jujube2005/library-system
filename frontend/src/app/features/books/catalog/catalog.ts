@@ -120,9 +120,6 @@ export class BookCatalogComponent implements OnInit {
       return coverByTitle[titleKey]
     }
 
-    // Deterministic fallback based on ID
-    const num = (book.id.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0) % 9) + 1;
-    if (num === 8) return '/book8jpg.jpg';
-    return `/book${num}.jpg`;
+    return '/default-book-cover.svg'
   }
 }

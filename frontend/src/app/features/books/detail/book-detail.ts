@@ -109,10 +109,19 @@ export class BookDetailComponent implements OnInit {
     }
   }
 
-  getBookCover(id: string): string {
-    // This is a fallback if needed, but we should use a consistent logic
-    const num = (id.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0) % 9) + 1;
-    if (num === 8) return '/book8jpg.jpg';
-    return `/book${num}.jpg`;
+  getBookCover(title: string | undefined): string {
+    const titleKey = (title || '').trim().toLowerCase()
+    const coverByTitle: Record<string, string> = {
+      'เพราะเป็นวัยรุ่นจึงเจ็บปวด': '/book1.jpg',
+      'กล้าที่จะถูกเกลียด': '/book2.jpg',
+      'i decided to live as myself': '/book3.jpg',
+      'อยากตายแต่ก็อยากกินต๊อกบกกี #2': '/book4.jpg',
+      'sapiens: a brief history of humankind': '/book5.jpg',
+      'the intelligent investor': '/book6.jpg',
+      'ต้นส้มแสนรัก': '/book7.jpg',
+      'ก็แค่ปล่อยมันไป': '/book8jpg.jpg',
+      'เจ้าชายน้อย': '/book9.jpg'
+    }
+    return coverByTitle[titleKey] || '/default-book-cover.svg'
   }
 }
