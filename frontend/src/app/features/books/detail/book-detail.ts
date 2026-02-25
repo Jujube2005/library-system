@@ -84,12 +84,14 @@ export class BookDetailComponent implements OnInit {
     this.error = ''
 
     try {
+      console.log('Reserving Book ID:', this.book.id)
       const res = await this.reservationApi.createReservation(this.book.id)
       this.myReservation = res.data
-    } catch {
-      this.error = 'ไม่สามารถจองหนังสือได้'
+    } catch (err: any) {
+      this.error = err.error?.error || err.error?.message || 'ไม่สามารถจองหนังสือได้'
     } finally {
       this.reserving = false
+      this.cdr.detectChanges()
     }
   }
 
@@ -106,6 +108,7 @@ export class BookDetailComponent implements OnInit {
       this.error = 'ไม่สามารถยกเลิกการจองได้'
     } finally {
       this.reserving = false
+      this.cdr.detectChanges()
     }
   }
 

@@ -27,7 +27,7 @@
         <h2 class="brand-caps">New Admissions</h2>
 
         <div class="featured-grid" *ngIf="featuredBooks.length; else noBooks">
-          <a *ngFor="let b of featuredBooks" routerLink="/books/{{b.id}}" class="mini-book-card">
+          <a *ngFor="let b of featuredBooks" [routerLink]="['/books', b.id]" class="mini-book-card">
             <div class="mini-cover">
               <img [src]="getBookCover(b)" alt="">
             </div>

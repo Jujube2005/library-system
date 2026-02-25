@@ -1,4 +1,4 @@
-<div class="page-loader" *ngIf="loading">
+<div class="page-loader" [class.hidden]="!loading">
     <div class="page-loader-bar"></div>
 </div>
 <router-outlet></router-outlet>

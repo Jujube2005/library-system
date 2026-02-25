@@ -1,5 +1,5 @@
-import { Component, inject, OnInit } from '@angular/core';
-import { RouterOutlet, Router, NavigationStart, NavigationEnd, NavigationCancel, NavigationError } from '@angular/router';
+import { Component, inject, OnInit, ChangeDetectorRef } from '@angular/core';
+import { RouterOutlet, Router, NavigationStart, NavigationEnd, NavigationCancel, NavigationError, Event } from '@angular/router';
 import { NgIf } from '@angular/common';
 
 @Component({
@@ -11,11 +11,16 @@ import { NgIf } from '@angular/common';
 export class App implements OnInit {
   loading = false;
   private router = inject(Router);
+  private cdr = inject(ChangeDetectorRef);
 
   ngOnInit() {
     this.router.events.subscribe((event) => {
       if (event instanceof NavigationStart) {
-        this.loading = true;
+        // Move to next tick to avoid ExpressionChangedAfterItHasBeenCheckedError
+        setTimeout(() => {
+          this.loading = true;
+          this.cdr.detectChanges();
+        });
       } else if (
         event instanceof NavigationEnd ||
         event instanceof NavigationCancel ||
@@ -23,6 +28,7 @@ export class App implements OnInit {
       ) {
         setTimeout(() => {
           this.loading = false;
+          this.cdr.detectChanges();
         }, 300); // Small delay for smooth transition
       }
     });

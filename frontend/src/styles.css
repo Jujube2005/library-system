@@ -160,3 +160,7 @@ button {
 a {
     transition: all 0.3s var(--transition-ease);
 }
+
+.hidden {
+    display: none !important;
+}

@@ -35,7 +35,7 @@
   <p class="error-msg" *ngIf="!loading && error">{{ error }}</p>
 
   <div class="book-grid loading-fade" *ngIf="!loading && !error && books.length">
-    <a *ngFor="let b of books" routerLink="/books/{{b.id}}" class="book-card">
+    <a *ngFor="let b of books" [routerLink]="['/books', b.id]" class="book-card">
       <div class="book-cover">
         <img [src]="getBookCover(b)" [alt]="b.title" class="cover-image" />
       </div>

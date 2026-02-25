@@ -58,7 +58,11 @@ export class ApiService {
     })
 
     if (!res.ok) {
-      throw new Error(`Request failed: ${res.status}`)
+      const errorData = await res.json().catch(() => ({}))
+      const err = new Error(`Request failed: ${res.status}`)
+        ; (err as any).status = res.status
+        ; (err as any).error = errorData
+      throw err
     }
 
     return res.json() as Promise<T>
@@ -76,7 +80,11 @@ export class ApiService {
     })
 
     if (!res.ok) {
-      throw new Error(`Request failed: ${res.status}`)
+      const errorData = await res.json().catch(() => ({}))
+      const err = new Error(`Request failed: ${res.status}`)
+        ; (err as any).status = res.status
+        ; (err as any).error = errorData
+      throw err
     }
 
     return res.json() as Promise<T>
@@ -93,7 +101,11 @@ export class ApiService {
     })
 
     if (!res.ok) {
-      throw new Error(`Request failed: ${res.status}`)
+      const errorData = await res.json().catch(() => ({}))
+      const err = new Error(`Request failed: ${res.status}`)
+        ; (err as any).status = res.status
+        ; (err as any).error = errorData
+      throw err
     }
 
     return res.json() as Promise<T>
