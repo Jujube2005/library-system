@@ -133,7 +133,7 @@ export const recordReturnByStaff = async (loanId: string) => {
 export const confirmReservationByStaff = async (reservationId: string, staffId: string) => {
   const { data: resv, error } = await supabase
     .from('reservations')
-    .select('id, user_id, book_id, status, reserved_at, expires_at')
+    .select('id, user_id, book_id, status, reserved_at')
     .eq('id', reservationId)
     .single()
 
@@ -193,7 +193,7 @@ export const createBook = async (bookData: any) => {
     const increment = Number(bookData.total_copies ?? bookData.copies ?? 1)
     const { data } = await supabase
       .from('books')
-      .update({ 
+      .update({
         total_copies: (existingBook as any).total_copies + increment,
         available_copies: (existingBook as any).available_copies + increment
       })
@@ -244,10 +244,10 @@ export const deleteBookSafely = async (bookId: string) => {
 
   const { data, error } = await supabase
     .from('books')
-    .update({ 
-      is_archived: true, 
+    .update({
+      is_archived: true,
       status: 'unavailable',
-      deleted_at: new Date() 
+      deleted_at: new Date()
     })
     .eq('id', bookId);
 

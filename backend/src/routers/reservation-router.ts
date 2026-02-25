@@ -8,7 +8,7 @@ const router = Router()
 router.post(
   '/',
   protect,
-  authorize('student', 'instructor'),
+  authorize('student', 'instructor', 'staff'),
   async (req: any, res: Response) => {
     try {
       const supabase = req.supabase
@@ -37,7 +37,7 @@ router.post(
           user_id: userId,
           book_id: bookId
         })
-        .select('id, book_id, status, reserved_at, expires_at')
+        .select('id, book_id, status, reserved_at')
         .single()
 
       if (error) {
@@ -55,7 +55,7 @@ router.post(
 router.get(
   '/my',
   protect,
-  authorize('student', 'instructor'),
+  authorize('student', 'instructor', 'staff'),
   async (req: any, res: Response) => {
     try {
       const supabase = req.supabase
@@ -74,8 +74,16 @@ router.get(
 
       const { data, error } = await supabase
         .from('reservations')
-        .select('*')
+        .select(`
+          *,
+          books (
+            title,
+            author,
+            category
+          )
+        `)
         .eq('user_id', userId)
+        .order('reserved_at', { ascending: false })
 
       if (error) {
         console.error('Reservations Query Error:', error)
@@ -93,7 +101,7 @@ router.get(
 router.delete(
   '/:id',
   protect,
-  authorize('student', 'instructor'),
+  authorize('student', 'instructor', 'staff'),
   async (req: any, res: Response) => {
     try {
       const supabase = req.supabase
