@@ -1,22 +1,26 @@
-import { Component, OnInit } from '@angular/core'
-import { NgFor, NgIf } from '@angular/common'
+import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core'
+import { NgFor, NgIf, DatePipe, NgClass } from '@angular/common'
 import { ReservationApiService } from '../../../services/reservation-api.service'
 import { Reservation } from '../../../models/reservation.model'
 
 @Component({
   selector: 'app-reservations',
   standalone: true,
-  imports: [NgFor, NgIf],
-  templateUrl: './reservations.html'
+  imports: [NgFor, NgIf, DatePipe, NgClass],
+  templateUrl: './reservations.html',
+  styleUrls: ['./reservations.css']
 })
-export class ReservationsComponent implements OnInit {
+export class MyReservationsComponent implements OnInit {
   reservations: Reservation[] = []
   loading = false
   error = ''
+  private cdr = inject(ChangeDetectorRef)
+  private reservationApi = inject(ReservationApiService)
 
-  constructor(private reservationApi: ReservationApiService) {}
+  constructor() { }
 
   ngOnInit() {
+    console.log('[Reservations] Component Initialized - Design v2')
     void this.loadReservations()
   }
 
@@ -31,6 +35,7 @@ export class ReservationsComponent implements OnInit {
       this.error = 'ไม่สามารถดึงรายการจองหนังสือได้'
     } finally {
       this.loading = false
+      this.cdr.detectChanges()
     }
   }
 
@@ -40,8 +45,10 @@ export class ReservationsComponent implements OnInit {
     try {
       await this.reservationApi.cancelReservation(reservation.id)
       this.reservations = this.reservations.filter(r => r.id !== reservation.id)
+      this.cdr.detectChanges()
     } catch {
       this.error = 'ไม่สามารถยกเลิกการจองได้'
+      this.cdr.detectChanges()
     }
   }
 }

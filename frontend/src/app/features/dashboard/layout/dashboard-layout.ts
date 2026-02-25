@@ -1,6 +1,5 @@
 import { Component, inject, ChangeDetectorRef } from '@angular/core'
 import { Router, RouterOutlet } from '@angular/router'
-import { NgIf } from '@angular/common'
 import { UserApiService } from '../../../services/user-api.service'
 import { AuthService } from '../../../core/auth.service'
 import { Profile } from '../../../models/profile.model'
@@ -10,7 +9,7 @@ import { SidebarComponent } from '../../../shared/components/sidebar/sidebar'
 @Component({
   selector: 'app-dashboard-layout',
   standalone: true,
-  imports: [RouterOutlet, NgIf, NavbarComponent, SidebarComponent],
+  imports: [RouterOutlet, NavbarComponent, SidebarComponent],
   templateUrl: './dashboard-layout.html',
   styleUrls: ['./dashboard-layout.css']
 })

@@ -1,29 +1,48 @@
-<h1>Reservations</h1>
+<div class="reservations-container">
+  <header class="reservations-header">
+    <span class="view-tag">Personal <!-- v2 --></span>
+    <h1 class="page-title">My Book <br>Reservations</h1>
+  </header>
 
-<p *ngIf="loading">กำลังโหลด...</p>
-<p *ngIf="!loading && error">{{ error }}</p>
+  <!-- Loading Skeleton -->
+  <div class="skeleton-list" *ngIf="loading">
+    <div class="skeleton-card skeleton" *ngFor="let i of [1,2,3]"></div>
+  </div>
 
-<table *ngIf="!loading && !error && reservations.length">
-  <thead>
-    <tr>
-      <th>Book</th>
-      <th>Status</th>
-      <th>Reserved At</th>
-      <th>Expires At</th>
-      <th></th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr *ngFor="let r of reservations">
-      <td>{{ r.book_id }}</td>
-      <td>{{ r.status }}</td>
-      <td>{{ r.reserved_at }}</td>
-      <td>{{ r.expires_at || '-' }}</td>
-      <td>
-        <button *ngIf="r.status === 'pending'" (click)="cancel(r)">ยกเลิก</button>
-      </td>
-    </tr>
-  </tbody>
-</table>
+  <p class="error-msg" *ngIf="!loading && error">{{ error }}</p>
 
-<p *ngIf="!loading && !error && !reservations.length">ยังไม่มีรายการจอง</p>
+  <!-- Empty State -->
+  <div class="empty-state" *ngIf="!loading && !error && !reservations.length">
+    <span class="material-icons empty-icon">turned_in_not</span>
+    <p class="notify-meta">คุณยังไม่มีรายการจองหนังสือในขณะนี้</p>
+  </div>
+
+  <!-- Reservation List -->
+  <div class="reservation-list loading-fade" *ngIf="!loading && !error && reservations.length">
+    <div class="reservation-card" *ngFor="let r of reservations">
+      <div class="book-info">
+        <span class="res-category">{{ r.books?.category || 'Collection' }}</span>
+        <h3 class="res-title">{{ r.books?.title || 'Unknown Title' }}</h3>
+        <span class="res-author">By {{ r.books?.author || 'Unknown Author' }}</span>
+      </div>
+
+      <div class="status-section">
+        <div class="meta-info">
+          <span class="meta-label">Reserved On</span>
+          <span class="meta-value">{{ r.reserved_at | date:'dd MMM yyyy' }}</span>
+        </div>
+
+        <div class="meta-info">
+          <span class="meta-label">Status</span>
+          <span class="status-badge" [ngClass]="'status-' + r.status">
+            {{ r.status }}
+          </span>
+        </div>
+
+        <button class="cancel-btn" *ngIf="r.status === 'pending'" (click)="cancel(r)">
+          Cancel Request
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

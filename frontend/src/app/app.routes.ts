@@ -6,7 +6,7 @@ import { DashboardOverviewComponent } from './features/dashboard/overview/overvi
 import { BookCatalogComponent } from './features/books/catalog/catalog'
 import { BookDetailComponent } from './features/books/detail/book-detail'
 import { LoansComponent } from './features/borrow/loans/loans'
-import { ReservationsComponent } from './features/reservations/list/reservations'
+import { MyReservationsComponent } from './features/reservations/list/reservations'
 import { FinesComponent } from './features/borrow/fines/fines'
 import { MembersComponent } from './features/admin/members/members'
 import { ReportsComponent } from './features/admin/reports/reports'
@@ -39,7 +39,7 @@ export const routes: Routes = [
       { path: '', component: DashboardOverviewComponent },
       // Moved books to /books
       { path: 'loans', component: LoansComponent },
-      { path: 'reservations', component: ReservationsComponent },
+      { path: 'reservations', component: MyReservationsComponent },
       { path: 'fines', component: FinesComponent },
       { path: 'members', component: MembersComponent },
       { path: 'reports', component: ReportsComponent },
