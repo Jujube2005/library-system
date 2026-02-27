@@ -4,6 +4,7 @@ export interface Profile {
   id: string
   full_name: string
   email: string
+  avatar_url: string | null
   student_id: string | null
   phone: string | null
   role: UserRole

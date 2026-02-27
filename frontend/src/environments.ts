@@ -1,3 +1,3 @@
-export const supabaseUrl = 'https://ijdrnvemifppzgsffqjv.supabase.co'
-export const supabaseAnonKey = 'sb_publishable_Heh5x5XRBmC2C_QE7BOFaQ_gHDPzmGL'
+export const supabaseUrl = 'https://nzhnzwmkhrwngpdinkca.supabase.co'
+export const supabaseAnonKey = 'sb_publishable_5w3ppr6OJTQh-HGfTKZoYA_hfkJ7RM7'
 

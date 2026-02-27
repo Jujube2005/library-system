@@ -1,5 +1,5 @@
 import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core'
-import { NgIf, DatePipe } from '@angular/common'
+import { NgIf, NgFor, DatePipe } from '@angular/common'
 import { FormsModule } from '@angular/forms'
 import { UserApiService } from '../../services/user-api.service'
 import { Profile } from '../../models/profile.model'
@@ -7,15 +7,13 @@ import { Profile } from '../../models/profile.model'
 @Component({
     selector: 'app-profile',
     standalone: true,
-    imports: [NgIf, FormsModule, DatePipe],
+    imports: [NgIf, NgFor, FormsModule, DatePipe],
     templateUrl: './profile.html',
-    styleUrls: ['./profile.css']
+    styleUrl: './profile.css'
 })
 export class ProfileComponent implements OnInit {
     profile: Profile | null = null
     loading = false
-    saving = false
-    message = ''
     error = ''
 
     private userApi = inject(UserApiService)
@@ -27,36 +25,14 @@ export class ProfileComponent implements OnInit {
 
     async loadProfile() {
         this.loading = true
+        this.error = ''
         try {
             this.profile = await this.userApi.getMe()
         } catch (err) {
-            this.error = 'ไม่สามารถโหลดข้อมูลโปรไฟล์ได้'
+            console.error('Error loading profile:', err)
+            this.error = 'ไม่สามารถโหลดข้อมูลโปรไฟล์ได้ กรุณาลองใหม่อีกครั้ง'
         } finally {
             this.loading = false
-            this.cdr.detectChanges()
-        }
-    }
-
-    async saveProfile() {
-        if (!this.profile) return
-
-        this.saving = true
-        this.message = ''
-        this.error = ''
-
-        try {
-            if (!this.profile) return
-            await this.userApi.updateMe({
-                full_name: this.profile.full_name,
-                email: this.profile.email,
-                student_id: this.profile.student_id,
-                phone: this.profile.phone
-            })
-            this.message = 'บันทึกข้อมูลสำเร็จ'
-        } catch (err) {
-            this.error = 'เกิดข้อผิดพลาดในการบันทึกข้อมูล'
-        } finally {
-            this.saving = false
             this.cdr.detectChanges()
         }
     }

@@ -32,7 +32,6 @@ export class ApiService {
 
     const res = await fetch(this.buildUrl(path), {
       method: 'GET',
-      credentials: 'include',
       headers,
       ...options
     })
@@ -51,7 +50,6 @@ export class ApiService {
 
     const res = await fetch(this.buildUrl(path), {
       method: 'POST',
-      credentials: 'include',
       headers,
       body: JSON.stringify(body),
       ...options
@@ -73,7 +71,6 @@ export class ApiService {
 
     const res = await fetch(this.buildUrl(path), {
       method: 'PATCH',
-      credentials: 'include',
       headers,
       body: JSON.stringify(body),
       ...options
@@ -95,7 +92,6 @@ export class ApiService {
 
     const res = await fetch(this.buildUrl(path), {
       method: 'DELETE',
-      credentials: 'include',
       headers,
       ...options
     })
