@@ -1,5 +1,5 @@
-import { Book } from './book.model';
-import { Profile } from './profile.model'; // Assuming a profile.model.ts will be created
+import { Book } from './book';
+import { Profile } from './profile';
 
 export type LoanStatus = 'active' | 'returned' | 'overdue' | 'cancelled';
 
@@ -17,5 +17,5 @@ export interface Loan {
 
   // Joined data (optional, for display purposes)
   books?: Book;
-  user?: Profile[]; // Changed from Profile to Profile[] to match backend
+  user?: Profile[];
 }

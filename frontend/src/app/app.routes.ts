@@ -51,8 +51,16 @@ export const routes: Routes = [
       { path: 'members', component: MembersComponent },
       { path: 'reports', component: ReportsComponent },
       {
+        path: 'book-management',
+        loadComponent: () => import('./features/staff/book-management/book-management').then(m => m.BookManagementComponent)
+      },
+      {
         path: 'profile',
         loadComponent: () => import('./features/profile/profile').then(m => m.ProfileComponent)
+      },
+      {
+        path: 'loan-management',
+        loadComponent: () => import('./features/staff/loan-management/loan-management').then(m => m.LoanManagementComponent)
       }
     ]
   },

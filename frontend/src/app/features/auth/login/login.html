@@ -9,10 +9,30 @@
       </header>
 
       <div class="form-main">
-        <h1 class="welcome-text">RMUTI <br>Single Sign-On</h1>
+        <div class="role-selector">
+          <button type="button" class="role-btn" [class.active]="loginRole === 'student'" (click)="setRole('student')">
+            <span class="material-icons">person</span>
+            Student / Member
+          </button>
+          <button type="button" class="role-btn" [class.active]="loginRole === 'staff'" (click)="setRole('staff')">
+            <span class="material-icons">admin_panel_settings</span>
+            Library Staff
+          </button>
+        </div>
+
+        <h1 class="welcome-text">
+          <ng-container *ngIf="loginRole === 'student'">Student <br>Sign-In</ng-container>
+          <ng-container *ngIf="loginRole === 'staff'">Staff <br>Sign-In</ng-container>
+        </h1>
         <p class="sub-text">
-          เข้าสู่ระบบห้องสมุดดิจิทัลด้วยบัญชีผู้ใช้มหาวิทยาลัย <br>
-          เพื่อเข้าถึงฐานข้อมูลวิชาการและบริการยืม-คืนออนไลน์
+          <ng-container *ngIf="loginRole === 'student'">
+            เข้าสู่ระบบด้วยบัญชีนักศึกษา/อาจารย์ <br>
+            เพื่อจัดการการยืม-คืน และการจองหนังสือ
+          </ng-container>
+          <ng-container *ngIf="loginRole === 'staff'">
+            สำหรับเจ้าหน้าที่ห้องสมุดเท่านั้น <br>
+            เพื่อจัดการระบบ คลังหนังสือ และรายงาน
+          </ng-container>
         </p>
 
         <form (ngSubmit)="login()" class="auth-form">
@@ -27,7 +47,7 @@
           </div>
 
           <div class="form-options">
-            <span>ไม่มีบัญชี? <a routerLink="/register" class="forgot-link">สมัครสมาชิก</a></span>
+            <span>ไม่มีบัญชี? <a [routerLink]="['/register']" [queryParams]="{ role: loginRole }" class="forgot-link">สมัครสมาชิก</a></span>
             <span style="opacity: 0.2">|</span>
             <a href="#" class="forgot-link" (click)="goBack()">กลับหน้าหลัก</a>
           </div>

@@ -53,13 +53,21 @@ const updateUserStatus = async (supabase, targetUserId, isActive) => {
     return data;
 };
 exports.updateUserStatus = updateUserStatus;
-const updateMyProfile = async (supabase, userId, updates) => {
+const updateMyProfile = async (supabase, userId, updates, userRole // เพิ่ม userRole เข้ามา
+) => {
     const payload = {};
     if (typeof updates.full_name === 'string') {
         payload.full_name = updates.full_name;
     }
     if (typeof updates.phone === 'string') {
         payload.phone = updates.phone;
+    }
+    if (typeof updates.student_id === 'string') {
+        // อนุญาตให้อัปเดต student_id ได้เฉพาะ staff เท่านั้น
+        if (userRole !== 'staff') {
+            throw new Error('คุณไม่มีสิทธิ์แก้ไขรหัสนักศึกษา/เจ้าหน้าที่');
+        }
+        payload.student_id = updates.student_id;
     }
     if (Object.keys(payload).length === 0) {
         throw new Error('No fields to update');

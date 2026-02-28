@@ -33,10 +33,9 @@ var __importStar = (this && this.__importStar) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.renewLoanHandler = exports.returnLoan = exports.viewAllLoans = exports.viewMyLoans = exports.createLoan = void 0;
+exports.getLoanById = exports.renewLoanByStaff = exports.renewLoanHandler = exports.returnLoan = exports.viewAllLoans = exports.viewMyLoans = exports.createLoan = void 0;
 const loanService = __importStar(require("../services/loan-service"));
 const fine_service_1 = require("../services/fine-service");
-const staffService = __importStar(require("../services/staff-service"));
 const createLoan = async (req, res) => {
     try {
         const staffId = req.user?.id;
@@ -49,7 +48,7 @@ const createLoan = async (req, res) => {
             res.status(400).json({ error: 'MISSING_FIELDS' });
             return;
         }
-        const result = await staffService.recordBorrowByStaff(staffId, userId, bookId);
+        const result = await loanService.createLoan(userId, bookId, staffId);
         res.status(201).json({
             data: result
         });
@@ -95,7 +94,7 @@ const returnLoan = async (req, res) => {
             res.status(400).json({ error: 'MISSING_LOAN_ID' });
             return;
         }
-        const result = await staffService.recordReturnByStaff(id);
+        const result = await loanService.returnLoan(id);
         res.status(200).json({
             data: result
         });
@@ -123,3 +122,51 @@ const renewLoanHandler = async (req, res) => {
     }
 };
 exports.renewLoanHandler = renewLoanHandler;
+const renewLoanByStaff = async (req, res) => {
+    try {
+        const staffId = req.user?.id;
+        const { id } = req.params;
+        const { userId } = req.body;
+        if (!staffId) {
+            res.status(401).json({ error: 'UNAUTHENTICATED' });
+            return;
+        }
+        if (!id) {
+            res.status(400).json({ error: 'MISSING_LOAN_ID' });
+            return;
+        }
+        if (!userId) {
+            res.status(400).json({ error: 'MISSING_USER_ID' });
+            return;
+        }
+        const result = await loanService.renewLoanByStaff(id, userId, staffId);
+        res.status(200).json({
+            data: result
+        });
+    }
+    catch (error) {
+        res.status(400).json({ error: error.message });
+    }
+};
+exports.renewLoanByStaff = renewLoanByStaff;
+const getLoanById = async (req, res) => {
+    try {
+        const { id } = req.params;
+        if (!id) {
+            res.status(400).json({ error: 'MISSING_LOAN_ID' });
+            return;
+        }
+        const loan = await loanService.getLoanById(id);
+        if (!loan) {
+            res.status(404).json({ error: 'LOAN_NOT_FOUND' });
+            return;
+        }
+        res.status(200).json({
+            data: loan
+        });
+    }
+    catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
+exports.getLoanById = getLoanById;

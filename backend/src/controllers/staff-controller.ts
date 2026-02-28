@@ -1,6 +1,7 @@
 import { Request, Response } from 'express'
 import { createClient } from '@supabase/supabase-js'
 import * as staffService from '../services/staff-service'
+import * as loanService from '../services/loan-service' // เพิ่ม import loanService
 import { env } from '../config/env'
 
 export const recordBorrow = async (req: any, res: Response) => {
@@ -21,7 +22,7 @@ export const recordBorrow = async (req: any, res: Response) => {
             return
         }
 
-        const result = await staffService.recordBorrowByStaff(staffId, targetUserId, bookId)
+        const result = await loanService.createLoan(targetUserId, bookId, staffId) // เรียกใช้ loanService.createLoan
 
         res.status(201).json({
             message: 'บันทึกการยืมโดย Staff สำเร็จ',
@@ -41,7 +42,7 @@ export const recordReturn = async (req: Request, res: Response) => {
             return
         }
 
-        const result = await staffService.recordReturnByStaff(borrowId)
+        const result = await loanService.returnLoan(borrowId) // เรียกใช้ loanService.returnLoan
 
         res.status(200).json({
             message: 'บันทึกการคืนโดย Staff สำเร็จ',

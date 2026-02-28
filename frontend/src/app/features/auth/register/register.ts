@@ -1,7 +1,7 @@
-import { Component, inject } from '@angular/core'
+import { Component, inject, OnInit } from '@angular/core'
 import { FormsModule } from '@angular/forms'
 import { NgIf } from '@angular/common'
-import { Router, RouterLink } from '@angular/router'
+import { Router, RouterLink, ActivatedRoute } from '@angular/router'
 import { AuthService } from '../../../core/auth.service'
 
 @Component({
@@ -11,23 +11,34 @@ import { AuthService } from '../../../core/auth.service'
     templateUrl: './register.html',
     styleUrls: ['./register.css']
 })
-export class RegisterComponent {
+export class RegisterComponent implements OnInit {
     email = ''
     password = ''
     confirmPassword = ''
     fullName = ''
     phone = ''
     studentId = ''
+    role = 'student'
     isSubmitting = false
     errorMessage = ''
     isDarkMode = false
 
     private auth = inject(AuthService)
     private router = inject(Router)
+    private route = inject(ActivatedRoute)
 
     constructor() {
         const savedTheme = localStorage.getItem('theme')
         this.isDarkMode = savedTheme === 'dark'
+    }
+
+    ngOnInit() {
+        // รับค่า role จาก query parameters เช่น /register?role=staff
+        this.route.queryParams.subscribe(params => {
+            if (params['role']) {
+                this.role = params['role']
+            }
+        })
     }
 
     goBack() {
@@ -63,10 +74,12 @@ export class RegisterComponent {
                 this.password,
                 this.fullName,
                 this.phone,
-                this.studentId || undefined
+                this.studentId || undefined,
+                this.role
             )
             alert('สมัครสมาชิกสำเร็จ! กรุณาเข้าสู่ระบบ')
-            await this.router.navigateByUrl('/login')
+            // พาล็อกอินตาม role ที่สมัคร
+            await this.router.navigate(['/login'], { queryParams: { role: this.role } })
         } catch (err: any) {
             this.errorMessage = err?.message ?? 'สมัครสมาชิกไม่สำเร็จ กรุณาลองใหม่อีกครั้ง'
         } finally {

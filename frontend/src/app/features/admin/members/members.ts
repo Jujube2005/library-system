@@ -3,7 +3,7 @@ import { NgFor, NgIf } from '@angular/common'
 import { FormsModule } from '@angular/forms'
 import { AdminApiService } from '../../../services/admin-api.service'
 import { StaffApiService } from '../../../services/staff-api.service'
-import { Profile, UserRole } from '../../../models/profile.model'
+import { Profile } from '../../../models/profile.model'
 
 @Component({
   selector: 'app-members',
@@ -20,7 +20,7 @@ export class MembersComponent implements OnInit {
 
   inviteEmail = ''
   inviteName = ''
-  inviteRole: UserRole = 'student'
+  inviteRole: 'student' | 'instructor' | 'staff' | 'admin' = 'student'
   inviting = false
 
   savingUserId: string | null = null
@@ -65,7 +65,7 @@ export class MembersComponent implements OnInit {
     )
   }
 
-  async changeRole(user: Profile, role: UserRole) {
+  async changeRole(user: Profile, role: 'student' | 'instructor' | 'staff' | 'admin') {
     if (this.savingUserId) return
 
     this.savingUserId = user.id

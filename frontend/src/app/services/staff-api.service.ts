@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core'
 import { ApiService } from './api.service'
-import { UserRole } from '../models/profile.model'
+import { Profile } from '../models/profile.model'
 
 interface InviteResponse {
   data: {
@@ -17,7 +17,7 @@ interface InviteResponse {
 export class StaffApiService {
   constructor(private api: ApiService) {}
 
-  inviteUser(email: string, fullName: string, role: UserRole) {
+  inviteUser(email: string, fullName: string, role: 'student' | 'instructor' | 'staff' | 'admin') {
     return this.api.post<InviteResponse>('/api/staff/users/invite', {
       email,
       fullName,

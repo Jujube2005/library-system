@@ -39,7 +39,8 @@ export async function register(
     password: string,
     fullName: string, 
     phone: string,    
-    studentId?: string 
+    studentId?: string,
+    role: string = 'student'
 ): Promise<AuthResult<null>> {
     const client = createClient(env.supabaseUrl, env.supabaseAnonKey)
     const { data, error } = await client.auth.signUp({
@@ -49,7 +50,8 @@ export async function register(
             data: {
                 full_name: fullName,
                 phone: phone,
-                student_id: studentId
+                student_id: studentId,
+                role: role
             }
         }
     })
@@ -75,7 +77,7 @@ export async function register(
                 full_name: fullName,
                 phone: phone,
                 student_id: studentId,
-                role: 'student',
+                role: role,
                 is_active: true
             }, { onConflict: 'id' })
     }

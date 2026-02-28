@@ -2,7 +2,7 @@ import { Request, Response } from 'express'
 import { createClient } from '@supabase/supabase-js'
 import { env } from '../config/env'
 import * as bookService from '../services/book-service'
-import * as staffService from '../services/staff-service'
+import { Book } from '../types/book'
 
 export async function searchBooks(req: Request, res: Response): Promise<void> {
   try {
@@ -162,8 +162,8 @@ export const returnBook = async (req: any, res: Response) => {
 
 export const createBook = async (req: Request, res: Response) => {
   try {
-    const bookData = req.body
-    const result = await staffService.createBook(bookData)
+    const bookData = req.body as Omit<Book, 'id' | 'created_at' | 'updated_at'>
+    const result = await bookService.createBook(bookData)
 
     res.status(201).json({
       data: result
@@ -182,8 +182,8 @@ export const updateBook = async (req: Request, res: Response) => {
       return
     }
 
-    const updateData = req.body
-    const result = await staffService.updateBookInfo(id, updateData)
+    const updateData = req.body as Partial<Book>
+    const result = await bookService.updateBookInfo(id, updateData)
 
     res.status(200).json({
       data: result
@@ -202,7 +202,31 @@ export const deleteBook = async (req: Request, res: Response) => {
       return
     }
 
-    const result = await staffService.deleteBookSafely(id)
+    const result = await bookService.deleteBook(id)
+
+    res.status(200).json({
+      data: result
+    })
+  } catch (error: any) {
+    res.status(400).json({ error: error.message })
+  }
+}
+
+export const updateBookCopies = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params
+    const { change } = req.body as { change?: number }
+
+    if (!id) {
+      res.status(400).json({ error: 'MISSING_BOOK_ID' })
+      return
+    }
+    if (typeof change !== 'number') {
+      res.status(400).json({ error: 'CHANGE_AMOUNT_REQUIRED' })
+      return
+    }
+
+    const result = await bookService.updateBookCopies(id, change)
 
     res.status(200).json({
       data: result

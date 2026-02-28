@@ -35,6 +35,14 @@
 
         <div class="nav-section" *ngIf="isStaff">
             <span class="section-label">Management</span>
+            <a routerLink="/dashboard/book-management" routerLinkActive="active" class="nav-item">
+                <span class="material-icons">menu_book</span>
+                <span class="item-label">Book Management</span>
+            </a>
+            <a routerLink="/dashboard/loan-management" routerLinkActive="active" class="nav-item">
+                <span class="material-icons">assignment_return</span>
+                <span class="item-label">Loan Management</span>
+            </a>
             <a routerLink="/dashboard/members" routerLinkActive="active" class="nav-item">
                 <span class="material-icons">people_outline</span>
                 <span class="item-label">Members</span>

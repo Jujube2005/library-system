@@ -9,12 +9,13 @@ export async function login(req: Request, res: Response): Promise<void> {
 }
 
 export async function register(req: Request, res: Response): Promise<void> {
-    const { email, password, fullName, phone, studentId } = req.body as {
+    const { email, password, fullName, phone, studentId, role } = req.body as {
         email?: string;
         password?: string;
         fullName?: string;
         phone?: string;
         studentId?: string;
+        role?: string;
     }
 
     const result = await registerService(
@@ -22,7 +23,8 @@ export async function register(req: Request, res: Response): Promise<void> {
         password ?? '',
         fullName ?? '',
         phone ?? '',
-        studentId
+        studentId,
+        role
     )
     res.json(result)
 }

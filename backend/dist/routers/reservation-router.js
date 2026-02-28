@@ -38,7 +38,7 @@ const auth_middleware_1 = require("../middleware/auth-middleware");
 const role_middleware_1 = require("../middleware/role-middleware");
 const staffService = __importStar(require("../services/staff-service"));
 const router = (0, express_1.Router)();
-router.post('/', auth_middleware_1.protect, (0, role_middleware_1.authorize)('student', 'instructor'), async (req, res) => {
+router.post('/', auth_middleware_1.protect, (0, role_middleware_1.authorize)('student', 'instructor', 'staff'), async (req, res) => {
     try {
         const supabase = req.supabase;
         if (!supabase) {
@@ -61,7 +61,7 @@ router.post('/', auth_middleware_1.protect, (0, role_middleware_1.authorize)('st
             user_id: userId,
             book_id: bookId
         })
-            .select('id, book_id, status, reserved_at, expires_at')
+            .select('id, book_id, status, reserved_at')
             .single();
         if (error) {
             res.status(400).json({ error: error.message });
@@ -73,7 +73,7 @@ router.post('/', auth_middleware_1.protect, (0, role_middleware_1.authorize)('st
         res.status(400).json({ error: error.message });
     }
 });
-router.get('/my', auth_middleware_1.protect, (0, role_middleware_1.authorize)('student', 'instructor'), async (req, res) => {
+router.get('/my', auth_middleware_1.protect, (0, role_middleware_1.authorize)('student', 'instructor', 'staff'), async (req, res) => {
     try {
         const supabase = req.supabase;
         if (!supabase) {
@@ -87,10 +87,19 @@ router.get('/my', auth_middleware_1.protect, (0, role_middleware_1.authorize)('s
         }
         const { data, error } = await supabase
             .from('reservations')
-            .select('id, status, reserved_at, expires_at, books ( title )')
-            .eq('user_id', userId);
+            .select(`
+          *,
+          books (
+            title,
+            author,
+            category
+          )
+        `)
+            .eq('user_id', userId)
+            .order('reserved_at', { ascending: false });
         if (error) {
-            res.status(400).json({ error: error.message });
+            console.error('Reservations Query Error:', error);
+            res.status(400).json({ error: error.message, details: error.details });
             return;
         }
         res.json({ data: data ?? [] });
@@ -99,7 +108,7 @@ router.get('/my', auth_middleware_1.protect, (0, role_middleware_1.authorize)('s
         res.status(400).json({ error: error.message });
     }
 });
-router.delete('/:id', auth_middleware_1.protect, (0, role_middleware_1.authorize)('student', 'instructor'), async (req, res) => {
+router.delete('/:id', auth_middleware_1.protect, (0, role_middleware_1.authorize)('student', 'instructor', 'staff'), async (req, res) => {
     try {
         const supabase = req.supabase;
         if (!supabase) {

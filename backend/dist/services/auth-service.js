@@ -25,17 +25,42 @@ async function login(email, password) {
         }
     };
 }
-async function register(email, password) {
+async function register(email, password, fullName, phone, studentId, role = 'student') {
     const client = (0, supabase_js_1.createClient)(env_1.env.supabaseUrl, env_1.env.supabaseAnonKey);
-    const { error } = await client.auth.signUp({
+    const { data, error } = await client.auth.signUp({
         email,
-        password
+        password,
+        options: {
+            data: {
+                full_name: fullName,
+                phone: phone,
+                student_id: studentId,
+                role: role
+            }
+        }
     });
     if (error) {
         return {
             success: false,
             message: error.message
         };
+    }
+    // If registration is successful and we have a user ID, 
+    // we manually insert/update the profile using service role key
+    // to ensure student_id and phone are saved.
+    if (data.user && env_1.env.supabaseServiceRoleKey) {
+        const adminClient = (0, supabase_js_1.createClient)(env_1.env.supabaseUrl, env_1.env.supabaseServiceRoleKey);
+        await adminClient
+            .from('profiles')
+            .upsert({
+            id: data.user.id,
+            email: email,
+            full_name: fullName,
+            phone: phone,
+            student_id: studentId,
+            role: role,
+            is_active: true
+        }, { onConflict: 'id' });
     }
     return {
         success: true,

@@ -58,7 +58,7 @@ export async function updateMyProfile(req: AuthenticatedRequest, res: Response):
       full_name,
       phone,
       student_id
-    })
+    }, req.user?.role || 'student') // เพิ่ม ?. และกำหนดค่า default เป็น 'student'
 
     res.json(profile)
   } catch (error) {

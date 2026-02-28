@@ -5,7 +5,8 @@ import {
   searchBooks,
   createBook,
   updateBook,
-  deleteBook
+  deleteBook,
+  updateBookCopies
 } from '../controllers/book-controller'
 import { protect } from '../middleware/auth-middleware'
 import { authorize } from '../middleware/role-middleware'
@@ -19,5 +20,6 @@ router.get('/:id/check', protect, checkBook)
 router.post('/', protect, authorize('staff'), createBook)
 router.patch('/:id', protect, authorize('staff'), updateBook)
 router.delete('/:id', protect, authorize('staff'), deleteBook)
+router.patch('/:id/copies', protect, authorize('staff'), updateBookCopies)
 
 export default router

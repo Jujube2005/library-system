@@ -26,6 +26,10 @@ export class ProfileComponent implements OnInit {
     private userApi = inject(UserApiService)
     private cdr = inject(ChangeDetectorRef)
 
+    get isStaff(): boolean {
+        return this.profile?.role === 'staff'
+    }
+
     ngOnInit() {
         void this.loadProfile()
     }

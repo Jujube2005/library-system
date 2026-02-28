@@ -72,21 +72,66 @@
   font-size: 0.75rem;
 }
 
+/* Role Selector */
+.role-selector {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.role-btn {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 1.25rem;
+  background: var(--input-bg);
+  border: 1px solid var(--input-border);
+  border-radius: 12px;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.role-btn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+  transform: translateY(-2px);
+}
+
+.role-btn.active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: white;
+  box-shadow: 0 10px 25px rgba(211, 84, 0, 0.15);
+}
+
+.role-btn .material-icons {
+  font-size: 1.5rem;
+}
+
 .welcome-text {
   font-family: 'Playfair Display', serif;
   font-size: 3rem;
   font-weight: 400;
   line-height: 1.2;
-  margin-bottom: 1.5rem;
+  margin-bottom: 1rem;
   letter-spacing: -0.02em;
 }
 
 .sub-text {
   color: var(--text-muted);
-  font-size: 0.95rem;
-  margin-bottom: 3.5rem;
-  line-height: 1.8;
+  font-size: 0.85rem;
+  margin-bottom: 3rem;
+  line-height: 1.6;
   font-weight: 300;
+  min-height: 3.2rem;
 }
 
 .auth-form {

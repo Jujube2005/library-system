@@ -16,7 +16,7 @@ export class AuthService {
     }
   }
 
-  async signUp(email: string, password: string, fullName: string, phone: string, studentId?: string) {
+  async signUp(email: string, password: string, fullName: string, phone: string, studentId?: string, role: string = 'student') {
     const res = await fetch('http://localhost:4000/api/auth/register', {
       method: 'POST',
       headers: {
@@ -27,7 +27,8 @@ export class AuthService {
         password,
         fullName,
         phone,
-        studentId
+        studentId,
+        role
       })
     })
 

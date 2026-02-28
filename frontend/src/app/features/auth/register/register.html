@@ -9,10 +9,18 @@
             </header>
 
             <div class="form-main">
-                <h1 class="welcome-text">Create <br>Account</h1>
+                <h1 class="welcome-text">
+                    {{ role === 'staff' ? 'Staff' : 'Create' }} <br>Account
+                </h1>
                 <p class="sub-text">
-                    สมัครสมาชิกห้องสมุดดิจิทัล RMUTI <br>
-                    เพื่อเริ่มต้นใช้งานระบบยืม-คืนหนังสือ
+                    <ng-container *ngIf="role === 'staff'">
+                        ลงทะเบียนเจ้าหน้าที่ห้องสมุด RMUTI <br>
+                        เพื่อเข้าถึงส่วนจัดการระบบ Staff Mode
+                    </ng-container>
+                    <ng-container *ngIf="role !== 'staff'">
+                        สมัครสมาชิกห้องสมุดดิจิทัล RMUTI <br>
+                        เพื่อเริ่มต้นใช้งานระบบยืม-คืนหนังสือ
+                    </ng-container>
                 </p>
 
                 <form (ngSubmit)="register()" class="auth-form">
@@ -24,8 +32,9 @@
                         </div>
 
                         <div class="input-field">
-                            <label>รหัสนักศึกษา (Student ID - optional)</label>
-                            <input type="text" [(ngModel)]="studentId" name="studentId" placeholder="64XXXXXXXX" />
+                            <label>{{ role === 'staff' ? 'รหัสเจ้าหน้าที่ (Staff ID)' : 'รหัสนักศึกษา (Student ID - optional)' }}</label>
+                            <input type="text" [(ngModel)]="studentId" name="studentId" 
+                                [placeholder]="role === 'staff' ? 'STAFF-XXXX' : '64XXXXXXXX'" />
                         </div>
 
                         <div class="input-field">
