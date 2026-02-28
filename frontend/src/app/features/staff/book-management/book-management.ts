@@ -73,6 +73,12 @@ export class BookManagementComponent implements OnInit {
   }
 
   async createBook() {
+    // Validation
+    if (this.newBook.isbn && this.newBook.isbn.replace(/[-\s]/g, '').length > 13) {
+      this.errorMessage = 'ISBN ต้องไม่เกิน 13 ตัวอักษร (ไม่รวมขีดหรือเว้นวรรค)';
+      return;
+    }
+
     this.isSubmitting = true;
     this.errorMessage = '';
     this.successMessage = '';
@@ -91,7 +97,26 @@ export class BookManagementComponent implements OnInit {
       };
       void this.loadBooks(); // Reload books after creation
     } catch (err: any) {
-      this.errorMessage = err.message || 'ไม่สามารถเพิ่มหนังสือได้';
+      console.error('Create Book Error - Full Error Object:', err);
+      const backendError = err.error;
+      if (backendError) {
+        console.error('Backend Error Body:', JSON.stringify(backendError, null, 2));
+      }
+      
+      if (backendError?.error) {
+        let msg = `Backend Error: ${backendError.error}`;
+        if (backendError.details) msg += ` | Details: ${backendError.details}`;
+        if (backendError.hint) msg += ` | Hint: ${backendError.hint}`;
+        if (backendError.code) msg += ` | Code: ${backendError.code}`;
+        this.errorMessage = msg;
+      } else if (backendError?.message) {
+        this.errorMessage = `Backend Message: ${backendError.message}`;
+      } else if (err.status) {
+        // Fallback if structure is different
+        this.errorMessage = `HTTP ${err.status}: ${JSON.stringify(backendError || err.message)}`;
+      } else {
+        this.errorMessage = err.message || 'ไม่สามารถเพิ่มหนังสือได้';
+      }
     } finally {
       this.isSubmitting = false;
     }
