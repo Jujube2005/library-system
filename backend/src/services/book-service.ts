@@ -1,6 +1,10 @@
 import axios from 'axios'
+import { createClient, SupabaseClient } from '@supabase/supabase-js'
 import { supabase } from '../config/supabase'
+import { env } from '../config/env'
+import { Book } from '../types/book'
 
+// Original functions
 export const searchBooksFromAPI = async (query: string) => {
     const response = await axios.get(
         `https://www.googleapis.com/books/v1/volumes?q=${query}&maxResults=10`
@@ -115,3 +119,109 @@ export const calculateDueDate = (role: string) => {
   if (role === 'Student') return 7;     // นักเรียนยืมได้ 7 วัน
   return 0;
 };
+
+// New Staff functions
+export const createBook = async (bookData: Omit<Book, 'id' | 'created_at' | 'updated_at'>) => {
+  const supabaseAdmin = createClient(env.supabaseUrl, env.supabaseServiceRoleKey as string)
+
+  const { data, error } = await supabaseAdmin
+    .from('books')
+    .insert({
+      ...bookData,
+      available_copies: bookData.total_copies,
+      status: bookData.total_copies > 0 ? 'available' : 'unavailable'
+    })
+    .select()
+    .single()
+
+  if (error) {
+    throw new Error(error.message)
+  }
+
+  return data
+}
+
+export const updateBookInfo = async (bookId: string, updateData: Partial<Book>) => {
+  const supabaseAdmin = createClient(env.supabaseUrl, env.supabaseServiceRoleKey as string)
+
+  const { data, error } = await supabaseAdmin
+    .from('books')
+    .update(updateData)
+    .eq('id', bookId)
+    .select()
+    .single()
+
+  if (error) {
+    throw new Error(error.message)
+  }
+
+  return data
+}
+
+export const deleteBook = async (bookId: string) => {
+  const supabaseAdmin = createClient(env.supabaseUrl, env.supabaseServiceRoleKey as string)
+
+  const { data: loans, error: loanError } = await supabaseAdmin
+    .from('loans')
+    .select('id')
+    .eq('book_id', bookId)
+    .neq('status', 'returned')
+
+  if (loanError) throw new Error(loanError.message)
+  if (loans && loans.length > 0) {
+    throw new Error('ไม่สามารถลบหนังสือได้ เนื่องจากมีการยืมหรือจองค้างอยู่')
+  }
+
+  const { error } = await supabaseAdmin
+    .from('books')
+    .delete()
+    .eq('id', bookId)
+
+  if (error) {
+    throw new Error(error.message)
+  }
+
+  return { message: 'ลบหนังสือสำเร็จ' }
+}
+
+export const updateBookCopies = async (bookId: string, change: number) => {
+  const supabaseAdmin = createClient(env.supabaseUrl, env.supabaseServiceRoleKey as string)
+
+  const { data: currentBook, error: fetchError } = await supabaseAdmin
+    .from('books')
+    .select('total_copies, available_copies')
+    .eq('id', bookId)
+    .single()
+
+  if (fetchError) throw new Error(fetchError.message)
+  if (!currentBook) throw new Error('ไม่พบหนังสือ')
+
+  const newTotalCopies = currentBook.total_copies + change
+  if (newTotalCopies < 0) {
+    throw new Error('จำนวนสำเนาทั้งหมดไม่สามารถน้อยกว่า 0 ได้')
+  }
+
+  const borrowedCopies = currentBook.total_copies - currentBook.available_copies
+  const newAvailableCopies = newTotalCopies - borrowedCopies
+
+  if (newAvailableCopies < 0) {
+    throw new Error('จำนวนสำเนาที่ว่างไม่สามารถน้อยกว่าจำนวนที่ถูกยืมอยู่ได้')
+  }
+
+  const { data, error } = await supabaseAdmin
+    .from('books')
+    .update({
+      total_copies: newTotalCopies,
+      available_copies: newAvailableCopies,
+      status: newTotalCopies > 0 ? 'available' : 'unavailable'
+    })
+    .eq('id', bookId)
+    .select()
+    .single()
+
+  if (error) {
+    throw new Error(error.message)
+  }
+
+  return data
+}

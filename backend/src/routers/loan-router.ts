@@ -1,43 +1,27 @@
 import { Router } from 'express'
-import { createLoan, viewMyLoans, viewAllLoans, returnLoan, renewLoanHandler } from '../controllers/loan-controller'
 import { protect } from '../middleware/auth-middleware'
 import { authorize } from '../middleware/role-middleware'
+import {
+  viewMyLoans,
+  viewAllLoans,
+  createLoan,
+  returnLoan,
+  renewLoanHandler,
+  renewLoanByStaff,
+  getLoanById
+} from '../controllers/loan-controller'
 
 const router = Router()
 
-router.post(
-  '/',
-  protect,
-  authorize('staff'),
-  createLoan
-)
+// User routes
+router.get('/my', protect, viewMyLoans)
+router.patch('/:id/renew', protect, renewLoanHandler)
 
-router.get(
-  '/my',
-  protect,
-  authorize('student', 'instructor'),
-  viewMyLoans
-)
-
-router.get(
-  '/',
-  protect,
-  authorize('staff'),
-  viewAllLoans
-)
-
-router.post(
-  '/:id/return',
-  protect,
-  authorize('staff'),
-  returnLoan
-)
-
-router.post(
-  '/:id/renew',
-  protect,
-  authorize('instructor'),
-  renewLoanHandler
-)
+// Staff routes
+router.get('/', protect, authorize('staff'), viewAllLoans)
+router.get('/:id', protect, authorize('staff'), getLoanById)
+router.post('/', protect, authorize('staff'), createLoan)
+router.patch('/:id/return', protect, authorize('staff'), returnLoan)
+router.patch('/:id/renew-by-staff', protect, authorize('staff'), renewLoanByStaff)
 
 export default router

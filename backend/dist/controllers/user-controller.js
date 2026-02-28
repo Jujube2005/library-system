@@ -61,7 +61,7 @@ async function updateMyProfile(req, res) {
     try {
         const userId = req.user?.id;
         const supabase = req.supabase;
-        const { full_name, phone } = req.body;
+        const { full_name, phone, student_id } = req.body;
         if (!userId) {
             res.status(401).json({ error: 'UNAUTHENTICATED' });
             return;
@@ -72,8 +72,9 @@ async function updateMyProfile(req, res) {
         }
         const profile = await userService.updateMyProfile(supabase, userId, {
             full_name,
-            phone
-        });
+            phone,
+            student_id
+        }, req.user?.role || 'student'); // เพิ่ม ?. และกำหนดค่า default เป็น 'student'
         res.json(profile);
     }
     catch (error) {

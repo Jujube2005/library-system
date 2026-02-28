@@ -16,6 +16,28 @@ export class AuthService {
     }
   }
 
+  async signUp(email: string, password: string, fullName: string, phone: string, studentId?: string, role: string = 'student') {
+    const res = await fetch('http://localhost:4000/api/auth/register', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        email,
+        password,
+        fullName,
+        phone,
+        studentId,
+        role
+      })
+    })
+
+    const data = await res.json()
+    if (!res.ok || !data.success) {
+      throw new Error(data.message || 'Registration failed')
+    }
+  }
+
   async signOut() {
     await supabase.auth.signOut()
   }

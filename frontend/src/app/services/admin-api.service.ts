@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core'
 import { ApiService } from './api.service'
-import { Profile, UserRole } from '../models/profile.model'
+import { Profile } from '../models/profile.model'
 
 interface UserListResponse {
   data: Profile[]
@@ -20,7 +20,7 @@ export class AdminApiService {
     return this.api.get<UserListResponse>('/api/admin/users')
   }
 
-  updateUserRole(id: string, role: UserRole) {
+  updateUserRole(id: string, role: 'student' | 'instructor' | 'staff' | 'admin') {
     return this.api.patch<UserResponse>(`/api/admin/users/${id}/role`, { role })
   }
 

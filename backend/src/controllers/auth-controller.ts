@@ -1,10 +1,31 @@
 import { Request, Response } from 'express'
-import { login as loginService, logout as logoutService } from '../services/auth-service'
+import { login as loginService, logout as logoutService, register as registerService } from '../services/auth-service'
 
 export async function login(req: Request, res: Response): Promise<void> {
     const { email, password } = req.body as { email?: string; password?: string }
 
     const result = await loginService(email ?? '', password ?? '')
+    res.json(result)
+}
+
+export async function register(req: Request, res: Response): Promise<void> {
+    const { email, password, fullName, phone, studentId, role } = req.body as {
+        email?: string;
+        password?: string;
+        fullName?: string;
+        phone?: string;
+        studentId?: string;
+        role?: string;
+    }
+
+    const result = await registerService(
+        email ?? '',
+        password ?? '',
+        fullName ?? '',
+        phone ?? '',
+        studentId,
+        role
+    )
     res.json(result)
 }
 

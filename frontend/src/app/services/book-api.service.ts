@@ -41,4 +41,20 @@ export class BookApiService {
 
     return this.api.get<BookSearchResponse>(path)
   }
+
+  createBook(book: Omit<Book, 'id' | 'created_at' | 'updated_at' | 'available_copies' | 'status'>) {
+    return this.api.post<{ data: Book }>('/api/books', book)
+  }
+
+  updateBook(id: string, book: Partial<Book>) {
+    return this.api.patch<{ data: Book }>(`/api/books/${id}`, book)
+  }
+
+  deleteBook(id: string) {
+    return this.api.delete<{ data: { message: string } }>(`/api/books/${id}`)
+  }
+
+  updateBookCopies(id: string, change: number) {
+    return this.api.patch<{ data: Book }>(`/api/books/${id}/copies`, { change })
+  }
 }

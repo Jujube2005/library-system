@@ -35,7 +35,7 @@ var __importStar = (this && this.__importStar) || (function () {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.inviteUser = exports.recordReturn = exports.recordBorrow = void 0;
 const supabase_js_1 = require("@supabase/supabase-js");
-const staffService = __importStar(require("../services/staff-service"));
+const loanService = __importStar(require("../services/loan-service")); // เพิ่ม import loanService
 const env_1 = require("../config/env");
 const recordBorrow = async (req, res) => {
     try {
@@ -49,7 +49,7 @@ const recordBorrow = async (req, res) => {
             res.status(400).json({ message: 'targetUserId and bookId are required' });
             return;
         }
-        const result = await staffService.recordBorrowByStaff(staffId, targetUserId, bookId);
+        const result = await loanService.createLoan(targetUserId, bookId, staffId); // เรียกใช้ loanService.createLoan
         res.status(201).json({
             message: 'บันทึกการยืมโดย Staff สำเร็จ',
             data: result
@@ -67,7 +67,7 @@ const recordReturn = async (req, res) => {
             res.status(400).json({ message: 'borrowId is required' });
             return;
         }
-        const result = await staffService.recordReturnByStaff(borrowId);
+        const result = await loanService.returnLoan(borrowId); // เรียกใช้ loanService.returnLoan
         res.status(200).json({
             message: 'บันทึกการคืนโดย Staff สำเร็จ',
             data: result

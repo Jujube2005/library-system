@@ -49,7 +49,7 @@ export class LoansComponent implements OnInit {
 
     try {
       if (this.isStaff) {
-        const res = await this.loanApi.getAllLoans()
+        const res = await this.loanApi.getAllLoansInSystem()
         this.loans = res.data
       } else {
         const res = await this.loanApi.getMyLoans()

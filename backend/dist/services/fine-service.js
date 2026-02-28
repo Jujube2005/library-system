@@ -7,7 +7,8 @@ const getMyFines = async (supabase, userId) => {
         .select('id, loan_id, amount, status, created_at, updated_at, paid_at')
         .eq('user_id', userId);
     if (error) {
-        throw new Error('ไม่สามารถดึงข้อมูลค่าปรับได้');
+        console.error('Supabase Fines Error:', error);
+        throw error; // Throw the original error object
     }
     return data;
 };

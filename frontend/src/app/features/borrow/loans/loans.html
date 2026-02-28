@@ -11,20 +11,18 @@
       <th>Loan Date</th>
       <th>Due Date</th>
       <th>Status</th>
-      <th>Current Fine</th>
       <th></th>
     </tr>
   </thead>
   <tbody>
     <tr *ngFor="let l of loans">
       <td *ngIf="isStaff">
-        {{ l.user?.full_name || l.user?.email || l.user_id }}
+        {{ l.user && l.user.length > 0 ? (l.user[0].full_name || l.user[0].email) : l.user_id }}
       </td>
-      <td>{{ l.book?.title || l.book_id }}</td>
+      <td>{{ l.books?.title || l.book_id }}</td>
       <td>{{ l.loan_date }}</td>
       <td>{{ l.due_date }}</td>
       <td>{{ l.status }}</td>
-      <td>{{ l.current_fine || 0 }}</td>
       <td>
         <button
           *ngIf="!isStaff && l.status === 'active'"

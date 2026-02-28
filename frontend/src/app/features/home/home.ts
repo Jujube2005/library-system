@@ -51,7 +51,26 @@ export class HomeComponent {
 
   async handleResourcesClick(event: MouseEvent) {
     event.preventDefault()
-    await this.router.navigateByUrl('/books')
+    
+    const loggedIn = await this.auth.isLoggedIn()
+    if (loggedIn) {
+      await this.router.navigateByUrl('/dashboard')
+    } else {
+      await this.router.navigateByUrl('/login')
+    }
+  }
+
+  async handleStaffClick(event: MouseEvent) {
+    event.preventDefault()
+    
+    const loggedIn = await this.auth.isLoggedIn()
+    if (loggedIn) {
+      // ถ้า login แล้ว ให้ไปหน้า dashboard เลย (ซึ่งจะมีเมนู Staff ถ้าเป็น staff)
+      await this.router.navigateByUrl('/dashboard')
+    } else {
+      // ถ้ายังไม่ได้ login ให้ไปหน้าลงทะเบียน Staff ตามที่ผู้ใช้ต้องการ
+      await this.router.navigate(['/register'], { queryParams: { role: 'staff' } })
+    }
   }
 
   // Animation constants
