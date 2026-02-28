@@ -13,6 +13,8 @@ import { ReportsComponent } from './features/admin/reports/reports'
 import { authGuard } from './guards/auth.guard'
 import { guestGuard } from './guards/guest.guard'
 
+import { RegisterComponent } from './features/auth/register/register'
+
 export const routes: Routes = [
   {
     path: '',
@@ -21,6 +23,11 @@ export const routes: Routes = [
   {
     path: 'login',
     component: LoginComponent,
+    canActivate: [guestGuard]
+  },
+  {
+    path: 'register',
+    component: RegisterComponent,
     canActivate: [guestGuard]
   },
   {

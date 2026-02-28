@@ -36,13 +36,22 @@ export async function login(email: string, password: string): Promise<AuthResult
 
 export async function register(
     email: string,
-    password: string
+    password: string,
+    fullName: string, 
+    phone: string,    
+    studentId?: string 
 ): Promise<AuthResult<null>> {
     const client = createClient(env.supabaseUrl, env.supabaseAnonKey)
-
-    const { error } = await client.auth.signUp({
+    const { data, error } = await client.auth.signUp({
         email,
-        password
+        password,
+        options: {
+            data: {
+                full_name: fullName,
+                phone: phone,
+                student_id: studentId
+            }
+        }
     })
 
     if (error) {
@@ -50,6 +59,25 @@ export async function register(
             success: false,
             message: error.message
         }
+    }
+
+    // If registration is successful and we have a user ID, 
+    // we manually insert/update the profile using service role key
+    // to ensure student_id and phone are saved.
+    if (data.user && env.supabaseServiceRoleKey) {
+        const adminClient = createClient(env.supabaseUrl, env.supabaseServiceRoleKey)
+        
+        await adminClient
+            .from('profiles')
+            .upsert({
+                id: data.user.id,
+                email: email,
+                full_name: fullName,
+                phone: phone,
+                student_id: studentId,
+                role: 'student',
+                is_active: true
+            }, { onConflict: 'id' })
     }
 
     return {

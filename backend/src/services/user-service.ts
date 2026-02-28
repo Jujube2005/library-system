@@ -62,6 +62,7 @@ export const updateMyProfile = async (
   updates: {
     full_name?: string
     phone?: string
+    student_id?: string
   }
 ) => {
   const payload: Record<string, unknown> = {}
@@ -72,6 +73,10 @@ export const updateMyProfile = async (
 
   if (typeof updates.phone === 'string') {
     payload.phone = updates.phone
+  }
+
+  if (typeof updates.student_id === 'string') {
+    payload.student_id = updates.student_id
   }
 
   if (Object.keys(payload).length === 0) {
