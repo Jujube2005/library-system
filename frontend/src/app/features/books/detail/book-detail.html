@@ -1,0 +1,70 @@
+<div class="detail-stage">
+  <div class="skeleton-detail" *ngIf="loading">
+    <div class="detail-container">
+      <div class="cover-side">
+        <div class="detail-cover skeleton"></div>
+      </div>
+      <div class="info-side">
+        <div class="skeleton" style="width: 150px; height: 12px; margin-bottom: 2rem;"></div>
+        <div class="skeleton" style="width: 80%; height: 60px; margin-bottom: 2rem;"></div>
+        <div class="skeleton" style="width: 40%; height: 30px; margin-bottom: 4rem;"></div>
+        <div class="stats-grid">
+          <div class="skeleton" style="height: 50px;"></div>
+          <div class="skeleton" style="height: 50px;"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <p class="error-msg" *ngIf="!loading && error">{{ error }}</p>
+
+  <div class="detail-container loading-fade" *ngIf="!loading && !error && book">
+    <!-- Cover Background -->
+    <div class="cover-side">
+      <div class="detail-cover">
+        <img [src]="getBookCover(book.title)" [alt]="book.title" class="detail-image" />
+      </div>
+    </div>
+
+    <!-- Content Side -->
+    <div class="info-side">
+      <a routerLink="/books" class="back-link">
+        <span class="material-icons">west</span>
+        <span>Back to Collection</span>
+      </a>
+
+      <span class="detail-category">{{ book.category || 'Standard Edition' }}</span>
+      <h1 class="detail-title">{{ book.title }}</h1>
+      <p class="detail-author">Curated by {{ book.author }}</p>
+
+      <div class="stats-grid">
+        <div class="stat-item">
+          <span class="stat-label">Availability</span>
+          <span class="stat-value">{{ book.available_copies }} of {{ book.total_copies }} Copies</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">Access Status</span>
+          <span class="stat-value">{{ book.status }}</span>
+        </div>
+      </div>
+
+      <div class="detail-actions">
+        <!-- Not Reserved Yet -->
+        <button class="btn-primary" *ngIf="canReserve" (click)="reserve()" [disabled]="reserving">
+          {{ reserving ? 'Processing...' : 'Request Reservation' }}
+        </button>
+
+        <!-- Already Reserved -->
+        <div class="reservation-notice" *ngIf="hasActiveReservation">
+          <p>
+            <strong>Active Request Identified</strong><br>
+            สถานะปัจจุบัน: {{ myReservation?.status }}
+          </p>
+          <button class="btn-outline" (click)="cancelReservation()" [disabled]="reserving" style="margin-top: 1.5rem;">
+            {{ reserving ? 'Cancelling...' : 'Revoke Request' }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

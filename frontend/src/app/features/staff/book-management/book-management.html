@@ -1,0 +1,181 @@
+<div class="book-management-container">
+  <header class="book-management-header">
+    <span class="view-tag">Staff</span>
+    <h1 class="page-title">Book Management</h1>
+  </header>
+
+  <div class="content-section">
+    <h2>เพิ่มหนังสือใหม่</h2>
+    <form (ngSubmit)="createBook()" class="book-form">
+      <div class="form-grid">
+        <div class="form-group">
+          <label for="title">ชื่อหนังสือ</label>
+          <input id="title" type="text" [(ngModel)]="newBook.title" name="title" required>
+        </div>
+        <div class="form-group">
+          <label for="author">ผู้แต่ง</label>
+          <input id="author" type="text" [(ngModel)]="newBook.author" name="author" required>
+        </div>
+        <div class="form-group">
+          <label for="isbn">ISBN</label>
+          <input id="isbn" type="text" [(ngModel)]="newBook.isbn" name="isbn" required>
+        </div>
+        <div class="form-group">
+          <label for="category">หมวดหมู่</label>
+          <input id="category" type="text" [(ngModel)]="newBook.category" name="category" required>
+        </div>
+        <div class="form-group">
+          <label for="shelf_location">ตำแหน่งชั้นวาง</label>
+          <input id="shelf_location" type="text" [(ngModel)]="newBook.shelf_location" name="shelf_location" required>
+        </div>
+        <div class="form-group">
+          <label for="total_copies">จำนวนสำเนา</label>
+          <input id="total_copies" type="number" [(ngModel)]="newBook.total_copies" name="total_copies" min="1" required>
+        </div>
+        <div class="form-group full-width">
+          <label for="image_file">รูปหน้าปกหนังสือ</label>
+          <div class="image-upload-container">
+            <input id="image_file" type="file" (change)="onFileSelected($event)" accept="image/*" class="file-input">
+            <div class="image-preview-box" *ngIf="imagePreview">
+              <img [src]="imagePreview" alt="Book cover preview">
+              <button type="button" class="remove-image-btn" (click)="selectedFile = null; imagePreview = null">
+                <span class="material-icons">close</span>
+              </button>
+            </div>
+            <div class="upload-placeholder" *ngIf="!imagePreview">
+              <span class="material-icons">add_a_photo</span>
+              <p>คลิกเพื่อเลือกรูปภาพ</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button type="submit" [disabled]="isSubmitting">
+          <span class="material-icons" *ngIf="!isSubmitting">add</span>
+          <span *ngIf="!isSubmitting">เพิ่มหนังสือ</span>
+          <span *ngIf="isSubmitting">กำลังเพิ่ม...</span>
+        </button>
+      </div>
+
+      <div *ngIf="errorMessage" class="error-message">{{ errorMessage }}</div>
+      <div *ngIf="successMessage" class="success-message">{{ successMessage }}</div>
+    </form>
+  </div>
+
+  <div class="content-section book-list-section">
+    <h2>รายการหนังสือ</h2>
+    <div class="search-filter-bar">
+      <input type="text" [(ngModel)]="searchQuery" (ngModelChange)="applyFilter()" placeholder="ค้นหาหนังสือ (ชื่อ, ผู้แต่ง, ISBN, หมวดหมู่)" class="search-input">
+    </div>
+    <div *ngIf="loadingBooks" class="loading-spinner"></div>
+    <div *ngIf="booksError" class="error-message">{{ booksError }}</div>
+
+    <div *ngIf="!loadingBooks && !booksError && books.length === 0" class="no-data-message">
+      ไม่พบหนังสือในระบบ
+    </div>
+
+    <div class="book-table-container" *ngIf="!loadingBooks && !booksError && books.length > 0">
+      <table class="book-table">
+        <thead>
+          <tr>
+            <th>รูปภาพ</th>
+            <th>ชื่อหนังสือ</th>
+            <th>ผู้แต่ง</th>
+            <th>ISBN</th>
+            <th>หมวดหมู่</th>
+            <th>ตำแหน่ง</th>
+            <th>สำเนา</th>
+            <th>ที่ว่าง</th>
+            <th>สถานะ</th>
+            <th class="sticky-action">จัดการ</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let book of books">
+            <td class="book-thumbnail-cell">
+              <img *ngIf="book.image_url" [src]="book.image_url" [alt]="book.title" class="book-thumbnail" onerror="this.src='assets/images/no-book-cover.png'">
+              <div *ngIf="!book.image_url" class="book-no-thumbnail">
+                <span class="material-icons">book</span>
+              </div>
+            </td>
+            <td [title]="book.title">{{ book.title }}</td>
+            <td [title]="book.author">{{ book.author }}</td>
+            <td>{{ book.isbn }}</td>
+            <td>{{ book.category }}</td>
+            <td>{{ book.shelf_location }}</td>
+            <td>{{ book.total_copies }}</td>
+            <td>{{ book.available_copies }}</td>
+            <td>
+              <span class="status-badge" [class.available]="book.available_copies > 0" [class.unavailable]="book.available_copies <= 0">
+                {{ book.status }}
+              </span>
+            </td>
+            <td class="sticky-action">
+              <div class="action-btn-group">
+                <button class="action-btn edit-btn" (click)="editBook(book)" title="แก้ไข">
+                  <span class="material-icons">edit</span>
+                </button>
+                <button class="action-btn delete-btn" (click)="deleteBook(book.id, book.title)" title="ลบ">
+                  <span class="material-icons">delete</span>
+                </button>
+                <button class="action-btn add-copy-btn" (click)="updateCopies(book.id, book.title, 1)" title="เพิ่มจำนวน">
+                  <span class="material-icons">add_box</span>
+                </button>
+                <button class="action-btn remove-copy-btn" (click)="updateCopies(book.id, book.title, -1)" [disabled]="book.total_copies <= 0" title="ลดจำนวน">
+                  <span class="material-icons">remove_circle</span>
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Edit Book Modal/Form -->
+  <div *ngIf="selectedBook" class="edit-book-modal-overlay">
+    <div class="edit-book-modal">
+      <h3>แก้ไขหนังสือ: {{ selectedBook.title }}</h3>
+      <form (ngSubmit)="saveEditedBook()" class="book-form">
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="edit_title">ชื่อหนังสือ</label>
+            <input id="edit_title" type="text" [(ngModel)]="editBookForm.title" name="edit_title" required>
+          </div>
+          <div class="form-group">
+            <label for="edit_author">ผู้แต่ง</label>
+            <input id="edit_author" type="text" [(ngModel)]="editBookForm.author" name="edit_author" required>
+          </div>
+          <div class="form-group">
+            <label for="edit_isbn">ISBN</label>
+            <input id="edit_isbn" type="text" [(ngModel)]="editBookForm.isbn" name="edit_isbn" required>
+          </div>
+          <div class="form-group">
+            <label for="edit_category">หมวดหมู่</label>
+            <input id="edit_category" type="text" [(ngModel)]="editBookForm.category" name="edit_category" required>
+          </div>
+          <div class="form-group">
+            <label for="edit_shelf_location">ตำแหน่งชั้นวาง</label>
+            <input id="edit_shelf_location" type="text" [(ngModel)]="editBookForm.shelf_location" name="edit_shelf_location" required>
+          </div>
+          <div class="form-group full-width">
+            <label for="edit_image_url">URL รูปหน้าปกหนังสือ (ถ้ามี)</label>
+            <input id="edit_image_url" type="url" [(ngModel)]="editBookForm.image_url" name="edit_image_url" placeholder="https://example.com/book-cover.jpg">
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button type="button" class="cancel-btn" (click)="cancelEdit()" [disabled]="isSavingEdit">ยกเลิก</button>
+          <button type="submit" [disabled]="isSavingEdit">
+            <span *ngIf="!isSavingEdit">บันทึก</span>
+            <span *ngIf="isSavingEdit">กำลังบันทึก...</span>
+          </button>
+        </div>
+
+        <div *ngIf="errorMessage" class="error-message">{{ errorMessage }}</div>
+        <div *ngIf="successMessage" class="success-message">{{ successMessage }}</div>
+      </form>
+    </div>
+  </div>
+</div>

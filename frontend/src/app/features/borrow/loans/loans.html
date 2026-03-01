@@ -1,0 +1,44 @@
+<h1>Loans</h1>
+
+<p *ngIf="loading">กำลังโหลด...</p>
+<p *ngIf="!loading && error">{{ error }}</p>
+
+<table *ngIf="!loading && !error && loans.length">
+  <thead>
+    <tr>
+      <th *ngIf="isStaff">User</th>
+      <th>Book</th>
+      <th>Loan Date</th>
+      <th>Due Date</th>
+      <th>Status</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let l of loans">
+      <td *ngIf="isStaff">
+        {{ l.user && l.user.length > 0 ? (l.user[0].full_name || l.user[0].email) : l.user_id }}
+      </td>
+      <td>{{ l.books?.title || l.book_id }}</td>
+      <td>{{ l.loan_date }}</td>
+      <td>{{ l.due_date }}</td>
+      <td>{{ l.status }}</td>
+      <td>
+        <button
+          *ngIf="!isStaff && l.status === 'active'"
+          (click)="renew(l)"
+        >
+          Renew
+        </button>
+        <button
+          *ngIf="isStaff && l.status === 'active'"
+          (click)="returnLoan(l)"
+        >
+          Return
+        </button>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<p *ngIf="!loading && !error && !loans.length">ยังไม่มีรายการยืม</p>

@@ -1,0 +1,41 @@
+<h1>Fines</h1>
+
+<p *ngIf="loading">กำลังโหลด...</p>
+<p *ngIf="!loading && error">{{ error }}</p>
+
+<p *ngIf="!loading && !error && fines.length">
+  Outstanding total: {{ outstandingTotal }}
+</p>
+
+<table *ngIf="!loading && !error && fines.length">
+  <thead>
+    <tr>
+      <th *ngIf="isStaff">User</th>
+      <th>Amount</th>
+      <th>Status</th>
+      <th>Created At</th>
+      <th>Paid At</th>
+      <th *ngIf="isStaff"></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let f of fines">
+      <td *ngIf="isStaff">{{ f.user_id }}</td>
+      <td>{{ f.amount }}</td>
+      <td>{{ f.status }}</td>
+      <td>{{ f.created_at }}</td>
+      <td>{{ f.paid_at || '-' }}</td>
+      <td *ngIf="isStaff">
+        <button
+          *ngIf="f.status === 'unpaid'"
+          (click)="markAsPaid(f)"
+        >
+          Mark as paid
+        </button>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<p *ngIf="!loading && !error && !fines.length">ยังไม่มีค่าปรับ</p>
+

@@ -1,18 +1,35 @@
-create type user_role as enum (
+-- =========================
+-- ENUM TYPES
+-- =========================
+
+CREATE TYPE role_enum AS ENUM (
   'student',
   'instructor',
-  'staff',
-  'admin'
+  'staff'
 );
 
-create type borrow_status as enum (
+CREATE TYPE book_status_enum AS ENUM (
+  'available',
   'borrowed',
+  'reserved',
+  'unavailable'
+);
+
+CREATE TYPE loan_status_enum AS ENUM (
+  'active',
   'returned',
   'overdue'
 );
 
-create type reservation_status as enum (
-  'active',
-  'expired',
-  'cancelled'
+CREATE TYPE fine_status_enum AS ENUM (
+  'unpaid',
+  'paid'
+);
+
+CREATE TYPE reservation_status_enum AS ENUM (
+  'pending',
+  'ready',
+  'fulfilled',
+  'cancelled',
+  'expired'
 );

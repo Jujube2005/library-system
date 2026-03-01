@@ -1,0 +1,92 @@
+<div class="login-wrapper" [class.dark-mode]="isDarkMode">
+    <div class="login-container">
+
+        <!-- Form Section -->
+        <section class="form-section">
+            <header class="brand-header" (click)="goBack()">
+                <span class="material-icons">west</span>
+                <span class="brand-name">RMUTI</span>
+            </header>
+
+            <div class="form-main">
+                <h1 class="welcome-text">
+                    {{ role === 'staff' ? 'Staff' : 'Create' }} <br>Account
+                </h1>
+                <p class="sub-text">
+                    <ng-container *ngIf="role === 'staff'">
+                        ลงทะเบียนเจ้าหน้าที่ห้องสมุด RMUTI <br>
+                        เพื่อเข้าถึงส่วนจัดการระบบ Staff Mode
+                    </ng-container>
+                    <ng-container *ngIf="role !== 'staff'">
+                        สมัครสมาชิกห้องสมุดดิจิทัล RMUTI <br>
+                        เพื่อเริ่มต้นใช้งานระบบยืม-คืนหนังสือ
+                    </ng-container>
+                </p>
+
+                <form (ngSubmit)="register()" class="auth-form">
+                    <div class="form-grid">
+                        <div class="input-field">
+                            <label>ชื่อ-นามสกุล (Full Name)</label>
+                            <input type="text" [(ngModel)]="fullName" name="fullName" placeholder="สมชาย ใจดี"
+                                required />
+                        </div>
+
+                        <div class="input-field">
+                            <label>{{ role === 'staff' ? 'รหัสเจ้าหน้าที่ (Staff ID)' : 'รหัสนักศึกษา (Student ID - optional)' }}</label>
+                            <input type="text" [(ngModel)]="studentId" name="studentId" 
+                                [placeholder]="role === 'staff' ? 'STAFF-XXXX' : '64XXXXXXXX'" />
+                        </div>
+
+                        <div class="input-field">
+                            <label>อีเมล (Email)</label>
+                            <input type="email" [(ngModel)]="email" name="email" placeholder="username@rmuti.ac.th"
+                                required />
+                        </div>
+
+                        <div class="input-field">
+                            <label>เบอร์โทรศัพท์ (Phone Number)</label>
+                            <input type="tel" [(ngModel)]="phone" name="phone" placeholder="08XXXXXXXX" required />
+                        </div>
+
+                        <div class="input-field">
+                            <label>รหัสผ่าน (Password)</label>
+                            <input type="password" [(ngModel)]="password" name="password" placeholder="••••••••••••"
+                                required />
+                        </div>
+
+                        <div class="input-field">
+                            <label>ยืนยันรหัสผ่าน (Confirm Password)</label>
+                            <input type="password" [(ngModel)]="confirmPassword" name="confirmPassword"
+                                placeholder="••••••••••••" required />
+                        </div>
+                    </div>
+
+                    <div class="form-options">
+                        <span>มีบัญชีอยู่แล้ว? <a routerLink="/login" class="forgot-link">เข้าสู่ระบบ</a></span>
+                        <span style="opacity: 0.2">|</span>
+                        <a href="#" class="forgot-link" (click)="goBack()">กลับหน้าหลัก</a>
+                    </div>
+
+                    <button type="submit" class="btn-submit" [disabled]="isSubmitting">
+                        {{ isSubmitting ? 'กำลังสร้างบัญชี...' : 'สมัครสมาชิก' }}
+                    </button>
+
+                    <p class="error-msg" *ngIf="errorMessage">
+                        <span class="material-icons" style="font-size: 1rem">error_outline</span>
+                        {{ errorMessage }}
+                    </p>
+                </form>
+            </div>
+        </section>
+
+        <!-- Visual Section -->
+        <section class="visual-section">
+            <img src="/library.jpg" alt="RMUTI Library">
+            <div class="glass-caption">
+                <span class="glass-tag">Philosophy</span>
+                <h2 class="glass-title">Knowledge is the <br>ultimate luxury.</h2>
+            </div>
+        </section>
+
+    </div>
+</div>

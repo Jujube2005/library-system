@@ -1,0 +1,243 @@
+.loan-management-container {
+  padding: 2rem 0;
+  max-width: 1200px;
+}
+
+.loan-management-header {
+  margin-bottom: 4rem;
+}
+
+.view-tag {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.3em;
+  opacity: 0.5;
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.page-title {
+  font-size: 3.5rem;
+  line-height: 1;
+  font-weight: 400;
+  color: var(--text-main);
+}
+
+.content-section {
+  background: var(--bg-card);
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+  border: 1px solid var(--border-light);
+  margin-bottom: 2rem;
+}
+
+.loan-form {
+  margin-top: 2rem;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--text-muted);
+}
+
+.form-group input[type="text"],
+.form-group input[type="date"] {
+  width: 100%;
+  padding: 0.8rem 1rem;
+  border: 1px solid var(--border-light);
+  border-radius: 8px;
+  background-color: var(--bg-hover);
+  color: var(--text-main);
+  font-size: 1rem;
+  transition: all 0.3s var(--transition-ease);
+}
+
+.form-group input[type="text"]:hover,
+.form-group input[type="date"]:hover {
+  border-color: var(--text-muted);
+}
+
+.form-group input[type="text"]:focus,
+.form-group input[type="date"]:focus {
+  outline: none;
+  border-color: var(--accent);
+  background-color: var(--bg-card);
+  box-shadow: 0 0 0 4px rgba(211, 84, 0, 0.1);
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.form-actions button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.8rem 2.5rem;
+  background-color: var(--accent);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s var(--transition-ease);
+}
+
+.form-actions button:hover:not(:disabled) {
+  background-color: #e67e22;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(211, 84, 0, 0.2);
+}
+
+.form-actions button:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.form-actions button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  filter: grayscale(1);
+}
+
+.error-message {
+  color: #e74c3c; /* Red */
+  margin-top: 1rem;
+  text-align: center;
+  font-weight: 500;
+}
+
+.success-message {
+  color: #27ae60; /* Green */
+  margin-top: 1rem;
+  text-align: center;
+  font-weight: 500;
+}
+
+/* Loan List Table */
+.loan-list-section {
+  margin-top: 2rem;
+}
+
+.loan-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1.5rem;
+  background: var(--bg-card);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+}
+
+.loan-table th,
+.loan-table td {
+  padding: 1rem 1.2rem;
+  text-align: left;
+  border-bottom: 1px solid var(--border-light);
+  color: var(--text-main);
+  vertical-align: middle;
+}
+
+.loan-table th {
+  background-color: var(--bg-alt);
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+}
+
+.loan-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.loan-table tbody tr:hover {
+  background-color: var(--bg-hover);
+}
+
+.action-btn-group {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.action-btn {
+  background: var(--bg-hover);
+  border: 1px solid var(--border-light);
+  color: var(--text-muted);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem 1rem;
+  height: 36px;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  gap: 0.4rem;
+  transition: all 0.2s var(--transition-ease);
+}
+
+.action-btn:hover:not(:disabled) {
+  background-color: var(--bg-card);
+  border-color: var(--accent);
+  color: var(--accent);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.action-btn.return-btn:hover:not(:disabled) {
+  color: #27ae60;
+  border-color: #27ae60;
+}
+
+.action-btn.renew-btn:hover:not(:disabled) {
+  color: #f39c12;
+  border-color: #f39c12;
+}
+
+.action-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.action-btn .material-icons {
+  font-size: 1.1rem;
+}
+
+.no-data-message {
+  text-align: center;
+  color: var(--text-muted);
+  margin-top: 2rem;
+  font-size: 1.1rem;
+}
+
+.loading-spinner {
+  border: 4px solid var(--border-light);
+  border-top: 4px solid var(--accent);
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: spin 1s linear infinite;
+  margin: 2rem auto;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}

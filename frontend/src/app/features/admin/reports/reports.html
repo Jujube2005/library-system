@@ -1,0 +1,44 @@
+<h1>Reports</h1>
+
+<p *ngIf="loading">กำลังโหลด...</p>
+<p *ngIf="!loading && error">{{ error }}</p>
+
+<section *ngIf="!loading && !error">
+  <h2>Popular Books</h2>
+  <table *ngIf="popularBooks.length">
+    <thead>
+      <tr>
+        <th>Title</th>
+        <th>Loans</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let b of popularBooks">
+        <td>{{ b.title || b.book_id }}</td>
+        <td>{{ b.loan_count }}</td>
+      </tr>
+    </tbody>
+  </table>
+  <p *ngIf="!popularBooks.length">ยังไม่มีข้อมูลการยืม</p>
+</section>
+
+<section *ngIf="!loading && !error">
+  <h2>Overdue Fines</h2>
+  <p>Total unpaid: {{ totalUnpaid }}</p>
+
+  <table *ngIf="overdueFines.length">
+    <thead>
+      <tr>
+        <th>User</th>
+        <th>Amount</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let f of overdueFines">
+        <td>{{ f.user_name || f.user_id }}</td>
+        <td>{{ f.amount }}</td>
+      </tr>
+    </tbody>
+  </table>
+  <p *ngIf="!overdueFines.length">ไม่มีค่าปรับค้างชำระ</p>
+</section>

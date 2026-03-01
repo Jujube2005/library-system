@@ -1,0 +1,73 @@
+<div class="overview-content">
+  <header class="overview-header">
+    <span class="welcome-msg">Dashboard</span>
+    <h1 class="page-title">Management <br>Overview</h1>
+  </header>
+
+  <div class="skeleton-overview" *ngIf="loading">
+    <div class="skeleton-featured">
+      <div class="skeleton" style="width: 200px; height: 30px; margin-bottom: 2rem;"></div>
+      <div class="featured-grid">
+        <div class="mini-book-card skeleton-card" *ngFor="let i of [1,2,3,4]">
+          <div class="mini-cover skeleton"></div>
+          <div class="mini-info">
+            <div class="skeleton" style="width: 100px; height: 15px; margin-bottom: 8px;"></div>
+            <div class="skeleton" style="width: 60px; height: 10px;"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <p class="error-msg" *ngIf="!loading && error">{{ error }}</p>
+
+  <div class="dashboard-grid loading-fade" *ngIf="!loading">
+    <div class="main-stats">
+      <section class="section-card featured-section">
+        <h2 class="brand-caps">New Admissions</h2>
+
+        <div class="featured-grid" *ngIf="featuredBooks.length; else noBooks">
+          <a *ngFor="let b of featuredBooks" [routerLink]="['/books', b.id]" class="mini-book-card">
+            <div class="mini-cover">
+              <img [src]="getBookCover(b)" alt="">
+            </div>
+            <div class="mini-info">
+              <h4 class="mini-title">{{ b.title }}</h4>
+              <span class="mini-author">{{ b.author }}</span>
+            </div>
+          </a>
+        </div>
+        <ng-template #noBooks>
+          <div class="empty-state">
+            <span class="material-icons empty-icon">library_books</span>
+            <p class="notify-meta">ไม่มีรายการหนังสือเข้าใหม่</p>
+          </div>
+        </ng-template>
+
+        <div class="action-footer">
+          <a routerLink="/books" class="text-btn">View Full Archive →</a>
+        </div>
+      </section>
+    </div>
+
+    <div class="side-panel">
+      <section class="section-card">
+        <h2 class="brand-caps">Journal Log</h2>
+
+        <ul class="notify-list" *ngIf="notifications.length; else empty">
+          <li class="notify-item" *ngFor="let n of notifications">
+            <span class="notify-msg">{{ n.message }}</span>
+            <span class="notify-meta">{{ n.created_at | date:'medium' }}</span>
+          </li>
+        </ul>
+
+        <ng-template #empty>
+          <div class="empty-state">
+            <span class="material-icons empty-icon">notifications_none</span>
+            <p class="notify-meta">ไม่มีการแจ้งเตือนใหม่</p>
+          </div>
+        </ng-template>
+      </section>
+    </div>
+  </div>
+</div>

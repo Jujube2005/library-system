@@ -1,0 +1,121 @@
+<div class="profile-container">
+    <header class="profile-header">
+        <div class="header-content">
+            <span class="view-tag">Account</span>
+            <h1 class="page-title">Profile </h1>
+        </div>
+        <button class="edit-toggle-btn" (click)="toggleEdit()" [disabled]="loading || saving">
+            <span class="material-icons">{{ isEditing ? 'close' : 'edit' }}</span>
+            <span>{{ isEditing ? 'ยกเลิก' : 'แก้ไขโปรไฟล์' }}</span>
+        </button>
+    </header>
+
+    <div class="status-indicator" *ngIf="loading">
+        <div class="skeleton-form">
+            <div class="skeleton" style="width: 30%; height: 20px; margin-bottom: 2rem;"></div>
+            <div class="skeleton" style="width: 100%; height: 50px; margin-bottom: 1rem;" *ngFor="let i of [1,2,3,4]"></div>
+        </div>
+    </div>
+
+    <div class="error-container" *ngIf="!loading && error && !profile">
+        <div class="error-card">
+            <span class="material-icons error-icon">error_outline</span>
+            <p>{{ error }}</p>
+            <button class="retry-btn" (click)="loadProfile()">ลองใหม่อีกครั้ง</button>
+        </div>
+    </div>
+
+    <div class="profile-layout" *ngIf="!loading && profile">
+        <!-- Sidebar/Avatar Section -->
+        <aside class="profile-aside">
+            <div class="avatar-card">
+                <div class="avatar-circle">
+                    <span class="material-icons">person</span>
+                </div>
+                <div class="avatar-info">
+                    <h2 class="user-name">{{ profile.full_name || 'Member' }}</h2>
+                    <span class="user-role brand-caps">{{ profile.role }}</span>
+                </div>
+            </div>
+
+            <div class="meta-card">
+                <div class="meta-item">
+                    <span class="material-icons">event</span>
+                    <div class="meta-text">
+                        <label>Joined</label>
+                        <span>{{ profile.created_at | date:'longDate' }}</span>
+                    </div>
+                </div>
+                <div class="meta-item">
+                    <span class="material-icons">badge</span>
+                    <div class="meta-text">
+                        <label>ID</label>
+                        <span>{{ profile.student_id || 'Not Assigned' }}</span>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Form Section -->
+        <main class="profile-main">
+            <div class="profile-section">
+                <h3 class="section-title brand-caps">Personal Information</h3>
+                <div class="form-grid">
+                    <div class="form-group" [class.readonly]="!isEditing">
+                        <label>Full Name</label>
+                        <div class="input-wrapper">
+                            <span class="material-icons input-icon">person_outline</span>
+                            <input [(ngModel)]="editFullName" [disabled]="!isEditing" class="form-input" />
+                        </div>
+                    </div>
+
+                    <div class="form-group readonly">
+                        <label>Email Address</label>
+                        <div class="input-wrapper">
+                            <span class="material-icons input-icon">mail_outline</span>
+                            <input [value]="profile.email" disabled class="form-input" />
+                        </div>
+                    </div>
+
+                    <div class="form-group" [class.readonly]="!isEditing">
+                        <label>Phone Number</label>
+                        <div class="input-wrapper">
+                            <span class="material-icons input-icon">phone_iphone</span>
+                            <input [(ngModel)]="editPhone" [disabled]="!isEditing" class="form-input" />
+                        </div>
+                    </div>
+
+                    <div class="form-group" [class.readonly]="!isEditing || !isStaff">
+                        <label>Student / Staff ID</label>
+                        <div class="input-wrapper">
+                            <span class="material-icons input-icon">badge</span>
+                            <input [(ngModel)]="editStudentId" [disabled]="!isEditing || !isStaff" class="form-input" />
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-actions" *ngIf="isEditing">
+                    <button class="save-btn" (click)="saveProfile()" [disabled]="saving">
+                        <span class="material-icons" *ngIf="!saving">save</span>
+                        <span class="spinner" *ngIf="saving"></span>
+                        <span>{{ saving ? 'กำลังบันทึก...' : 'บันทึกข้อมูล' }}</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="profile-section">
+                <h3 class="section-title brand-caps">Account Security</h3>
+                <div class="form-grid">
+                    <div class="form-group readonly">
+                        <label>System Role</label>
+                        <div class="input-wrapper">
+                            <span class="material-icons input-icon">verified_user</span>
+                            <input [value]="profile.role" disabled class="form-input" />
+                        </div>
+                        <span class="hint-text">Data is synchronized with the university central system.</span>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>

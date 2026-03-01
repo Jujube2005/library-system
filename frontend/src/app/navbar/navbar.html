@@ -1,0 +1,35 @@
+<header class="top-bar">
+    <div class="brand" routerLink="/">
+        <span class="brand-caps">RMUTI</span>
+        <span class="view-tag">Archive</span>
+    </div>
+
+    <div class="actions">
+        <button class="theme-toggle" (click)="toggleDarkMode()">
+            <span class="material-icons">{{ isDarkMode ? 'light_mode' : 'dark_mode' }}</span>
+        </button>
+
+        <div class="profile-menu-wrap" *ngIf="profile">
+            <div class="profile-chip" (click)="toggleProfileMenu($event)">
+                <span class="role-badge">{{ profile.role }}</span>
+                <span class="user-name">{{ profile.full_name || 'User' }}</span>
+                <span class="material-icons dropdown-arrow">expand_more</span>
+            </div>
+
+            <div class="profile-dropdown" [class.show]="showProfileMenu">
+                <div class="dropdown-header">
+                    <p class="user-email">{{ profile.email }}</p>
+                </div>
+                <div class="dropdown-divider"></div>
+                <a routerLink="/dashboard/profile" class="dropdown-item">
+                    <span class="material-icons">person_outline</span>
+                    Profile Settings
+                </a>
+                <button (click)="logout()" class="dropdown-item logout-link">
+                    <span class="material-icons">logout</span>
+                    Sign Out
+                </button>
+            </div>
+        </div>
+    </div>
+</header>

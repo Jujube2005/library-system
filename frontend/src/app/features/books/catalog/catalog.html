@@ -1,0 +1,72 @@
+<div class="catalog-container">
+  <header class="catalog-header">
+    <span class="view-tag">Collection</span>
+    <h1 class="page-title">Digital Library <br>Archive</h1>
+  </header>
+
+  <div class="search-section">
+    <div class="search-box">
+      <span class="material-icons search-icon">search</span>
+      <input [(ngModel)]="q" placeholder="Search title or author..." (keyup.enter)="onSearch()" />
+    </div>
+
+    <div class="filter-group">
+      <select [(ngModel)]="category" (change)="onSearch()" class="category-select">
+        <option *ngFor="let cat of categories" [value]="cat.id">{{ cat.name }}</option>
+      </select>
+      <button class="discover-btn" (click)="onSearch()">
+        <span>Discover</span>
+        <span class="material-icons">auto_awesome</span>
+      </button>
+    </div>
+  </div>
+
+  <div class="skeleton-grid" *ngIf="loading">
+    <div class="book-card skeleton-card" *ngFor="let i of [1,2,3,4,5,6,7,8]">
+      <div class="book-cover skeleton"></div>
+      <div class="book-info">
+        <div class="skeleton" style="width: 40%; height: 10px; margin-bottom: 10px;"></div>
+        <div class="skeleton" style="width: 100%; height: 20px; margin-bottom: 10px;"></div>
+        <div class="skeleton" style="width: 60%; height: 12px;"></div>
+      </div>
+    </div>
+  </div>
+
+  <p class="error-msg" *ngIf="!loading && error">{{ error }}</p>
+
+  <div class="book-grid loading-fade" *ngIf="!loading && !error && books.length">
+    <a *ngFor="let b of books" [routerLink]="['/books', b.id]" class="book-card">
+      <div class="book-cover">
+        <img [src]="getBookCover(b)" [alt]="b.title" class="cover-image" />
+      </div>
+      <div class="book-info">
+        <span class="book-category">{{ b.category || 'Uncategorized' }}</span>
+        <h3 class="book-title">{{ b.title }}</h3>
+        <span class="book-author">By {{ b.author }}</span>
+        <div class="book-status">
+          <span class="status-dot" [class.available]="b.available_copies > 0"
+            [class.unavailable]="b.available_copies === 0"></span>
+          <span>{{ b.available_copies > 0 ? 'Available for Loan' : 'Reserved' }}</span>
+        </div>
+      </div>
+    </a>
+  </div>
+
+  <div class="empty-state" *ngIf="!loading && !error && !books.length">
+    <span class="material-icons empty-icon">unarchive</span>
+    <p class="notify-meta">ไม่พบทรัพยากรที่ระบบสืบค้นได้</p>
+  </div>
+
+  <!-- Pagination -->
+  <div class="pagination" *ngIf="!loading && total > limit">
+    <button class="page-btn" (click)="prevPage()" [disabled]="!canPrev()">
+      <span class="material-icons">chevron_left</span>
+    </button>
+    <div class="page-info">
+      {{ page }} <span style="opacity: 0.3; margin: 0 5px;">/</span> {{ totalPages() }}
+    </div>
+    <button class="page-btn" (click)="nextPage()" [disabled]="!canNext()">
+      <span class="material-icons">chevron_right</span>
+    </button>
+  </div>
+</div>

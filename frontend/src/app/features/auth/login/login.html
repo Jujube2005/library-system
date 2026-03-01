@@ -1,0 +1,77 @@
+<div class="login-wrapper" [class.dark-mode]="isDarkMode">
+  <div class="login-container">
+
+    <!-- Form Section -->
+    <section class="form-section">
+      <header class="brand-header" (click)="goBack()">
+        <span class="material-icons">west</span>
+        <span class="brand-name">RMUTI</span>
+      </header>
+
+      <div class="form-main">
+        <div class="role-selector">
+          <button type="button" class="role-btn" [class.active]="loginRole === 'student'" (click)="setRole('student')">
+            <span class="material-icons">person</span>
+            Student / Member
+          </button>
+          <button type="button" class="role-btn" [class.active]="loginRole === 'staff'" (click)="setRole('staff')">
+            <span class="material-icons">admin_panel_settings</span>
+            Library Staff
+          </button>
+        </div>
+
+        <h1 class="welcome-text">
+          <ng-container *ngIf="loginRole === 'student'">Student <br>Sign-In</ng-container>
+          <ng-container *ngIf="loginRole === 'staff'">Staff <br>Sign-In</ng-container>
+        </h1>
+        <p class="sub-text">
+          <ng-container *ngIf="loginRole === 'student'">
+            เข้าสู่ระบบด้วยบัญชีนักศึกษา/อาจารย์ <br>
+            เพื่อจัดการการยืม-คืน และการจองหนังสือ
+          </ng-container>
+          <ng-container *ngIf="loginRole === 'staff'">
+            สำหรับเจ้าหน้าที่ห้องสมุดเท่านั้น <br>
+            เพื่อจัดการระบบ คลังหนังสือ และรายงาน
+          </ng-container>
+        </p>
+
+        <form (ngSubmit)="login()" class="auth-form">
+          <div class="input-field">
+            <label>บัญชีผู้ใช้ (RMUTI Account)</label>
+            <input type="email" [(ngModel)]="email" name="email" placeholder="username@rmuti.ac.th" required />
+          </div>
+
+          <div class="input-field">
+            <label>รหัสผ่าน (Password)</label>
+            <input type="password" [(ngModel)]="password" name="password" placeholder="••••••••••••" required />
+          </div>
+
+          <div class="form-options">
+            <span>ไม่มีบัญชี? <a [routerLink]="['/register']" [queryParams]="{ role: loginRole }" class="forgot-link">สมัครสมาชิก</a></span>
+            <span style="opacity: 0.2">|</span>
+            <a href="#" class="forgot-link" (click)="goBack()">กลับหน้าหลัก</a>
+          </div>
+
+          <button type="submit" class="btn-submit" [disabled]="isSubmitting">
+            {{ isSubmitting ? 'กำลังตรวจสอบสิทธิ์...' : 'เข้าสู่ระบบ' }}
+          </button>
+
+          <p class="error-msg" *ngIf="errorMessage">
+            <span class="material-icons" style="font-size: 1rem">error_outline</span>
+            {{ errorMessage }}
+          </p>
+        </form>
+      </div>
+    </section>
+
+    <!-- Visual Section -->
+    <section class="visual-section">
+      <img src="/library.jpg" alt="RMUTI Library">
+      <div class="glass-caption">
+        <span class="glass-tag">Philosophy</span>
+        <h2 class="glass-title">Knowledge is the <br>ultimate luxury.</h2>
+      </div>
+    </section>
+
+  </div>
+</div>
