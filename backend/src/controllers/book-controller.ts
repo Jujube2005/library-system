@@ -161,31 +161,23 @@ export const returnBook = async (req: any, res: Response) => {
 }
 
 export const createBook = async (req: Request, res: Response) => {
-  console.log('--- START CREATE BOOK REQUEST ---');
   try {
     const bookData = req.body as Omit<Book, 'id' | 'created_at' | 'updated_at'>
-    console.log('Book Data received:', JSON.stringify(bookData));
-    
     // Use the authenticated supabase client if available, or fall back to service role logic
     const supabaseClient = (req as any).supabase
-    console.log('Using Supabase client from request:', !!supabaseClient);
-    
     const result = await bookService.createBook(bookData, supabaseClient)
-    console.log('Book created successfully in service');
 
     res.status(201).json({
       data: result
     })
   } catch (error: any) {
-    console.error('Create Book Error detail:', error)
+    console.error('Create Book Error:', error)
     res.status(400).json({ 
       error: error.message || 'Create Book Failed', 
       details: error.details, 
       hint: error.hint,
       code: error.code 
     })
-  } finally {
-    console.log('--- END CREATE BOOK REQUEST ---');
   }
 }
 
