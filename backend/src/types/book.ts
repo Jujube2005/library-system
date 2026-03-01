@@ -10,6 +10,7 @@ export interface Book {
   total_copies: number;
   available_copies: number;
   status: BookStatus;
+  image_url?: string;
   due_date?: string; // ถ้าถูกยืม อาจจะมีวันกำหนดส่ง
   created_at?: string;
   updated_at?: string;

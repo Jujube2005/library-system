@@ -32,6 +32,22 @@
           <label for="total_copies">จำนวนสำเนา</label>
           <input id="total_copies" type="number" [(ngModel)]="newBook.total_copies" name="total_copies" min="1" required>
         </div>
+        <div class="form-group full-width">
+          <label for="image_file">รูปหน้าปกหนังสือ</label>
+          <div class="image-upload-container">
+            <input id="image_file" type="file" (change)="onFileSelected($event)" accept="image/*" class="file-input">
+            <div class="image-preview-box" *ngIf="imagePreview">
+              <img [src]="imagePreview" alt="Book cover preview">
+              <button type="button" class="remove-image-btn" (click)="selectedFile = null; imagePreview = null">
+                <span class="material-icons">close</span>
+              </button>
+            </div>
+            <div class="upload-placeholder" *ngIf="!imagePreview">
+              <span class="material-icons">add_a_photo</span>
+              <p>คลิกเพื่อเลือกรูปภาพ</p>
+            </div>
+          </div>
+        </div>
       </div>
 
       <div class="form-actions">
@@ -63,6 +79,7 @@
       <table class="book-table">
         <thead>
           <tr>
+            <th>รูปภาพ</th>
             <th>ชื่อหนังสือ</th>
             <th>ผู้แต่ง</th>
             <th>ISBN</th>
@@ -76,6 +93,12 @@
         </thead>
         <tbody>
           <tr *ngFor="let book of books">
+            <td class="book-thumbnail-cell">
+              <img *ngIf="book.image_url" [src]="book.image_url" [alt]="book.title" class="book-thumbnail" onerror="this.src='assets/images/no-book-cover.png'">
+              <div *ngIf="!book.image_url" class="book-no-thumbnail">
+                <span class="material-icons">book</span>
+              </div>
+            </td>
             <td [title]="book.title">{{ book.title }}</td>
             <td [title]="book.author">{{ book.author }}</td>
             <td>{{ book.isbn }}</td>
@@ -136,7 +159,10 @@
             <label for="edit_shelf_location">ตำแหน่งชั้นวาง</label>
             <input id="edit_shelf_location" type="text" [(ngModel)]="editBookForm.shelf_location" name="edit_shelf_location" required>
           </div>
-          <!-- total_copies and available_copies will be managed separately -->
+          <div class="form-group full-width">
+            <label for="edit_image_url">URL รูปหน้าปกหนังสือ (ถ้ามี)</label>
+            <input id="edit_image_url" type="url" [(ngModel)]="editBookForm.image_url" name="edit_image_url" placeholder="https://example.com/book-cover.jpg">
+          </div>
         </div>
 
         <div class="form-actions">

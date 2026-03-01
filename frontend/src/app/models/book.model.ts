@@ -7,6 +7,7 @@ export interface Book {
   isbn: string
   category: string
   shelf_location: string
+  image_url?: string
   available_copies: number
   total_copies: number
   status: BookStatus

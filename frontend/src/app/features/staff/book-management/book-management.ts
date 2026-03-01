@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { BookApiService } from '../../../services/book-api.service';
 import { Book } from '../../../models/book.model';
+import { supabase } from '../../../../lib/supabase';
 
 @Component({
   selector: 'app-book-management',
@@ -19,11 +20,17 @@ export class BookManagementComponent implements OnInit {
     isbn: '',
     category: '',
     shelf_location: '',
+    image_url: '',
     total_copies: 1
   };
   isSubmitting = false;
   errorMessage = '';
   successMessage = '';
+
+  // Image Upload properties
+  selectedFile: File | null = null;
+  imagePreview: string | null = null;
+  isUploading = false;
 
   // Book list and editing
   books: Book[] = [];
@@ -72,6 +79,51 @@ export class BookManagementComponent implements OnInit {
     ).slice(0, 50); // จำกัดผลลัพธ์การค้นหาเพื่อไม่ให้ UI กระตุก
   }
 
+  onFileSelected(event: any) {
+    const file = event.target.files[0];
+    if (file) {
+      if (!file.type.startsWith('image/')) {
+        this.errorMessage = 'กรุณาเลือกไฟล์รูปภาพเท่านั้น';
+        return;
+      }
+      if (file.size > 2 * 1024 * 1024) { // 2MB Limit
+        this.errorMessage = 'ขนาดไฟล์ต้องไม่เกิน 2MB';
+        return;
+      }
+
+      this.selectedFile = file;
+      const reader = new FileReader();
+      reader.onload = () => {
+        this.imagePreview = reader.result as string;
+      };
+      reader.readAsDataURL(file);
+    }
+  }
+
+  async uploadImage(file: File): Promise<string | null> {
+    try {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${Math.random().toString(36).substring(2)}_${Date.now()}.${fileExt}`;
+      const filePath = fileName; // ใช้แค่ fileName เพื่อให้ URL สั้นลง (bucket/fileName)
+
+      const { error: uploadError } = await supabase.storage
+        .from('book-covers')
+        .upload(filePath, file);
+
+      if (uploadError) throw uploadError;
+
+      const { data } = supabase.storage
+        .from('book-covers')
+        .getPublicUrl(filePath);
+
+      return data.publicUrl;
+    } catch (err: any) {
+      console.error('Upload Image Error:', err);
+      this.errorMessage = `อัปโหลดรูปภาพไม่สำเร็จ: ${err.message}`;
+      return null;
+    }
+  }
+
   async createBook() {
     // Validation
     if (this.newBook.isbn && this.newBook.isbn.replace(/[-\s]/g, '').length > 13) {
@@ -84,6 +136,16 @@ export class BookManagementComponent implements OnInit {
     this.successMessage = '';
 
     try {
+      // Upload image if selected
+      if (this.selectedFile) {
+        this.isUploading = true;
+        const imageUrl = await this.uploadImage(this.selectedFile);
+        if (imageUrl) {
+          this.newBook.image_url = imageUrl;
+        }
+        this.isUploading = false;
+      }
+
       const createdBook = await this.bookApi.createBook(this.newBook);
       this.successMessage = `เพิ่มหนังสือ "${createdBook.data.title}" สำเร็จ!`;
       // Reset form
@@ -93,8 +155,11 @@ export class BookManagementComponent implements OnInit {
         isbn: '',
         category: '',
         shelf_location: '',
+        image_url: '',
         total_copies: 1
       };
+      this.selectedFile = null;
+      this.imagePreview = null;
       void this.loadBooks(); // Reload books after creation
     } catch (err: any) {
       console.error('Create Book Error - Full Error Object:', err);

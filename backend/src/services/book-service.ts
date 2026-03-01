@@ -149,6 +149,7 @@ export const createBook = async (bookData: Omit<Book, 'id' | 'created_at' | 'upd
     isbn: isbn && isbn.length > 0 ? isbn : null,
     category: bookData.category.trim(),
     shelf_location: bookData.shelf_location.trim(),
+    image_url: bookData.image_url ? bookData.image_url.trim() : null,
     total_copies: Number(bookData.total_copies),
     available_copies: Number(bookData.total_copies),
     status: (Number(bookData.total_copies) > 0 ? 'available' : 'unavailable') as BookStatus
@@ -183,7 +184,7 @@ export const updateBookInfo = async (bookId: string, updateData: Partial<Book>, 
     : supabase);
 
   // Filter out invalid columns
-  const validColumns = ['title', 'author', 'isbn', 'category', 'shelf_location', 'total_copies', 'available_copies', 'status']
+  const validColumns = ['title', 'author', 'isbn', 'category', 'shelf_location', 'image_url', 'total_copies', 'available_copies', 'status']
   const filteredData: Record<string, any> = {}
   
   for (const key of validColumns) {

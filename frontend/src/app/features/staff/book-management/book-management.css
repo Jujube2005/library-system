@@ -52,7 +52,8 @@
 }
 
 .form-group input[type="text"],
-.form-group input[type="number"] {
+.form-group input[type="number"],
+.form-group input[type="url"] {
   width: 100%;
   padding: 0.8rem 1rem;
   border: 1px solid var(--border-light);
@@ -64,16 +65,22 @@
 }
 
 .form-group input[type="text"]:hover,
-.form-group input[type="number"]:hover {
+.form-group input[type="number"]:hover,
+.form-group input[type="url"]:hover {
   border-color: var(--text-muted);
 }
 
 .form-group input[type="text"]:focus,
-.form-group input[type="number"]:focus {
+.form-group input[type="number"]:focus,
+.form-group input[type="url"]:focus {
   outline: none;
   border-color: var(--accent);
   background-color: var(--bg-card);
   box-shadow: 0 0 0 4px rgba(211, 84, 0, 0.1);
+}
+
+.form-group.full-width {
+  grid-column: 1 / -1;
 }
 
 .form-actions {
@@ -113,10 +120,97 @@
   transform: translateY(0);
 }
 
-.form-actions button:disabled {
+/* Image Upload Styles */
+.image-upload-container {
+  position: relative;
+  width: 100%;
+  min-height: 150px;
+  border: 2px dashed var(--border-light);
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  overflow: hidden;
+  background-color: var(--bg-hover);
+}
+
+.image-upload-container:hover {
+  border-color: var(--accent);
+  background-color: rgba(211, 84, 0, 0.05);
+}
+
+.file-input {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
+  z-index: 2;
+}
+
+.upload-placeholder {
+  text-align: center;
+  color: var(--text-muted);
+}
+
+.upload-placeholder .material-icons {
+  font-size: 3rem;
+  margin-bottom: 0.5rem;
   opacity: 0.5;
-  cursor: not-allowed;
-  filter: grayscale(1);
+}
+
+.image-preview-box {
+  position: relative;
+  width: 100%;
+  height: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 3;
+}
+
+.image-preview-box img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  border-radius: 8px;
+}
+
+.remove-image-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: rgba(231, 76, 60, 0.9);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+  transition: all 0.2s ease;
+}
+
+.remove-image-btn:hover {
+  background: #c0392b;
+  transform: scale(1.1);
+}
+
+.remove-image-btn .material-icons {
+  font-size: 1.2rem;
+}
+
+.form-actions button:disabled {
+  opacity: 0.7;
+  cursor: wait;
 }
 
 .error-message {
@@ -197,6 +291,41 @@
   z-index: 1;
   box-shadow: -2px 0 5px rgba(0,0,0,0.05);
   min-width: 180px; /* ให้พื้นที่เพียงพอสำหรับปุ่มกด */
+}
+
+/* Book Thumbnail styles */
+.book-thumbnail-cell {
+  width: 80px;
+  min-width: 80px;
+  padding: 0.5rem !important;
+  text-align: center !important;
+}
+
+.book-thumbnail {
+  width: 50px;
+  height: 70px;
+  object-fit: cover;
+  border-radius: 4px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  background-color: var(--bg-hover);
+}
+
+.book-no-thumbnail {
+  width: 50px;
+  height: 70px;
+  background-color: var(--bg-hover);
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto;
+  color: var(--text-muted);
+  border: 1px dashed var(--border-light);
+}
+
+.book-no-thumbnail .material-icons {
+  font-size: 2rem;
+  opacity: 0.3;
 }
 
 th.sticky-action {
