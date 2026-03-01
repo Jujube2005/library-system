@@ -246,7 +246,11 @@ export const getAllLoansInSystem = async (): Promise<Loan[]> => {
       due_date,
       return_date,
       status,
+<<<<<<< HEAD
       user:profiles!loans_user_id_fkey (
+=======
+      user:profiles!user_id (
+>>>>>>> 7479f8e69e6f112165719a63ec688f5b62fb9e1a
         id,
         full_name,
         role,
@@ -260,7 +264,8 @@ export const getAllLoansInSystem = async (): Promise<Loan[]> => {
     .order('due_date', { ascending: true })
 
   if (error) {
-    throw new Error("ไม่สามารถดึงข้อมูลรายการยืมทั้งหมดได้")
+    console.error('GetAllLoansInSystem Error:', error)
+    throw new Error("ไม่สามารถดึงข้อมูลรายการยืมทั้งหมดได้: " + error.message)
   }
 
   return data as Loan[]
@@ -277,7 +282,11 @@ export const getLoanById = async (loanId: string): Promise<Loan | null> => {
       due_date,
       return_date,
       status,
+<<<<<<< HEAD
       user:profiles!loans_user_id_fkey (
+=======
+      user:profiles!user_id (
+>>>>>>> 7479f8e69e6f112165719a63ec688f5b62fb9e1a
         id,
         full_name,
         role,
@@ -297,7 +306,7 @@ export const getLoanById = async (loanId: string): Promise<Loan | null> => {
     .single()
 
   if (error) {
-    // ถ้าไม่พบ loan จะ return null แทนที่จะ throw error
+    console.error('GetLoanById Error:', error)
     if (error.code === 'PGRST116') return null; // Not Found
     throw new Error(error.message)
   }

@@ -163,13 +163,21 @@ export const returnBook = async (req: any, res: Response) => {
 export const createBook = async (req: Request, res: Response) => {
   try {
     const bookData = req.body as Omit<Book, 'id' | 'created_at' | 'updated_at'>
-    const result = await bookService.createBook(bookData)
+    // Use the authenticated supabase client if available, or fall back to service role logic
+    const supabaseClient = (req as any).supabase
+    const result = await bookService.createBook(bookData, supabaseClient)
 
     res.status(201).json({
       data: result
     })
   } catch (error: any) {
-    res.status(400).json({ error: error.message })
+    console.error('Create Book Error:', error)
+    res.status(400).json({ 
+      error: error.message || 'Create Book Failed', 
+      details: error.details, 
+      hint: error.hint,
+      code: error.code 
+    })
   }
 }
 
@@ -183,14 +191,25 @@ export const updateBook = async (req: Request, res: Response) => {
     }
 
     const updateData = req.body as Partial<Book>
-    const result = await bookService.updateBookInfo(id, updateData)
+    const supabaseClient = (req as any).supabase
+    const result = await bookService.updateBookInfo(id, updateData, supabaseClient)
 
     res.status(200).json({
       data: result
     })
   } catch (error: any) {
+<<<<<<< HEAD
     console.error('SERVER UPDATE BOOK HTTP ERROR:', error);
     res.status(400).json({ error: error.message || String(error) })
+=======
+    console.error('Update Book Error:', error)
+    res.status(400).json({ 
+      error: error.message || 'Update Book Failed', 
+      details: error.details, 
+      hint: error.hint,
+      code: error.code 
+    })
+>>>>>>> 7479f8e69e6f112165719a63ec688f5b62fb9e1a
   }
 }
 
@@ -203,13 +222,20 @@ export const deleteBook = async (req: Request, res: Response) => {
       return
     }
 
-    const result = await bookService.deleteBook(id)
+    const supabaseClient = (req as any).supabase
+    const result = await bookService.deleteBook(id, supabaseClient)
 
     res.status(200).json({
       data: result
     })
   } catch (error: any) {
-    res.status(400).json({ error: error.message })
+    console.error('Delete Book Error:', error)
+    res.status(400).json({ 
+      error: error.message || 'Delete Book Failed', 
+      details: error.details, 
+      hint: error.hint,
+      code: error.code 
+    })
   }
 }
 
@@ -227,12 +253,19 @@ export const updateBookCopies = async (req: Request, res: Response) => {
       return
     }
 
-    const result = await bookService.updateBookCopies(id, change)
+    const supabaseClient = (req as any).supabase
+    const result = await bookService.updateBookCopies(id, change, supabaseClient)
 
     res.status(200).json({
       data: result
     })
   } catch (error: any) {
-    res.status(400).json({ error: error.message })
+    console.error('Update Book Copies Error:', error)
+    res.status(400).json({ 
+      error: error.message || 'Update Book Copies Failed', 
+      details: error.details, 
+      hint: error.hint,
+      code: error.code 
+    })
   }
 }

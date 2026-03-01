@@ -3,12 +3,26 @@ import { SupabaseClient } from '@supabase/supabase-js';
 export const getMyFines = async (supabase: SupabaseClient, userId: string) => {
   const { data, error } = await supabase
     .from('fines')
-    .select('id, loan_id, amount, status, created_at, updated_at, paid_at')
+    .select(`
+      id, 
+      loan_id, 
+      amount, 
+      status, 
+      created_at, 
+      updated_at, 
+      paid_at,
+      loan:loans (
+        id,
+        book:books (
+          title
+        )
+      )
+    `)
     .eq('user_id', userId)
 
   if (error) {
-    console.error('Supabase Fines Error:', error)
-    throw error // Throw the original error object
+    console.error('Supabase getMyFines Error:', error)
+    throw error 
   }
 
   return data
@@ -17,10 +31,29 @@ export const getMyFines = async (supabase: SupabaseClient, userId: string) => {
 export const getAllFines = async (supabase: SupabaseClient) => {
   const { data, error } = await supabase
     .from('fines')
-    .select('id, loan_id, user_id, amount, status, created_at, updated_at, paid_at')
+    .select(`
+      id, 
+      loan_id, 
+      user_id, 
+      amount, 
+      status, 
+      created_at, 
+      updated_at, 
+      paid_at,
+      user:profiles!user_id (
+        full_name,
+        email
+      ),
+      loan:loans (
+        book:books (
+          title
+        )
+      )
+    `)
 
   if (error) {
-    throw new Error('ไม่สามารถดึงข้อมูลค่าปรับทั้งหมดได้')
+    console.error('Supabase getAllFines Error:', error)
+    throw new Error('ไม่สามารถดึงข้อมูลค่าปรับทั้งหมดได้: ' + error.message)
   }
 
   return data
