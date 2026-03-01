@@ -87,7 +87,7 @@ const getStatus = async (req, res) => {
         const { id } = req.params;
         const { data, error } = await publicSupabase
             .from('books')
-            .select('id, title, author, category, shelf_location, available_copies, total_copies, status')
+            .select('id, title, author, category, shelf_location, available_copies, total_copies, status, cover_image_url')
             .eq('id', id)
             .single();
         if (error || !data) {

@@ -62,7 +62,7 @@ export const getStatus = async (req: Request, res: Response) => {
 
     const { data, error } = await publicSupabase
       .from('books')
-      .select('id, title, author, category, shelf_location, available_copies, total_copies, status')
+      .select('id, title, author, category, shelf_location, available_copies, total_copies, status, cover_image_url')
       .eq('id', id)
       .single()
 
@@ -189,7 +189,8 @@ export const updateBook = async (req: Request, res: Response) => {
       data: result
     })
   } catch (error: any) {
-    res.status(400).json({ error: error.message })
+    console.error('SERVER UPDATE BOOK HTTP ERROR:', error);
+    res.status(400).json({ error: error.message || String(error) })
   }
 }
 

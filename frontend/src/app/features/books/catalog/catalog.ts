@@ -101,6 +101,10 @@ export class BookCatalogComponent implements OnInit {
   }
 
   getBookCover(book: Book): string {
+    if (book.cover_image_url) {
+      return book.cover_image_url;
+    }
+
     const titleKey = (book.title || '').trim().toLowerCase()
 
     const coverByTitle: Record<string, string> = {

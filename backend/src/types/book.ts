@@ -13,4 +13,5 @@ export interface Book {
   due_date?: string; // ถ้าถูกยืม อาจจะมีวันกำหนดส่ง
   created_at?: string;
   updated_at?: string;
+  cover_image_url?: string;
 }

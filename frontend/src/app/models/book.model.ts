@@ -12,5 +12,6 @@ export interface Book {
   status: BookStatus
   created_at?: string
   updated_at?: string
+  cover_image_url?: string
 }
 

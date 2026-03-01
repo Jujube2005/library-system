@@ -30,7 +30,26 @@
         </div>
         <div class="form-group">
           <label for="total_copies">จำนวนสำเนา</label>
-          <input id="total_copies" type="number" [(ngModel)]="newBook.total_copies" name="total_copies" min="1" required>
+          <input id="total_copies" type="number" [(ngModel)]="newBook.total_copies" name="total_copies" min="1"
+            required>
+        </div>
+        <div class="form-group">
+          <label>รูปภาพหน้าปก</label>
+          <div class="file-upload-wrapper">
+            <input type="file" (change)="onFileSelected($event, false)" accept="image/*" id="cover_file_upload"
+              style="display: none;">
+            <label for="cover_file_upload" class="upload-btn">
+              <span class="material-icons">cloud_upload</span>
+              เลือกรูปภาพ
+            </label>
+            <span *ngIf="isUploadingCover" class="upload-status">กำลังอัปโหลด...</span>
+            <span *ngIf="!isUploadingCover && newBook.cover_image_url" class="upload-status success">
+              <span class="material-icons" style="font-size: 16px; color: green;">check_circle</span>
+              อัปโหลดสำเร็จ
+            </span>
+          </div>
+          <!-- เก็บ hidden input ไว้สำหรับส่งค่า ถ้าไม่จำเป็นก็ดึงจาก object ได้เลย -->
+          <input type="hidden" [(ngModel)]="newBook.cover_image_url" name="cover_image_url">
         </div>
       </div>
 
@@ -50,7 +69,8 @@
   <div class="content-section book-list-section">
     <h2>รายการหนังสือ</h2>
     <div class="search-filter-bar">
-      <input type="text" [(ngModel)]="searchQuery" (ngModelChange)="applyFilter()" placeholder="ค้นหาหนังสือ (ชื่อ, ผู้แต่ง, ISBN, หมวดหมู่)" class="search-input">
+      <input type="text" [(ngModel)]="searchQuery" (ngModelChange)="applyFilter()"
+        placeholder="ค้นหาหนังสือ (ชื่อ, ผู้แต่ง, ISBN, หมวดหมู่)" class="search-input">
     </div>
     <div *ngIf="loadingBooks" class="loading-spinner"></div>
     <div *ngIf="booksError" class="error-message">{{ booksError }}</div>
@@ -84,7 +104,8 @@
             <td>{{ book.total_copies }}</td>
             <td>{{ book.available_copies }}</td>
             <td>
-              <span class="status-badge" [class.available]="book.available_copies > 0" [class.unavailable]="book.available_copies <= 0">
+              <span class="status-badge" [class.available]="book.available_copies > 0"
+                [class.unavailable]="book.available_copies <= 0">
                 {{ book.status }}
               </span>
             </td>
@@ -96,10 +117,12 @@
                 <button class="action-btn delete-btn" (click)="deleteBook(book.id, book.title)" title="ลบ">
                   <span class="material-icons">delete</span>
                 </button>
-                <button class="action-btn add-copy-btn" (click)="updateCopies(book.id, book.title, 1)" title="เพิ่มจำนวน">
+                <button class="action-btn add-copy-btn" (click)="updateCopies(book.id, book.title, 1)"
+                  title="เพิ่มจำนวน">
                   <span class="material-icons">add_box</span>
                 </button>
-                <button class="action-btn remove-copy-btn" (click)="updateCopies(book.id, book.title, -1)" [disabled]="book.total_copies <= 0" title="ลดจำนวน">
+                <button class="action-btn remove-copy-btn" (click)="updateCopies(book.id, book.title, -1)"
+                  [disabled]="book.total_copies <= 0" title="ลดจำนวน">
                   <span class="material-icons">remove_circle</span>
                 </button>
               </div>
@@ -134,7 +157,25 @@
           </div>
           <div class="form-group">
             <label for="edit_shelf_location">ตำแหน่งชั้นวาง</label>
-            <input id="edit_shelf_location" type="text" [(ngModel)]="editBookForm.shelf_location" name="edit_shelf_location" required>
+            <input id="edit_shelf_location" type="text" [(ngModel)]="editBookForm.shelf_location"
+              name="edit_shelf_location" required>
+          </div>
+          <div class="form-group">
+            <label>รูปภาพหน้าปก</label>
+            <div class="file-upload-wrapper">
+              <input type="file" (change)="onFileSelected($event, true)" accept="image/*" id="edit_cover_file_upload"
+                style="display: none;">
+              <label for="edit_cover_file_upload" class="upload-btn">
+                <span class="material-icons">cloud_upload</span>
+                เปลี่ยนรูปภาพ
+              </label>
+              <span *ngIf="isUploadingCover" class="upload-status">กำลังอัปโหลด...</span>
+              <span *ngIf="!isUploadingCover && editBookForm.cover_image_url" class="upload-status success">
+                <span class="material-icons" style="font-size: 16px; color: green;">check_circle</span>
+                พร้อมใช้งาน
+              </span>
+            </div>
+            <input type="hidden" [(ngModel)]="editBookForm.cover_image_url" name="edit_cover_image_url">
           </div>
           <!-- total_copies and available_copies will be managed separately -->
         </div>
@@ -151,5 +192,12 @@
         <div *ngIf="successMessage" class="success-message">{{ successMessage }}</div>
       </form>
     </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div *ngIf="toastMessage" class="toast-notification" [class.success]="toastMessage.type === 'success'"
+    [class.error]="toastMessage.type === 'error'">
+    <span class="material-icons">{{ toastMessage.type === 'success' ? 'check_circle' : 'error' }}</span>
+    <span>{{ toastMessage.message }}</span>
   </div>
 </div>

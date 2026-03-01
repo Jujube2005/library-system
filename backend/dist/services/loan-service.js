@@ -208,7 +208,7 @@ const getAllLoansInSystem = async () => {
       due_date,
       return_date,
       status,
-      user:profiles!inner (
+      user:profiles!loans_user_id_fkey (
         id,
         full_name,
         role,
@@ -237,7 +237,7 @@ const getLoanById = async (loanId) => {
       due_date,
       return_date,
       status,
-      user:profiles!inner (
+      user:profiles!loans_user_id_fkey (
         id,
         full_name,
         role,

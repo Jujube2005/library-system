@@ -29,7 +29,8 @@
   border-radius: 12px;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
   border: 1px solid var(--border-light);
-  margin-bottom: 2rem; /* Added margin */
+  margin-bottom: 2rem;
+  /* Added margin */
 }
 
 .book-form {
@@ -120,14 +121,16 @@
 }
 
 .error-message {
-  color: #e74c3c; /* Red */
+  color: #e74c3c;
+  /* Red */
   margin-top: 1rem;
   text-align: center;
   font-weight: 500;
 }
 
 .success-message {
-  color: #27ae60; /* Green */
+  color: #27ae60;
+  /* Green */
   margin-top: 1rem;
   text-align: center;
   font-weight: 500;
@@ -136,7 +139,8 @@
 /* Book List Table */
 .book-list-section {
   margin-top: 2rem;
-  overflow-x: auto; /* เพิ่มการเลื่อนแนวนอนหากตารางกว้างเกินไป */
+  overflow-x: auto;
+  /* เพิ่มการเลื่อนแนวนอนหากตารางกว้างเกินไป */
 }
 
 .search-filter-bar {
@@ -174,20 +178,24 @@
   width: 100%;
   border-collapse: collapse;
   background: var(--bg-card);
-  min-width: 900px; /* กำหนดความกว้างขั้นต่ำเพื่อไม่ให้ข้อมูลทับกัน */
+  min-width: 900px;
+  /* กำหนดความกว้างขั้นต่ำเพื่อไม่ให้ข้อมูลทับกัน */
 }
 
 .book-table th,
 .book-table td {
-  padding: 1rem 0.8rem; /* ลด padding ลงเล็กน้อย */
+  padding: 1rem 0.8rem;
+  /* ลด padding ลงเล็กน้อย */
   text-align: left;
   border-bottom: 1px solid var(--border-light);
   color: var(--text-main);
   vertical-align: middle;
-  white-space: nowrap; /* ป้องกันข้อความขึ้นบรรทัดใหม่จนทับกัน */
+  white-space: nowrap;
+  /* ป้องกันข้อความขึ้นบรรทัดใหม่จนทับกัน */
   overflow: hidden;
   text-overflow: ellipsis;
-  max-width: 200px; /* จำกัดความกว้างสูงสุดของเซลล์ */
+  max-width: 200px;
+  /* จำกัดความกว้างสูงสุดของเซลล์ */
 }
 
 .sticky-action {
@@ -195,8 +203,9 @@
   right: 0;
   background-color: var(--bg-card);
   z-index: 1;
-  box-shadow: -2px 0 5px rgba(0,0,0,0.05);
-  min-width: 180px; /* ให้พื้นที่เพียงพอสำหรับปุ่มกด */
+  box-shadow: -2px 0 5px rgba(0, 0, 0, 0.05);
+  min-width: 180px;
+  /* ให้พื้นที่เพียงพอสำหรับปุ่มกด */
 }
 
 th.sticky-action {
@@ -305,12 +314,18 @@ th.sticky-action {
   height: 40px;
   animation: spin 1s linear infinite;
   margin: 2rem auto;
-  display: block; /* มั่นใจว่าอยู่กึ่งกลาง */
+  display: block;
+  /* มั่นใจว่าอยู่กึ่งกลาง */
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 /* Edit Book Modal */
@@ -358,5 +373,98 @@ th.sticky-action {
 }
 
 .edit-book-modal .cancel-btn:hover:not(:disabled) {
-  background-color: #6c757d; /* Darker grey */
+  background-color: #6c757d;
+  /* Darker grey */
+}
+
+/* File Upload Styles */
+.file-upload-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 0.5rem;
+}
+
+.upload-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.6rem 1.2rem;
+  background-color: var(--bg-hover);
+  border: 1px solid var(--border-light);
+  border-radius: 8px;
+  color: var(--text-main);
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s var(--transition-ease);
+}
+
+.upload-btn:hover {
+  background-color: var(--bg-card);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.upload-status {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.upload-status.success {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  color: #27ae60;
+}
+
+/* Toast Notification Styles */
+.toast-notification {
+  position: fixed;
+  bottom: 30px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: var(--bg-card);
+  border-left: 5px solid #bdc3c7;
+  border-radius: 8px;
+  padding: 1rem 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+  z-index: 2000;
+  animation: slideInUp 0.3s ease-out forwards;
+  color: var(--text-main);
+  font-weight: 500;
+}
+
+.toast-notification.success {
+  border-left-color: #27ae60;
+}
+
+.toast-notification.error {
+  border-left-color: #e74c3c;
+}
+
+.toast-notification .material-icons {
+  font-size: 1.5rem;
+}
+
+.toast-notification.success .material-icons {
+  color: #27ae60;
+}
+
+.toast-notification.error .material-icons {
+  color: #e74c3c;
+}
+
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 100%);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
 }

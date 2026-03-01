@@ -112,8 +112,12 @@ export class BookDetailComponent implements OnInit {
     }
   }
 
-  getBookCover(title: string | undefined): string {
-    const titleKey = (title || '').trim().toLowerCase()
+  getBookCover(book: Book | null): string {
+    if (book?.cover_image_url) {
+      return book.cover_image_url;
+    }
+
+    const titleKey = (book?.title || '').trim().toLowerCase()
     const coverByTitle: Record<string, string> = {
       'เพราะเป็นวัยรุ่นจึงเจ็บปวด': '/book1.jpg',
       'กล้าที่จะถูกเกลียด': '/book2.jpg',

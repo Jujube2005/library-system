@@ -246,7 +246,7 @@ export const getAllLoansInSystem = async (): Promise<Loan[]> => {
       due_date,
       return_date,
       status,
-      user:profiles!inner (
+      user:profiles!loans_user_id_fkey (
         id,
         full_name,
         role,
@@ -277,7 +277,7 @@ export const getLoanById = async (loanId: string): Promise<Loan | null> => {
       due_date,
       return_date,
       status,
-      user:profiles!inner (
+      user:profiles!loans_user_id_fkey (
         id,
         full_name,
         role,
