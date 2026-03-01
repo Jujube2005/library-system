@@ -73,15 +73,12 @@ export class BookManagementComponent implements OnInit {
   }
 
   async createBook() {
-<<<<<<< HEAD
     // Validation
     if (this.newBook.isbn && this.newBook.isbn.replace(/[-\s]/g, '').length > 13) {
       this.errorMessage = 'ISBN ต้องไม่เกิน 13 ตัวอักษร (ไม่รวมขีดหรือเว้นวรรค)';
       return;
     }
 
-=======
->>>>>>> ef204752f8201bc1bc181265c95d460b01f0ce6c
     this.isSubmitting = true;
     this.errorMessage = '';
     this.successMessage = '';
@@ -100,7 +97,6 @@ export class BookManagementComponent implements OnInit {
       };
       void this.loadBooks(); // Reload books after creation
     } catch (err: any) {
-<<<<<<< HEAD
       console.error('Create Book Error - Full Error Object:', err);
       const backendError = err.error;
       if (backendError) {
@@ -121,9 +117,6 @@ export class BookManagementComponent implements OnInit {
       } else {
         this.errorMessage = err.message || 'ไม่สามารถเพิ่มหนังสือได้';
       }
-=======
-      this.errorMessage = err.message || 'ไม่สามารถเพิ่มหนังสือได้';
->>>>>>> ef204752f8201bc1bc181265c95d460b01f0ce6c
     } finally {
       this.isSubmitting = false;
     }

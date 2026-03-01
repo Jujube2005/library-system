@@ -18,6 +18,7 @@ router.get('/my', protect, viewMyLoans)
 router.patch('/:id/renew', protect, renewLoanHandler)
 
 // Staff routes
+router.get('/system', protect, authorize('staff'), viewAllLoans)
 router.get('/', protect, authorize('staff'), viewAllLoans)
 router.get('/:id', protect, authorize('staff'), getLoanById)
 router.post('/', protect, authorize('staff'), createLoan)
