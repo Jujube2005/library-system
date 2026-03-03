@@ -3,8 +3,18 @@
 -- =========================
 
 -- Add role column if missing
+-- 1. Add column without NOT NULL
 ALTER TABLE public.profiles
-ADD COLUMN IF NOT EXISTS role role_enum DEFAULT 'student' NOT NULL;
+ADD COLUMN IF NOT EXISTS role role_enum DEFAULT 'student';
+
+-- 2. Update null rows
+UPDATE public.profiles
+SET role = 'student'
+WHERE role IS NULL;
+
+-- 3. Enforce NOT NULL
+ALTER TABLE public.profiles
+ALTER COLUMN role SET NOT NULL;
 
 -- Ensure is_active column exists and is properly set
 ALTER TABLE public.profiles
