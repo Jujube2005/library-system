@@ -14,7 +14,7 @@ export interface LoansResponse {
   providedIn: 'root'
 })
 export class LoanApiService {
-  constructor(private api: ApiService) {}
+  constructor(private api: ApiService) { }
 
   getAllLoansInSystem() {
     return this.api.get<LoansResponse>('/api/loans/system');
@@ -25,7 +25,7 @@ export class LoanApiService {
   }
 
   createLoan(userId: string, bookId: string, dueDate: string) {
-    return this.api.post<LoanResponse>('/api/loans', { user_id: userId, book_id: bookId, due_date: dueDate });
+    return this.api.post<LoanResponse>('/api/loans', { userId, bookId, due_date: dueDate });
   }
 
   returnLoan(loanId: string) {

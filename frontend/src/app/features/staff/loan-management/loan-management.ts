@@ -1,10 +1,8 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { LoanApiService } from '../../../services/loan-api.service'; // Will create this service next
-import { Loan, LoanStatus } from '../../../models/loan.model';
-import { Book } from '../../../models/book.model'; // For displaying book info
-import { Profile } from '../../../models/profile.model'; // For displaying user info
+import { LoanApiService } from '../../../services/loan-api.service';
+import { Loan } from '../../../models/loan.model';
 
 @Component({
   selector: 'app-loan-management',
@@ -17,26 +15,45 @@ export class LoanManagementComponent implements OnInit {
   loans: Loan[] = [];
   loadingLoans = false;
   loansError = '';
-  successMessage = '';
-  errorMessage = '';
 
-  // For creating a new loan
-  newLoan: { userId: string; bookId: string; dueDate: string } = {
+  // For Toast
+  toastMessage: { message: string, type: 'success' | 'error' } | null = null;
+  private toastTimeout: any;
+
+  // New Loan Form
+  newLoan = {
     userId: '',
-    bookId: '',
-    dueDate: ''
+    bookId: ''
   };
   isCreatingLoan = false;
 
-  // For editing/renewing a loan
-  selectedLoan: Loan | null = null;
-  editLoanForm: Partial<Loan> = {};
-  isSavingEdit = false;
-
   private loanApi = inject(LoanApiService);
+  private cdr = inject(ChangeDetectorRef);
 
   ngOnInit() {
     void this.loadLoans();
+  }
+
+  showToast(message: string, type: 'success' | 'error' = 'success') {
+    this.toastMessage = { message, type };
+    if (this.toastTimeout) clearTimeout(this.toastTimeout);
+    this.toastTimeout = setTimeout(() => {
+      this.toastMessage = null;
+      this.cdr.detectChanges();
+    }, 3000);
+    this.cdr.detectChanges();
+  }
+
+  get stats() {
+    const active = this.loans.filter(l => l.status === 'active').length;
+    const overdue = this.loans.filter(l => l.status === 'overdue').length;
+    const returnedToday = this.loans.filter(l => {
+      if (l.status !== 'returned' || !l.return_date) return false;
+      const today = new Date().toISOString().split('T')[0];
+      return l.return_date.startsWith(today);
+    }).length;
+
+    return { active, overdue, returnedToday };
   }
 
   async loadLoans() {
@@ -49,104 +66,60 @@ export class LoanManagementComponent implements OnInit {
       this.loansError = err.message || 'ไม่สามารถโหลดรายการการยืมได้';
     } finally {
       this.loadingLoans = false;
+      this.cdr.detectChanges();
     }
   }
 
   async createLoan() {
-    this.isCreatingLoan = true;
-    this.errorMessage = '';
-    this.successMessage = '';
-
-    try {
-      const createdLoan = await this.loanApi.createLoan(this.newLoan.userId, this.newLoan.bookId, this.newLoan.dueDate);
-      this.successMessage = `บันทึกการยืมสำหรับผู้ใช้ ${createdLoan.data.user_id} และหนังสือ ${createdLoan.data.book_id} สำเร็จ!`;
-      // Reset form
-      this.newLoan = { userId: '', bookId: '', dueDate: '' };
-      void this.loadLoans(); // Reload loans after creation
-    } catch (err: any) {
-      this.errorMessage = err.message || 'ไม่สามารถบันทึกการยืมได้';
-    } finally {
-      this.isCreatingLoan = false;
+    if (!this.newLoan.userId || !this.newLoan.bookId) {
+      this.showToast('กรุณากรอกข้อมูลให้ครบถ้วน', 'error');
+      return;
     }
-  }
 
-  editLoan(loan: Loan) {
-    this.selectedLoan = { ...loan };
-    this.editLoanForm = { ...loan };
-    this.errorMessage = '';
-    this.successMessage = '';
-  }
-
-  cancelEdit() {
-    this.selectedLoan = null;
-    this.editLoanForm = {};
-    this.errorMessage = '';
-    this.successMessage = '';
-  }
-
-  async saveEditedLoan() {
-    if (!this.selectedLoan?.id) return;
-
-    this.isSavingEdit = true;
-    this.errorMessage = '';
-    this.successMessage = '';
-
+    this.isCreatingLoan = true;
     try {
-      // Assuming updateLoan method exists in LoanApiService for general updates
-      // For now, we'll focus on status and due_date if needed
-      const updatedLoan = await this.loanApi.updateLoan(this.selectedLoan.id, this.editLoanForm);
-      this.successMessage = `อัปเดตการยืม ${updatedLoan.data.id} สำเร็จ!`;
-      this.selectedLoan = null;
+      // Due date is now handled by backend based on role
+      const res = await this.loanApi.createLoan(this.newLoan.userId, this.newLoan.bookId, '');
+      this.showToast('บันทึกการยืมสำเร็จ!');
+      this.newLoan = { userId: '', bookId: '' };
       void this.loadLoans();
     } catch (err: any) {
-      this.errorMessage = err.message || 'ไม่สามารถอัปเดตการยืมได้';
+      const msg = err.error?.error || err.message || 'ไม่สามารถบันทึกการยืมได้';
+      this.showToast(msg, 'error');
     } finally {
-      this.isSavingEdit = false;
+      this.isCreatingLoan = false;
+      this.cdr.detectChanges();
     }
   }
 
   async returnLoan(loanId: string) {
-    if (!confirm(`คุณแน่ใจหรือไม่ว่าต้องการบันทึกการคืนสำหรับการยืม ID: ${loanId}?`)) {
-      return;
-    }
-
-    this.errorMessage = '';
-    this.successMessage = '';
-
     try {
       await this.loanApi.returnLoan(loanId);
-      this.successMessage = `บันทึกการคืนสำหรับการยืม ID: ${loanId} สำเร็จ!`;
+      this.showToast('บันทึกการคืนสำเร็จ');
       void this.loadLoans();
     } catch (err: any) {
-      this.errorMessage = err.message || 'ไม่สามารถบันทึกการคืนได้';
+      this.showToast(err.message || 'Error', 'error');
     }
   }
 
   async renewLoan(loanId: string, currentDueDate: string) {
-    const newDueDate = prompt(`ป้อนวันครบกำหนดใหม่สำหรับการยืม ID: ${loanId} (ปัจจุบัน: ${currentDueDate}):`);
-    if (!newDueDate) {
-      return;
-    }
-
-    this.errorMessage = '';
-    this.successMessage = '';
+    const newDueDate = prompt(`ระบุวันที่คืนใหม่ (ปัจจุบัน: ${currentDueDate}):`);
+    if (!newDueDate) return;
 
     try {
       await this.loanApi.renewLoanByStaff(loanId, newDueDate);
-      this.successMessage = `ต่ออายุการยืม ID: ${loanId} เป็น ${newDueDate} สำเร็จ!`;
+      this.showToast('ต่ออายุสำเร็จ');
       void this.loadLoans();
     } catch (err: any) {
-      this.errorMessage = err.message || 'ไม่สามารถต่ออายุการยืมได้';
+      this.showToast(err.message || 'Error', 'error');
     }
   }
 
-  // Helper to get user full name from joined data
   getUserFullName(loan: Loan): string {
-    return loan.user && loan.user.length > 0 ? loan.user[0].full_name : 'N/A';
+    return (loan as any).user?.full_name || 'Unknown User';
   }
 
-  // Helper to get book title from joined data
   getBookTitle(loan: Loan): string {
-    return loan.books ? loan.books.title : 'N/A';
+    return (loan as any).book?.title || 'Unknown Book';
   }
 }

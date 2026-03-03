@@ -19,7 +19,7 @@ router.post(
       }
 
       const userId = req.user?.id as string | undefined
-      const { bookId } = req.body as { bookId?: string }
+      const { bookId, expiresAt } = req.body as { bookId?: string, expiresAt?: string }
 
       if (!userId) {
         res.status(401).json({ error: 'UNAUTHENTICATED' })
@@ -35,9 +35,10 @@ router.post(
         .from('reservations')
         .insert({
           user_id: userId,
-          book_id: bookId
+          book_id: bookId,
+          expires_at: expiresAt
         })
-        .select('id, book_id, status, reserved_at')
+        .select('id, book_id, status, reserved_at, expires_at')
         .single()
 
       if (error) {
@@ -72,26 +73,90 @@ router.get(
         return
       }
 
-      const { data, error } = await supabase
+      const { data: resvData, error: resvError } = await supabase
         .from('reservations')
-        .select(`
-          *,
-          books (
-            title,
-            author,
-            category
-          )
-        `)
+        .select('*')
         .eq('user_id', userId)
         .order('reserved_at', { ascending: false })
 
-      if (error) {
-        console.error('Reservations Query Error:', error)
-        res.status(400).json({ error: error.message, details: error.details })
+      if (resvError) {
+        res.status(400).json({ error: resvError.message })
         return
       }
 
-      res.json({ data: data ?? [] })
+      if (!resvData || resvData.length === 0) {
+        res.json({ data: [] })
+        return
+      }
+
+      const bookIds = [...new Set(resvData.map((r: any) => r.book_id))]
+      const { data: booksData } = await supabase
+        .from('books')
+        .select('id, title, author, category')
+        .in('id', bookIds)
+
+      const bookMap = new Map(booksData?.map((b: any) => [b.id, b]))
+
+      const merged = resvData.map((r: any) => ({
+        ...r,
+        books: bookMap.get(r.book_id) // Match the key expected by existing frontend logic
+      }))
+
+      res.json({ data: merged })
+    } catch (error: any) {
+      res.status(400).json({ error: error.message })
+    }
+  }
+)
+
+router.get(
+  '/all',
+  protect,
+  authorize('staff'),
+  async (req: any, res: Response) => {
+    try {
+      const supabase = req.supabase
+
+      if (!supabase) {
+        res.status(500).json({ error: 'Supabase client not available' })
+        return
+      }
+
+      const { data: resvData, error: resvError } = await supabase
+        .from('reservations')
+        .select('*')
+        .order('reserved_at', { ascending: false })
+
+      if (resvError) {
+        res.status(400).json({ error: resvError.message })
+        return
+      }
+
+      if (!resvData || resvData.length === 0) {
+        res.json({ data: [] })
+        return
+      }
+
+      // Collect unique IDs
+      const userIds = [...new Set(resvData.map((r: any) => r.user_id))]
+      const bookIds = [...new Set(resvData.map((r: any) => r.book_id))]
+
+      // Fetch related data
+      const [usersRes, booksRes] = await Promise.all([
+        supabase.from('profiles').select('id, full_name, email, student_id').in('id', userIds),
+        supabase.from('books').select('id, title, isbn, shelf_location').in('id', bookIds)
+      ])
+
+      const userMap = new Map(usersRes.data?.map((u: any) => [u.id, u]))
+      const bookMap = new Map(booksRes.data?.map((b: any) => [b.id, b]))
+
+      const merged = resvData.map((r: any) => ({
+        ...r,
+        user: userMap.get(r.user_id) || { full_name: 'Unknown', student_id: 'N/A' },
+        book: bookMap.get(r.book_id) || { title: 'Unknown Book', shelf_location: 'N/A' }
+      }))
+
+      res.json({ data: merged })
     } catch (error: any) {
       res.status(400).json({ error: error.message })
     }

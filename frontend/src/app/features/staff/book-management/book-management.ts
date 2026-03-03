@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, inject, OnInit, ChangeDetectorRef, NgZone } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { BookApiService } from '../../../services/book-api.service';
@@ -21,16 +21,21 @@ export class BookManagementComponent implements OnInit {
     category: '',
     shelf_location: '',
     total_copies: 1,
-    cover_image_url: ''
+    image_url: ''
   };
   isSubmitting = false;
+  showAddForm = false;
   errorMessage = '';
   successMessage = '';
 
+  stats = {
+    total: 0,
+    available: 0,
+    categories: 0
+  };
+
   // Image Upload properties
-  selectedFile: File | null = null;
   imagePreview: string | null = null;
-  isUploading = false;
 
   // Book list and editing
   books: Book[] = [];
@@ -42,14 +47,56 @@ export class BookManagementComponent implements OnInit {
 
   isUploadingCover = false;
 
-  searchQuery = ''; // New property for search input
-  allBooks: Book[] = []; // To store all books before filtering
+  searchQuery = '';
+
+  // Pagination & Filters
+  currentPage = 1;
+  pageSize = 10;
+  totalBooks = 0;
+  totalPages = 0;
+  selectedCategory = '';
+  sortOption = 'title.asc';
+
+  // History
+  isShowingHistory = false;
+  historyData: any[] = [];
+  loadingHistory = false;
+  selectedBookForHistory: Book | null = null;
+
+  categories = [
+    'Programming',
+    'Database',
+    'Networking',
+    'AI/Data Science',
+    'Mathematics',
+    'Science',
+    'Business/Management',
+    'General',
+    'Fiction',
+    'Non-Fiction',
+    'History',
+    'Biography',
+    'Other'
+  ];
+
+  shelfLocations = [
+    'PROG-01', 'PROG-02', 'PROG-03',
+    'DB-01', 'DB-02',
+    'NET-01', 'NET-02',
+    'AI-01', 'AI-02',
+    'MATH-01', 'MATH-02',
+    'SCI-01', 'SCI-02',
+    'BIZ-01', 'BIZ-02',
+    'GEN-01', 'GEN-02', 'GEN-03',
+    'Other'
+  ];
 
   toastMessage: { message: string, type: 'success' | 'error' } | null = null;
   private toastTimeout: any;
 
   private bookApi = inject(BookApiService);
   private cdr = inject(ChangeDetectorRef);
+  private zone = inject(NgZone);
 
   ngOnInit() {
     void this.loadBooks();
@@ -69,81 +116,73 @@ export class BookManagementComponent implements OnInit {
     this.loadingBooks = true;
     this.booksError = '';
     try {
-      const response = await this.bookApi.searchBooks({});
-      this.allBooks = response.data; // Store all books
-      this.applyFilter(); // Apply filter after loading
+      const response = await this.bookApi.searchBooks({
+        q: this.searchQuery || undefined,
+        category: this.selectedCategory || undefined,
+        sort: this.sortOption,
+        page: this.currentPage,
+        limit: this.pageSize
+      });
+
+      this.zone.run(() => {
+        this.books = response.data;
+        this.totalBooks = response.pagination.total;
+        this.totalPages = Math.ceil(this.totalBooks / this.pageSize);
+
+        // Basic stats calculation based on current batch (real apps would use a dedicated stats API)
+        this.stats.total = this.totalBooks;
+        this.stats.available = this.books.filter(b => b.available_copies > 0).length + (this.totalBooks - this.books.length); // Estimated
+        this.stats.categories = new Set(this.books.map(b => b.category)).size;
+      });
     } catch (err: any) {
-      this.booksError = err.message || 'ไม่สามารถโหลดรายการหนังสือได้';
+      this.zone.run(() => {
+        this.booksError = err.message || 'ไม่สามารถโหลดรายการหนังสือได้';
+      });
     } finally {
-      this.loadingBooks = false;
+      this.zone.run(() => {
+        this.loadingBooks = false;
+        this.cdr.detectChanges();
+      });
+    }
+  }
+
+  changePage(page: number) {
+    if (page >= 1 && page <= (this.totalPages || 1)) {
+      this.currentPage = page;
+      void this.loadBooks();
     }
   }
 
   applyFilter() {
-    // ปรับปรุงประสิทธิภาพการกรองโดยการใช้ debounce หรือตรวจสอบความยาว (ในที่นี้ทำแบบเรียบง่ายแต่ลดภาระ UI)
-    if (!this.searchQuery || this.searchQuery.length < 2) {
-      this.books = [...this.allBooks].slice(0, 50); // โหลดแค่ 50 เล่มแรกเพื่อความเร็ว
-      return;
-    }
-
-    const lowerCaseQuery = this.searchQuery.toLowerCase();
-    this.books = this.allBooks.filter(book =>
-      book.title.toLowerCase().includes(lowerCaseQuery) ||
-      book.author.toLowerCase().includes(lowerCaseQuery) ||
-      book.isbn.toLowerCase().includes(lowerCaseQuery) ||
-      book.category.toLowerCase().includes(lowerCaseQuery)
-    ).slice(0, 50); // จำกัดผลลัพธ์การค้นหาเพื่อไม่ให้ UI กระตุก
+    this.currentPage = 1; // Reset to page 1 on new search
+    void this.loadBooks();
   }
 
-  onFileSelected(event: any) {
-    const file = event.target.files[0];
-    if (file) {
-      if (!file.type.startsWith('image/')) {
-        this.errorMessage = 'กรุณาเลือกไฟล์รูปภาพเท่านั้น';
-        return;
-      }
-      if (file.size > 2 * 1024 * 1024) { // 2MB Limit
-        this.errorMessage = 'ขนาดไฟล์ต้องไม่เกิน 2MB';
-        return;
-      }
-
-      this.selectedFile = file;
-      const reader = new FileReader();
-      reader.onload = () => {
-        this.imagePreview = reader.result as string;
-      };
-      reader.readAsDataURL(file);
-    }
+  toggleAddForm() {
+    this.showAddForm = !this.showAddForm;
+    this.errorMessage = '';
+    this.successMessage = '';
   }
 
-  async uploadImage(file: File): Promise<string | null> {
-    try {
-      const fileExt = file.name.split('.').pop();
-      const fileName = `${Math.random().toString(36).substring(2)}_${Date.now()}.${fileExt}`;
-      const filePath = fileName; // ใช้แค่ fileName เพื่อให้ URL สั้นลง (bucket/fileName)
+  // Filter replaced by server-side applyFilter()
 
-      const { error: uploadError } = await supabase.storage
-        .from('book-covers')
-        .upload(filePath, file);
 
-      if (uploadError) throw uploadError;
 
-      const { data } = supabase.storage
-        .from('book-covers')
-        .getPublicUrl(filePath);
-
-      return data.publicUrl;
-    } catch (err: any) {
-      console.error('Upload Image Error:', err);
-      this.errorMessage = `อัปโหลดรูปภาพไม่สำเร็จ: ${err.message}`;
-      return null;
-    }
-  }
 
   async createBook() {
     // Validation
+    if (!this.newBook.title || !this.newBook.author || !this.newBook.category || !this.newBook.shelf_location) {
+      this.showToast('กรุณากรอกข้อมูลที่จำเป็นให้ครบถ้วน (ชื่อ, ผู้แต่ง, หมวดหมู่, ชั้นวาง)', 'error');
+      return;
+    }
+
     if (this.newBook.isbn && this.newBook.isbn.replace(/[-\s]/g, '').length > 13) {
-      this.errorMessage = 'ISBN ต้องไม่เกิน 13 ตัวอักษร (ไม่รวมขีดหรือเว้นวรรค)';
+      this.showToast('ISBN ต้องไม่เกิน 13 ตัวอักษร', 'error');
+      return;
+    }
+
+    if (this.newBook.total_copies < 1) {
+      this.showToast('จำนวนเล่มต้องมีอย่างน้อย 1 เล่ม', 'error');
       return;
     }
 
@@ -152,15 +191,6 @@ export class BookManagementComponent implements OnInit {
     this.successMessage = '';
 
     try {
-      // Upload image if selected
-      if (this.selectedFile) {
-        this.isUploading = true;
-        const imageUrl = await this.uploadImage(this.selectedFile);
-        if (imageUrl) {
-          this.newBook.image_url = imageUrl;
-        }
-        this.isUploading = false;
-      }
 
       const createdBook = await this.bookApi.createBook(this.newBook);
       this.successMessage = `เพิ่มหนังสือ "${createdBook.data.title}" สำเร็จ!`;
@@ -173,10 +203,8 @@ export class BookManagementComponent implements OnInit {
         category: '',
         shelf_location: '',
         total_copies: 1,
-        cover_image_url: ''
-
+        image_url: ''
       };
-      this.selectedFile = null;
       this.imagePreview = null;
       void this.loadBooks(); // Reload books after creation
     } catch (err: any) {
@@ -185,7 +213,7 @@ export class BookManagementComponent implements OnInit {
       if (backendError) {
         console.error('Backend Error Body:', JSON.stringify(backendError, null, 2));
       }
-      
+
       if (backendError?.error) {
         let msg = `Backend Error: ${backendError.error}`;
         if (backendError.details) msg += ` | Details: ${backendError.details}`;
@@ -234,7 +262,7 @@ export class BookManagementComponent implements OnInit {
         isbn: this.editBookForm.isbn,
         category: this.editBookForm.category,
         shelf_location: this.editBookForm.shelf_location,
-        cover_image_url: this.editBookForm.cover_image_url
+        image_url: this.editBookForm.image_url
       };
 
       const updatedBook = await this.bookApi.updateBook(this.selectedBook.id, updatePayload);
@@ -271,8 +299,20 @@ export class BookManagementComponent implements OnInit {
     }
   }
 
-  async updateCopies(bookId: string, bookTitle: string, change: number) {
-    if (!confirm(`คุณแน่ใจหรือไม่ว่าต้องการ ${change > 0 ? 'เพิ่ม' : 'ลด'} จำนวนสำเนาหนังสือ "${bookTitle}" ${Math.abs(change)} เล่ม?`)) {
+  async updateCopies(bookId: string, bookTitle: string, intent: number) {
+    const actionText = intent > 0 ? 'เพิ่ม' : 'ลด';
+    const amountStr = prompt(`กรุณาระบุจำนวนสำเนาที่ต้องการ${actionText}สำหรับหนังสือ "${bookTitle}":`, "1");
+    if (!amountStr) return;
+
+    const amount = parseInt(amountStr, 10);
+    if (isNaN(amount) || amount <= 0) {
+      alert("กรุณาระบุจำนวนที่ถูกต้อง (ต้องเป็นตัวเลขมากกว่า 0)");
+      return;
+    }
+
+    const change = intent > 0 ? amount : -amount;
+
+    if (!confirm(`คุณแน่ใจหรือไม่ว่าต้องการ${actionText}จำนวนสำเนาหนังสือ "${bookTitle}" จำนวน ${amount} เล่ม?`)) {
       return;
     }
 
@@ -281,10 +321,12 @@ export class BookManagementComponent implements OnInit {
 
     try {
       await this.bookApi.updateBookCopies(bookId, change);
-      this.successMessage = `${change > 0 ? 'เพิ่ม' : 'ลด'} จำนวนสำเนาหนังสือ "${bookTitle}" สำเร็จ!`;
+      this.successMessage = `${actionText}จำนวนสำเนาหนังสือ "${bookTitle}" สำเร็จ!`;
+      this.showToast(this.successMessage, 'success');
       void this.loadBooks(); // Reload books after update
     } catch (err: any) {
       this.errorMessage = err.message || 'ไม่สามารถอัปเดตจำนวนสำเนาได้';
+      this.showToast(this.errorMessage, 'error');
     }
   }
 
@@ -292,10 +334,27 @@ export class BookManagementComponent implements OnInit {
     const file = event.target.files[0];
     if (!file) return;
 
+    // Validation
+    if (!file.type.startsWith('image/')) {
+      this.errorMessage = 'กรุณาเลือกไฟล์รูปภาพเท่านั้น';
+      return;
+    }
+    if (file.size > 2 * 1024 * 1024) { // 2MB Limit
+      this.errorMessage = 'ขนาดไฟล์ต้องไม่เกิน 2MB';
+      return;
+    }
+
     this.isUploadingCover = true;
     this.errorMessage = '';
 
     try {
+      // Local preview
+      const reader = new FileReader();
+      reader.onload = () => {
+        this.imagePreview = reader.result as string;
+      };
+      reader.readAsDataURL(file);
+
       const fileExt = file.name.split('.').pop();
       const fileName = `${new Date().getTime()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
       const filePath = `${fileName}`;
@@ -311,9 +370,9 @@ export class BookManagementComponent implements OnInit {
         .getPublicUrl(filePath);
 
       if (isEdit) {
-        this.editBookForm.cover_image_url = publicUrlData.publicUrl;
+        this.editBookForm.image_url = publicUrlData.publicUrl;
       } else {
-        this.newBook.cover_image_url = publicUrlData.publicUrl;
+        this.newBook.image_url = publicUrlData.publicUrl;
       }
     } catch (err: any) {
       this.errorMessage = 'ล้มเหลวในการอัปโหลดรูปภาพ: ' + (err.message || 'Unknown error');
@@ -322,5 +381,173 @@ export class BookManagementComponent implements OnInit {
       this.isUploadingCover = false;
       this.cdr.detectChanges();
     }
+  }
+
+  // --- New Features Logic ---
+
+
+  printBarcode(book: Book) {
+    const textToEncode = book.isbn || book.id;
+    const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(textToEncode)}`;
+
+    const printWindow = window.open('', '_blank');
+    if (printWindow) {
+      printWindow.document.write(`
+        <html>
+          <head>
+            <title>Print Label - ${book.title}</title>
+            <style>
+              body { font-family: sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+              .label-card { border: 1px solid #000; padding: 20px; text-align: center; width: 300px; }
+              .qr-code { width: 150px; height: 150px; margin-bottom: 10px; }
+              .title { font-weight: bold; font-size: 14px; margin-bottom: 5px; word-wrap: break-word;}
+              .info { font-size: 12px; color: #333; }
+              @media print {
+                body { height: auto; }
+                .label-card { border: 1px dashed #ccc; page-break-inside: avoid; }
+              }
+            </style>
+          </head>
+          <body>
+            <div class="label-card">
+              <img src="${qrUrl}" class="qr-code" alt="QR Code" />
+              <div class="title">${book.title}</div>
+              <div class="info">ID: ${book.id}</div>
+              ${book.isbn ? `<div class="info">ISBN: ${book.isbn}</div>` : ''}
+              <div class="info">Shelf: ${book.shelf_location}</div>
+            </div>
+            <script>
+              window.onload = () => { window.print(); }
+            </script>
+          </body>
+        </html>
+      `);
+      printWindow.document.close();
+    }
+  }
+
+  async viewHistory(book: Book) {
+    this.selectedBookForHistory = book;
+    this.isShowingHistory = true;
+    this.loadingHistory = true;
+    this.historyData = [];
+
+    try {
+      const response = await this.bookApi.getBookHistory(book.id);
+      this.historyData = response.data;
+    } catch (error: any) {
+      this.showToast('ไม่สามารถดึงประวัติการยืมได้', 'error');
+    } finally {
+      this.loadingHistory = false;
+      this.cdr.detectChanges();
+    }
+  }
+
+  closeHistoryView() {
+    this.isShowingHistory = false;
+    this.selectedBookForHistory = null;
+  }
+
+  async exportToCSV() {
+    if (this.totalBooks === 0) {
+      this.showToast('ไม่มีข้อมูลหนังสือสำหรับ Export', 'error');
+      return;
+    }
+
+    this.showToast('กำลังเตรียมไฟล์ Export...', 'success');
+
+    try {
+      // Fetch all books for export (bypass pagination by setting high limit)
+      const response = await this.bookApi.searchBooks({
+        limit: 1000, // Reasonable cap for CSV export
+        sort: this.sortOption
+      });
+
+      const allBooks = response.data;
+      const headers = ['ID', 'Title', 'Author', 'ISBN', 'Category', 'Shelf Location', 'Total Copies', 'Available Copies', 'Status'];
+      const csvRows = [headers.join(',')];
+
+      allBooks.forEach(book => {
+        const row = [
+          book.id,
+          `"${book.title.replace(/"/g, '""')}"`,
+          `"${book.author.replace(/"/g, '""')}"`,
+          book.isbn || '',
+          book.category,
+          book.shelf_location,
+          book.total_copies,
+          book.available_copies,
+          book.status
+        ];
+        csvRows.push(row.join(','));
+      });
+
+      const csvContent = '\ufeff' + csvRows.join('\n');
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+
+      const link = document.createElement('a');
+      link.setAttribute('href', url);
+      link.setAttribute('download', `books_export_${new Date().toISOString().split('T')[0]}.csv`);
+      link.style.visibility = 'hidden';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+
+      this.showToast('Export สำเร็จ!', 'success');
+    } catch (err) {
+      this.showToast('เกิดข้อผิดพลาดในการ Export ข้อมูล', 'error');
+    }
+  }
+
+  triggerImport() {
+    document.getElementById('csvImportInput')?.click();
+  }
+
+  async onFileImport(event: any) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = async (e) => {
+      const text = e.target?.result as string;
+      const rows = text.split('\n').filter(row => row.trim() !== '');
+      if (rows.length <= 1) return; // Only headers
+
+      this.isSubmitting = true;
+      let successCount = 0;
+      let errorCount = 0;
+
+      // Expected simple CSV: Title,Author,ISBN,Category,ShelfLocation,TotalCopies
+      // Skip header row (i=1)
+      for (let i = 1; i < rows.length; i++) {
+        // Very basic CSV parsing (won't handle commas inside quotes well without regex, but okay for demo)
+        const cols = rows[i].split(',').map(c => c.trim().replace(/^"|"$/g, ''));
+        if (cols.length >= 6) {
+          try {
+            const parsedBook = {
+              title: cols[0],
+              author: cols[1],
+              isbn: cols[2],
+              category: cols[3],
+              shelf_location: cols[4],
+              total_copies: parseInt(cols[5], 10) || 1,
+              image_url: ''
+            };
+            await this.bookApi.createBook(parsedBook as any);
+            successCount++;
+          } catch (err) {
+            errorCount++;
+          }
+        }
+      }
+
+      this.showToast(`นำเข้าสำเร็จ ${successCount} รายการ, ผิดพลาด ${errorCount} รายการ`, successCount > 0 ? 'success' : 'error');
+      this.isSubmitting = false;
+      this.applyFilter(); // reload books
+    };
+    reader.readAsText(file);
+    // Reset input
+    event.target.value = '';
   }
 }

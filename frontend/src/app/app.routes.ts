@@ -61,6 +61,10 @@ export const routes: Routes = [
       {
         path: 'loan-management',
         loadComponent: () => import('./features/staff/loan-management/loan-management').then(m => m.LoanManagementComponent)
+      },
+      {
+        path: 'reservation-management',
+        loadComponent: () => import('./features/staff/reservation-management/reservation-management').then(m => m.ReservationManagementComponent)
       }
     ]
   },

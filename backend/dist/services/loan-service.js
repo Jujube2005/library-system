@@ -208,7 +208,7 @@ const getAllLoansInSystem = async () => {
       due_date,
       return_date,
       status,
-      user:profiles!loans_user_id_fkey (
+      user:profiles!user_id (
         id,
         full_name,
         role,
@@ -221,7 +221,8 @@ const getAllLoansInSystem = async () => {
     `)
         .order('due_date', { ascending: true });
     if (error) {
-        throw new Error("ไม่สามารถดึงข้อมูลรายการยืมทั้งหมดได้");
+        console.error('GetAllLoansInSystem Error:', error);
+        throw new Error("ไม่สามารถดึงข้อมูลรายการยืมทั้งหมดได้: " + error.message);
     }
     return data;
 };
@@ -237,7 +238,7 @@ const getLoanById = async (loanId) => {
       due_date,
       return_date,
       status,
-      user:profiles!loans_user_id_fkey (
+      user:profiles!user_id (
         id,
         full_name,
         role,
@@ -256,7 +257,7 @@ const getLoanById = async (loanId) => {
         .eq('id', loanId)
         .single();
     if (error) {
-        // ถ้าไม่พบ loan จะ return null แทนที่จะ throw error
+        console.error('GetLoanById Error:', error);
         if (error.code === 'PGRST116')
             return null; // Not Found
         throw new Error(error.message);

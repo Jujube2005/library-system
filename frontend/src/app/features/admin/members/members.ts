@@ -9,7 +9,8 @@ import { Profile } from '../../../models/profile.model'
   selector: 'app-members',
   standalone: true,
   imports: [NgFor, NgIf, FormsModule],
-  templateUrl: './members.html'
+  templateUrl: './members.html',
+  styleUrls: ['./members.css']
 })
 export class MembersComponent implements OnInit {
   users: Profile[] = []
@@ -28,7 +29,7 @@ export class MembersComponent implements OnInit {
   constructor(
     private adminApi: AdminApiService,
     private staffApi: StaffApiService
-  ) {}
+  ) { }
 
   ngOnInit() {
     void this.load()
@@ -58,10 +59,10 @@ export class MembersComponent implements OnInit {
     }
 
     this.filtered = this.users.filter(u =>
-      (u.full_name?.toLowerCase().includes(q) ||
-        u.email?.toLowerCase().includes(q) ||
-        u.student_id?.toLowerCase().includes(q) ||
-        u.role?.toLowerCase().includes(q))
+    (u.full_name?.toLowerCase().includes(q) ||
+      u.email?.toLowerCase().includes(q) ||
+      u.student_id?.toLowerCase().includes(q) ||
+      u.role?.toLowerCase().includes(q))
     )
   }
 

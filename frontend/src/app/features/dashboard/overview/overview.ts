@@ -55,8 +55,10 @@ export class DashboardOverviewComponent implements OnInit {
   }
 
   getBookCover(book: Book): string {
-    const titleKey = (book.title || '').trim().toLowerCase()
+    if (book.image_url) return book.image_url;
+    if (book.cover_image_url) return book.cover_image_url;
 
+    const titleKey = (book.title || '').trim().toLowerCase()
     const coverByTitle: Record<string, string> = {
       'เพราะเป็นวัยรุ่นจึงเจ็บปวด': '/book1.jpg',
       'กล้าที่จะถูกเกลียด': '/book2.jpg',

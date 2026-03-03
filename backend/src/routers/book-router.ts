@@ -6,7 +6,8 @@ import {
   createBook,
   updateBook,
   deleteBook,
-  updateBookCopies
+  updateBookCopies,
+  getBookHistory
 } from '../controllers/book-controller'
 import { protect } from '../middleware/auth-middleware'
 import { authorize } from '../middleware/role-middleware'
@@ -15,6 +16,7 @@ const router = Router()
 
 router.get('/', searchBooks)
 router.get('/:id', getStatus)
+router.get('/:id/history', protect, authorize('staff'), getBookHistory)
 router.get('/:id/check', protect, checkBook)
 
 router.post('/', protect, authorize('staff'), createBook)

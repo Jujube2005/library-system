@@ -23,16 +23,25 @@ export async function searchBooks(req: Request, res: Response): Promise<void> {
       .select('*', { count: 'exact' })
 
     if (q) {
-      query = query.or(`title.ilike.%${q}%,author.ilike.%${q}%`)
+      query = query.or(`title.ilike.%${q}%,author.ilike.%${q}%,isbn.ilike.%${q}%`)
     }
 
     if (category) {
       query = query.eq('category', category)
     }
 
+    if (sort) {
+      if (sort === 'title.asc') query = query.order('title', { ascending: true })
+      else if (sort === 'title.desc') query = query.order('title', { ascending: false })
+      else if (sort === 'copies.asc') query = query.order('available_copies', { ascending: true })
+      else if (sort === 'copies.desc') query = query.order('available_copies', { ascending: false })
+      else query = query.order('title', { ascending: true })
+    } else {
+      query = query.order('title', { ascending: true })
+    }
+
     const { data, error, count } = await query
       .range(from, to)
-      .order('title', { ascending: true })
 
     console.log(`[Backend] Query finished. Found ${data?.length} results. Total count: ${count}`)
 
@@ -75,6 +84,39 @@ export const getStatus = async (req: Request, res: Response) => {
     res.status(200).json({ data })
   } catch (_error) {
     res.status(500).json({ error: 'Failed to load book' })
+  }
+}
+
+export const getBookHistory = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params
+    // Use the service-role client derived from 'protect' or 'supabase' middleware
+    const supabaseClient = (req as any).supabase || createClient(env.supabaseUrl, env.supabaseAnonKey)
+
+    // Fetch loans for this book with user profile details
+    const { data, error } = await supabaseClient
+      .from('loans')
+      .select(`
+        *,
+        user:user_id (
+          full_name,
+          email,
+          student_id
+        )
+      `)
+      .eq('book_id', id)
+      .order('loan_date', { ascending: false })
+
+    if (error) {
+      console.error('History Fetch Error:', error)
+      res.status(400).json({ error: error.message })
+      return
+    }
+
+    res.json({ data: data ?? [] })
+  } catch (error: any) {
+    console.error('History System Error:', error)
+    res.status(500).json({ error: 'Failed to fetch history' })
   }
 }
 
@@ -172,11 +214,11 @@ export const createBook = async (req: Request, res: Response) => {
     })
   } catch (error: any) {
     console.error('Create Book Error:', error)
-    res.status(400).json({ 
-      error: error.message || 'Create Book Failed', 
-      details: error.details, 
+    res.status(400).json({
+      error: error.message || 'Create Book Failed',
+      details: error.details,
       hint: error.hint,
-      code: error.code 
+      code: error.code
     })
   }
 }
@@ -198,18 +240,13 @@ export const updateBook = async (req: Request, res: Response) => {
       data: result
     })
   } catch (error: any) {
-<<<<<<< HEAD
-    console.error('SERVER UPDATE BOOK HTTP ERROR:', error);
-    res.status(400).json({ error: error.message || String(error) })
-=======
     console.error('Update Book Error:', error)
-    res.status(400).json({ 
-      error: error.message || 'Update Book Failed', 
-      details: error.details, 
+    res.status(400).json({
+      error: error.message || 'Update Book Failed',
+      details: error.details,
       hint: error.hint,
-      code: error.code 
+      code: error.code
     })
->>>>>>> 7479f8e69e6f112165719a63ec688f5b62fb9e1a
   }
 }
 
@@ -230,11 +267,11 @@ export const deleteBook = async (req: Request, res: Response) => {
     })
   } catch (error: any) {
     console.error('Delete Book Error:', error)
-    res.status(400).json({ 
-      error: error.message || 'Delete Book Failed', 
-      details: error.details, 
+    res.status(400).json({
+      error: error.message || 'Delete Book Failed',
+      details: error.details,
       hint: error.hint,
-      code: error.code 
+      code: error.code
     })
   }
 }
@@ -261,11 +298,11 @@ export const updateBookCopies = async (req: Request, res: Response) => {
     })
   } catch (error: any) {
     console.error('Update Book Copies Error:', error)
-    res.status(400).json({ 
-      error: error.message || 'Update Book Copies Failed', 
-      details: error.details, 
+    res.status(400).json({
+      error: error.message || 'Update Book Copies Failed',
+      details: error.details,
       hint: error.hint,
-      code: error.code 
+      code: error.code
     })
   }
 }

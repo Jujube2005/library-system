@@ -33,7 +33,7 @@ var __importStar = (this && this.__importStar) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.updateBookCopies = exports.deleteBook = exports.updateBook = exports.createBook = exports.returnBook = exports.borrow = exports.cancelMyReservation = exports.reserve = exports.checkBook = exports.getStatus = void 0;
+exports.updateBookCopies = exports.deleteBook = exports.updateBook = exports.createBook = exports.returnBook = exports.borrow = exports.cancelMyReservation = exports.reserve = exports.checkBook = exports.getBookHistory = exports.getStatus = void 0;
 exports.searchBooks = searchBooks;
 const supabase_js_1 = require("@supabase/supabase-js");
 const env_1 = require("../config/env");
@@ -54,14 +54,28 @@ async function searchBooks(req, res) {
             .from('books')
             .select('*', { count: 'exact' });
         if (q) {
-            query = query.or(`title.ilike.%${q}%,author.ilike.%${q}%`);
+            query = query.or(`title.ilike.%${q}%,author.ilike.%${q}%,isbn.ilike.%${q}%`);
         }
         if (category) {
             query = query.eq('category', category);
         }
+        if (sort) {
+            if (sort === 'title.asc')
+                query = query.order('title', { ascending: true });
+            else if (sort === 'title.desc')
+                query = query.order('title', { ascending: false });
+            else if (sort === 'copies.asc')
+                query = query.order('available_copies', { ascending: true });
+            else if (sort === 'copies.desc')
+                query = query.order('available_copies', { ascending: false });
+            else
+                query = query.order('title', { ascending: true });
+        }
+        else {
+            query = query.order('title', { ascending: true });
+        }
         const { data, error, count } = await query
-            .range(from, to)
-            .order('title', { ascending: true });
+            .range(from, to);
         console.log(`[Backend] Query finished. Found ${data?.length} results. Total count: ${count}`);
         if (error) {
             console.error('Supabase Search Error:', error);
@@ -102,6 +116,27 @@ const getStatus = async (req, res) => {
     }
 };
 exports.getStatus = getStatus;
+const getBookHistory = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const publicSupabase = (0, supabase_js_1.createClient)(env_1.env.supabaseUrl, env_1.env.supabaseAnonKey);
+        // Fetch loans for this book
+        const { data, error } = await publicSupabase
+            .from('loans')
+            .select('*, profiles:user_id(first_name, last_name, email)')
+            .eq('book_id', id)
+            .order('borrow_date', { ascending: false });
+        if (error) {
+            res.status(400).json({ error: error.message });
+            return;
+        }
+        res.json({ data });
+    }
+    catch (error) {
+        res.status(500).json({ error: 'Failed to fetch history' });
+    }
+};
+exports.getBookHistory = getBookHistory;
 const checkBook = async (req, res) => {
     try {
         const { id } = req.params;
@@ -182,13 +217,21 @@ exports.returnBook = returnBook;
 const createBook = async (req, res) => {
     try {
         const bookData = req.body;
-        const result = await bookService.createBook(bookData);
+        // Use the authenticated supabase client if available, or fall back to service role logic
+        const supabaseClient = req.supabase;
+        const result = await bookService.createBook(bookData, supabaseClient);
         res.status(201).json({
             data: result
         });
     }
     catch (error) {
-        res.status(400).json({ error: error.message });
+        console.error('Create Book Error:', error);
+        res.status(400).json({
+            error: error.message || 'Create Book Failed',
+            details: error.details,
+            hint: error.hint,
+            code: error.code
+        });
     }
 };
 exports.createBook = createBook;
@@ -200,13 +243,20 @@ const updateBook = async (req, res) => {
             return;
         }
         const updateData = req.body;
-        const result = await bookService.updateBookInfo(id, updateData);
+        const supabaseClient = req.supabase;
+        const result = await bookService.updateBookInfo(id, updateData, supabaseClient);
         res.status(200).json({
             data: result
         });
     }
     catch (error) {
-        res.status(400).json({ error: error.message });
+        console.error('Update Book Error:', error);
+        res.status(400).json({
+            error: error.message || 'Update Book Failed',
+            details: error.details,
+            hint: error.hint,
+            code: error.code
+        });
     }
 };
 exports.updateBook = updateBook;
@@ -217,13 +267,20 @@ const deleteBook = async (req, res) => {
             res.status(400).json({ error: 'MISSING_BOOK_ID' });
             return;
         }
-        const result = await bookService.deleteBook(id);
+        const supabaseClient = req.supabase;
+        const result = await bookService.deleteBook(id, supabaseClient);
         res.status(200).json({
             data: result
         });
     }
     catch (error) {
-        res.status(400).json({ error: error.message });
+        console.error('Delete Book Error:', error);
+        res.status(400).json({
+            error: error.message || 'Delete Book Failed',
+            details: error.details,
+            hint: error.hint,
+            code: error.code
+        });
     }
 };
 exports.deleteBook = deleteBook;
@@ -239,13 +296,20 @@ const updateBookCopies = async (req, res) => {
             res.status(400).json({ error: 'CHANGE_AMOUNT_REQUIRED' });
             return;
         }
-        const result = await bookService.updateBookCopies(id, change);
+        const supabaseClient = req.supabase;
+        const result = await bookService.updateBookCopies(id, change, supabaseClient);
         res.status(200).json({
             data: result
         });
     }
     catch (error) {
-        res.status(400).json({ error: error.message });
+        console.error('Update Book Copies Error:', error);
+        res.status(400).json({
+            error: error.message || 'Update Book Copies Failed',
+            details: error.details,
+            hint: error.hint,
+            code: error.code
+        });
     }
 };
 exports.updateBookCopies = updateBookCopies;

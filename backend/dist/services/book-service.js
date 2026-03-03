@@ -68,7 +68,13 @@ const reserveBook = async (userId, bookId) => {
         .select('id, status, reserved_at')
         .single();
     if (error) {
-        throw new Error(error.message);
+        console.error('Supabase Update Copies Error:', error);
+        throw {
+            message: error.message,
+            details: error.details,
+            hint: error.hint,
+            code: error.code
+        };
     }
     return data;
 };
@@ -111,40 +117,98 @@ const calculateDueDate = (role) => {
 };
 exports.calculateDueDate = calculateDueDate;
 // New Staff functions
-const createBook = async (bookData) => {
-    const supabaseAdmin = (0, supabase_js_1.createClient)(env_1.env.supabaseUrl, env_1.env.supabaseServiceRoleKey);
-    const { data, error } = await supabaseAdmin
+const createBook = async (bookData, supabaseClient) => {
+    console.log('--- START BOOK SERVICE createBook ---');
+    // 1. Use the provided authenticated client
+    // 2. Or use a new admin client if service role key exists
+    // 3. Or fall back to the global anon client
+    const client = supabaseClient || (env_1.env.supabaseServiceRoleKey
+        ? (0, supabase_js_1.createClient)(env_1.env.supabaseUrl, env_1.env.supabaseServiceRoleKey)
+        : supabase_1.supabase);
+    if (!env_1.env.supabaseServiceRoleKey && !supabaseClient) {
+        console.warn('WARNING: No service role key and no auth client. This will likely fail due to RLS.');
+    }
+    // Ensure we only insert valid columns to avoid 400 errors from Supabase
+    const isbn = bookData.isbn ? bookData.isbn.replace(/[-\s]/g, '') : null;
+    const insertData = {
+        title: bookData.title.trim(),
+        author: bookData.author.trim(),
+        isbn: isbn && isbn.length > 0 ? isbn : null,
+        category: bookData.category.trim(),
+        shelf_location: bookData.shelf_location.trim(),
+        image_url: bookData.image_url ? bookData.image_url.trim() : null,
+        total_copies: Number(bookData.total_copies),
+        available_copies: Number(bookData.total_copies),
+        status: (Number(bookData.total_copies) > 0 ? 'available' : 'unavailable')
+    };
+    console.log('Inserting into Supabase:', JSON.stringify(insertData));
+    const { data, error } = await client
         .from('books')
-        .insert({
-        ...bookData,
-        available_copies: bookData.total_copies,
-        status: bookData.total_copies > 0 ? 'available' : 'unavailable'
-    })
+        .insert(insertData)
         .select()
         .single();
     if (error) {
-        throw new Error(error.message);
+        console.error('Supabase Insert Error detail:', error);
+        // Throw an object that matches the structure expected by the controller
+        throw {
+            message: error.message,
+            details: error.details,
+            hint: error.hint,
+            code: error.code
+        };
     }
+    console.log('Supabase insert success');
     return data;
 };
 exports.createBook = createBook;
-const updateBookInfo = async (bookId, updateData) => {
-    const supabaseAdmin = (0, supabase_js_1.createClient)(env_1.env.supabaseUrl, env_1.env.supabaseServiceRoleKey);
-    const { data, error } = await supabaseAdmin
+const updateBookInfo = async (bookId, updateData, supabaseClient) => {
+    const client = supabaseClient || (env_1.env.supabaseServiceRoleKey
+        ? (0, supabase_js_1.createClient)(env_1.env.supabaseUrl, env_1.env.supabaseServiceRoleKey)
+        : supabase_1.supabase);
+    // Filter out invalid columns
+    const validColumns = ['title', 'author', 'isbn', 'category', 'shelf_location', 'image_url', 'total_copies', 'available_copies', 'status'];
+    const filteredData = {};
+    for (const key of validColumns) {
+        if (key in updateData) {
+            const value = updateData[key];
+            if (key === 'isbn') {
+                const cleanedIsbn = typeof value === 'string' ? value.replace(/[-\s]/g, '') : value;
+                filteredData[key] = cleanedIsbn && cleanedIsbn.length > 0 ? cleanedIsbn : null;
+            }
+            else if (key === 'total_copies' || key === 'available_copies') {
+                filteredData[key] = Number(value);
+            }
+            else if (typeof value === 'string') {
+                filteredData[key] = value.trim();
+            }
+            else {
+                filteredData[key] = value;
+            }
+        }
+    }
+    const { data, error } = await client
         .from('books')
-        .update(updateData)
+        .update(filteredData)
         .eq('id', bookId)
         .select()
         .single();
     if (error) {
-        throw new Error(error.message);
+        console.error('Supabase Update Error:', error);
+        throw {
+            message: error.message,
+            details: error.details,
+            hint: error.hint,
+            code: error.code
+        };
     }
     return data;
 };
 exports.updateBookInfo = updateBookInfo;
-const deleteBook = async (bookId) => {
-    const supabaseAdmin = (0, supabase_js_1.createClient)(env_1.env.supabaseUrl, env_1.env.supabaseServiceRoleKey);
-    const { data: loans, error: loanError } = await supabaseAdmin
+const deleteBook = async (bookId, supabaseClient) => {
+    const client = supabaseClient || (env_1.env.supabaseServiceRoleKey
+        ? (0, supabase_js_1.createClient)(env_1.env.supabaseUrl, env_1.env.supabaseServiceRoleKey)
+        : supabase_1.supabase);
+    const { data: loans, error: loanError } = await client
         .from('loans')
         .select('id')
         .eq('book_id', bookId)
@@ -154,19 +218,27 @@ const deleteBook = async (bookId) => {
     if (loans && loans.length > 0) {
         throw new Error('ไม่สามารถลบหนังสือได้ เนื่องจากมีการยืมหรือจองค้างอยู่');
     }
-    const { error } = await supabaseAdmin
+    const { error } = await client
         .from('books')
         .delete()
         .eq('id', bookId);
     if (error) {
-        throw new Error(error.message);
+        console.error('Supabase Delete Error:', error);
+        throw {
+            message: error.message,
+            details: error.details,
+            hint: error.hint,
+            code: error.code
+        };
     }
     return { message: 'ลบหนังสือสำเร็จ' };
 };
 exports.deleteBook = deleteBook;
-const updateBookCopies = async (bookId, change) => {
-    const supabaseAdmin = (0, supabase_js_1.createClient)(env_1.env.supabaseUrl, env_1.env.supabaseServiceRoleKey);
-    const { data: currentBook, error: fetchError } = await supabaseAdmin
+const updateBookCopies = async (bookId, change, supabaseClient) => {
+    const client = supabaseClient || (env_1.env.supabaseServiceRoleKey
+        ? (0, supabase_js_1.createClient)(env_1.env.supabaseUrl, env_1.env.supabaseServiceRoleKey)
+        : supabase_1.supabase);
+    const { data: currentBook, error: fetchError } = await client
         .from('books')
         .select('total_copies, available_copies')
         .eq('id', bookId)
@@ -184,7 +256,7 @@ const updateBookCopies = async (bookId, change) => {
     if (newAvailableCopies < 0) {
         throw new Error('จำนวนสำเนาที่ว่างไม่สามารถน้อยกว่าจำนวนที่ถูกยืมอยู่ได้');
     }
-    const { data, error } = await supabaseAdmin
+    const { data, error } = await client
         .from('books')
         .update({
         total_copies: newTotalCopies,
@@ -195,7 +267,13 @@ const updateBookCopies = async (bookId, change) => {
         .select()
         .single();
     if (error) {
-        throw new Error(error.message);
+        console.error('Supabase Update Copies Error (New Staff):', error);
+        throw {
+            message: error.message,
+            details: error.details,
+            hint: error.hint,
+            code: error.code
+        };
     }
     return data;
 };

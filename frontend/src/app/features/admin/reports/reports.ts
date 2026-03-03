@@ -1,12 +1,13 @@
 import { Component, OnInit } from '@angular/core'
-import { NgFor, NgIf } from '@angular/common'
+import { NgFor, NgIf, DecimalPipe } from '@angular/common'
 import { ReportApiService, PopularBookItem, OverdueFineItem } from '../../../services/report-api.service'
 
 @Component({
   selector: 'app-reports',
   standalone: true,
-  imports: [NgFor, NgIf],
-  templateUrl: './reports.html'
+  imports: [NgFor, NgIf, DecimalPipe],
+  templateUrl: './reports.html',
+  styleUrls: ['./reports.css']
 })
 export class ReportsComponent implements OnInit {
   popularBooks: PopularBookItem[] = []
@@ -15,7 +16,7 @@ export class ReportsComponent implements OnInit {
   loading = false
   error = ''
 
-  constructor(private reportApi: ReportApiService) {}
+  constructor(private reportApi: ReportApiService) { }
 
   ngOnInit() {
     void this.load()

@@ -103,7 +103,7 @@ export const renewLoanByStaff = async (req: Request, res: Response) => {
   try {
     const staffId = (req as any).user?.id as string | undefined
     const { id } = req.params
-    const { userId } = req.body as { userId?: string }
+    const { new_due_date } = req.body as { new_due_date?: string }
 
     if (!staffId) {
       res.status(401).json({ error: 'UNAUTHENTICATED' })
@@ -113,12 +113,12 @@ export const renewLoanByStaff = async (req: Request, res: Response) => {
       res.status(400).json({ error: 'MISSING_LOAN_ID' })
       return
     }
-    if (!userId) {
-      res.status(400).json({ error: 'MISSING_USER_ID' })
+    if (!new_due_date) {
+      res.status(400).json({ error: 'MISSING_NEW_DUE_DATE' })
       return
     }
 
-    const result = await loanService.renewLoanByStaff(id, userId, staffId)
+    const result = await loanService.renewLoanByStaff(id, new_due_date, staffId)
 
     res.status(200).json({
       data: result

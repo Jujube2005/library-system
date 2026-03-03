@@ -49,22 +49,49 @@
       </div>
 
       <div class="detail-actions">
-        <!-- Not Reserved Yet -->
-        <button class="btn-primary" *ngIf="canReserve" (click)="reserve()" [disabled]="reserving">
-          {{ reserving ? 'Processing...' : 'Request Reservation' }}
+        <!-- Staff Only Quick Borrow -->
+        <button class="btn-staff" *ngIf="isStaff && book.available_copies > 0" (click)="quickBorrow()"
+          [disabled]="reserving">
+          <span class="material-icons">handshake</span>
+          Record Direct Loan
         </button>
+
+        <!-- Reservation Flow -->
+        <div class="reservation-section" *ngIf="canReserve">
+          <div class="date-picker-mini" *ngIf="showDatePicker">
+            <label>ระบุวันที่ต้องการรับหนังสือ:</label>
+            <input type="date" [(ngModel)]="selectedPickupDate" class="mini-input">
+          </div>
+
+          <button class="btn-primary" (click)="reserve()" [disabled]="reserving">
+            <span class="material-icons">event</span>
+            {{ showDatePicker ? 'ยืนยันการจองวันที่ ' + (selectedPickupDate | date:'mediumDate') : 'Request Reservation'
+            }}
+          </button>
+          <button class="btn-text" *ngIf="showDatePicker" (click)="toggleDatePicker()">Cancel</button>
+        </div>
 
         <!-- Already Reserved -->
         <div class="reservation-notice" *ngIf="hasActiveReservation">
           <p>
-            <strong>Active Request Identified</strong><br>
-            สถานะปัจจุบัน: {{ myReservation?.status }}
+            <span class="material-icons status-icon">verified</span>
+            <strong>Reservation Active</strong><br>
+            Current Status: {{ myReservation?.status }}<br>
+            <span *ngIf="myReservation?.expires_at" class="expire-note">
+              Hold until: {{ myReservation?.expires_at | date:'medium' }}
+            </span>
           </p>
           <button class="btn-outline" (click)="cancelReservation()" [disabled]="reserving" style="margin-top: 1.5rem;">
-            {{ reserving ? 'Cancelling...' : 'Revoke Request' }}
+            {{ reserving ? 'Processing...' : 'Revoke Request' }}
           </button>
         </div>
       </div>
     </div>
   </div>
+</div>
+
+<!-- Toast -->
+<div class="toast-wrap" *ngIf="toastMessage" [class.error]="toastMessage.type === 'error'">
+  <span class="material-icons">{{ toastMessage.type === 'success' ? 'verified' : 'report_problem' }}</span>
+  <p>{{ toastMessage.message }}</p>
 </div>

@@ -10,7 +10,6 @@ export const getMyFines = async (supabase: SupabaseClient, userId: string) => {
       status, 
       created_at, 
       updated_at, 
-      paid_at,
       loan:loans (
         id,
         book:books (
@@ -22,7 +21,7 @@ export const getMyFines = async (supabase: SupabaseClient, userId: string) => {
 
   if (error) {
     console.error('Supabase getMyFines Error:', error)
-    throw error 
+    throw error
   }
 
   return data
@@ -39,7 +38,6 @@ export const getAllFines = async (supabase: SupabaseClient) => {
       status, 
       created_at, 
       updated_at, 
-      paid_at,
       user:profiles!user_id (
         full_name,
         email
@@ -78,7 +76,7 @@ export const processPayment = async (supabase: SupabaseClient, fineId: string) =
     .from('fines')
     .update({
       status: 'paid',
-      paid_at: new Date()
+      updated_at: new Date()
     })
     .eq('id', fineId)
     .select()

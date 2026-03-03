@@ -15,7 +15,7 @@ export interface BookSearchResponse {
   providedIn: 'root'
 })
 export class BookApiService {
-  constructor(private api: ApiService) {}
+  constructor(private api: ApiService) { }
 
   getBook(id: string) {
     return this.api.get<{ data: Book }>(`/api/books/${id}`)
@@ -56,5 +56,9 @@ export class BookApiService {
 
   updateBookCopies(id: string, change: number) {
     return this.api.patch<{ data: Book }>(`/api/books/${id}/copies`, { change })
+  }
+
+  getBookHistory(id: string) {
+    return this.api.get<{ data: any[] }>(`/api/books/${id}/history`)
   }
 }

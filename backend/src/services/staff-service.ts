@@ -1,5 +1,6 @@
 import { supabase } from "../config/supabase"
 import { createNotification } from "./notification-service"
+import * as loanService from './loan-service'
 
 const getLoanRulesForRole = (role: string) => {
   if (role === 'instructor') {
@@ -42,8 +43,7 @@ export const confirmReservationByStaff = async (reservationId: string, staffId: 
   }
 
   // แทนที่ด้วย loanService.createLoan
-  // const loans = await recordBorrowByStaff(staffId, userId, bookId)
-  // const loan = Array.isArray(loans) ? loans[0] : loans
+  const loan = await loanService.createLoan(userId, bookId, staffId)
 
   const { error: updateError } = await supabase
     .from('reservations')
@@ -58,10 +58,10 @@ export const confirmReservationByStaff = async (reservationId: string, staffId: 
     await createNotification(supabase as any, {
       userId,
       type: 'reservation_ready',
-      message: 'รายการจองของคุณพร้อมรับแล้วที่ห้องสมุด'
+      message: 'รายการจองของคุณครบถ้วนและเริ่มการยืมแล้ว'
     })
   } catch {
   }
 
-  return { reservationId, loan: null } // loan is not directly returned here anymore
+  return { reservationId, loan }
 }

@@ -14,7 +14,7 @@
       <th>Amount</th>
       <th>Status</th>
       <th>Created At</th>
-      <th>Paid At</th>
+      <th>Updated At</th>
       <th *ngIf="isStaff"></th>
     </tr>
   </thead>
@@ -24,12 +24,9 @@
       <td>{{ f.amount }}</td>
       <td>{{ f.status }}</td>
       <td>{{ f.created_at }}</td>
-      <td>{{ f.paid_at || '-' }}</td>
+      <td>{{ f.status === 'paid' ? (f.updated_at | date:'short') : '-' }}</td>
       <td *ngIf="isStaff">
-        <button
-          *ngIf="f.status === 'unpaid'"
-          (click)="markAsPaid(f)"
-        >
+        <button *ngIf="f.status === 'unpaid'" (click)="markAsPaid(f)">
           Mark as paid
         </button>
       </td>
@@ -38,4 +35,3 @@
 </table>
 
 <p *ngIf="!loading && !error && !fines.length">ยังไม่มีค่าปรับ</p>
-

@@ -134,6 +134,9 @@
     cursor: pointer;
     transition: all 0.5s var(--transition-fluid);
     width: fit-content;
+    display: flex;
+    align-items: center;
+    gap: 12px;
 }
 
 .btn-primary:hover:not(:disabled) {
@@ -159,12 +162,108 @@
     background: rgba(0, 0, 0, 0.05);
 }
 
+.btn-staff {
+    padding: 1.2rem 2.5rem;
+    background: #27ae60;
+    color: white;
+    border: none;
+    font-family: var(--font-brand);
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    font-size: 0.75rem;
+    cursor: pointer;
+    width: fit-content;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.btn-staff:hover {
+    background: #219150;
+    box-shadow: 0 5px 15px rgba(39, 174, 96, 0.3);
+}
+
+.date-picker-mini {
+    margin-bottom: 1rem;
+}
+
+.date-picker-mini label {
+    display: block;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 0.5rem;
+}
+
+.mini-input {
+    padding: 0.8rem;
+    border: 1px solid var(--border-light);
+    border-radius: 4px;
+    background: var(--bg-hover);
+    color: var(--text-main);
+}
+
+.btn-text {
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    font-size: 0.8rem;
+    cursor: pointer;
+    margin-top: 0.5rem;
+    text-decoration: underline;
+}
+
 .reservation-notice {
     padding: 1.5rem;
     background: rgba(211, 84, 0, 0.05);
     border-left: 2px solid var(--accent);
     font-size: 0.9rem;
     line-height: 1.6;
+}
+
+.status-icon {
+    color: #27ae60;
+    vertical-align: middle;
+    margin-right: 8px;
+}
+
+.expire-note {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+}
+
+/* Toast Custom */
+.toast-wrap {
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    background: var(--text-main);
+    color: white;
+    padding: 1rem 2rem;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    z-index: 2000;
+    animation: slideLeft 0.5s ease-out;
+}
+
+.toast-wrap.error {
+    background: #e74c3c;
+}
+
+@keyframes slideLeft {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
 }
 
 @media (max-width: 1024px) {

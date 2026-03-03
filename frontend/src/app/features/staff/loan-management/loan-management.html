@@ -1,117 +1,127 @@
-<div class="loan-management-container">
-  <header class="loan-management-header">
-    <span class="view-tag">Staff</span>
-    <h1 class="page-title">Loan Management</h1>
-  </header>
+<div class="staff-loan-mgmt">
+  <div class="page-header">
+    <h1>Loan & Circulation</h1>
+    <p>Record new loans, process returns, and manage overdue items</p>
+  </div>
 
-  <div class="content-section">
-    <h2>บันทึกการยืมใหม่</h2>
-    <form (ngSubmit)="createLoan()" class="loan-form">
-      <div class="form-grid">
-        <div class="form-group">
-          <label for="userId">รหัสผู้ใช้ (User ID)</label>
-          <input id="userId" type="text" [(ngModel)]="newLoan.userId" name="userId" required>
-        </div>
-        <div class="form-group">
-          <label for="bookId">รหัสหนังสือ (Book ID)</label>
-          <input id="bookId" type="text" [(ngModel)]="newLoan.bookId" name="bookId" required>
-        </div>
-        <div class="form-group">
-          <label for="dueDate">วันที่ครบกำหนด (Due Date)</label>
-          <input id="dueDate" type="date" [(ngModel)]="newLoan.dueDate" name="dueDate" required>
+  <!-- Stats Overview -->
+  <div class="stats-overview">
+    <div class="stat-card active">
+      <span class="label">Active Loans</span>
+      <span class="value">{{ stats.active }}</span>
+    </div>
+    <div class="stat-card danger">
+      <span class="label">Overdue Items</span>
+      <span class="value">{{ stats.overdue }}</span>
+    </div>
+    <div class="stat-card success">
+      <span class="label">Returned Today</span>
+      <span class="value">{{ stats.returnedToday }}</span>
+    </div>
+  </div>
+
+  <!-- Quick Action / New Loan Form -->
+  <div class="action-card">
+    <h2><span class="material-icons">add_box</span> บันทึกการยืมใหม่ (Quick Loan)</h2>
+    <form (ngSubmit)="createLoan()" class="quick-form">
+      <div class="input-group">
+        <label>ผู้ยืม (Student ID / Email / UUID)</label>
+        <div class="icon-input">
+          <span class="material-icons">person_search</span>
+          <input type="text" [(ngModel)]="newLoan.userId" name="userId" placeholder="กรอกรหัสนักศึกษา หรือ อีเมล"
+            required>
         </div>
       </div>
-
-      <div class="form-actions">
-        <button type="submit" [disabled]="isCreatingLoan">
-          <span *ngIf="!isCreatingLoan">บันทึกการยืม</span>
-          <span *ngIf="isCreatingLoan">กำลังบันทึก...</span>
-        </button>
+      <div class="input-group">
+        <label>หนังสือ (Book ID / ISBN)</label>
+        <div class="icon-input">
+          <span class="material-icons">menu_book</span>
+          <input type="text" [(ngModel)]="newLoan.bookId" name="bookId" placeholder="กรอก ISBN หรือ รหัสหนังสือ"
+            required>
+        </div>
       </div>
-
-      <div *ngIf="errorMessage" class="error-message">{{ errorMessage }}</div>
-      <div *ngIf="successMessage" class="success-message">{{ successMessage }}</div>
+      <button type="submit" class="btn-submit" [disabled]="isCreatingLoan">
+        Record Loan
+      </button>
     </form>
   </div>
 
-  <div class="content-section loan-list-section">
-    <h2>รายการการยืมทั้งหมด</h2>
-    <div *ngIf="loadingLoans" class="loading-spinner"></div>
-    <div *ngIf="loansError" class="error-message">{{ loansError }}</div>
-
-    <div *ngIf="!loadingLoans && !loansError && loans.length === 0" class="no-data-message">
-      ไม่พบรายการการยืมในระบบ
+  <!-- Loan List -->
+  <div class="data-table-container">
+    <div class="table-header">
+      <h2>Current Circulation</h2>
+      <button class="btn-refresh" (click)="loadLoans()"><span class="material-icons">refresh</span></button>
     </div>
 
-    <table *ngIf="!loadingLoans && !loansError && loans.length > 0" class="loan-table">
+    <div class="loader-wrap" *ngIf="loadingLoans">
+      <div class="spinner"></div>
+      <p>Scanning records...</p>
+    </div>
+
+    <div class="error-box" *ngIf="loansError">{{ loansError }}</div>
+
+    <table *ngIf="!loadingLoans && loans.length > 0">
       <thead>
         <tr>
-          <th>ID การยืม</th>
-          <th>ผู้ใช้</th>
-          <th>หนังสือ</th>
-          <th>วันที่ยืม</th>
-          <th>วันที่ครบกำหนด</th>
-          <th>วันที่คืน</th>
-          <th>สถานะ</th>
-          <th>จัดการ</th>
+          <th>Member</th>
+          <th>Book Details</th>
+          <th>Loan Date</th>
+          <th>Due Date</th>
+          <th>Status</th>
+          <th>Actions</th>
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let loan of loans">
-          <td>{{ loan.id }}</td>
-          <td>{{ getUserFullName(loan) }} ({{ loan.user_id }})</td>
-          <td>{{ getBookTitle(loan) }} ({{ loan.book_id }})</td>
-          <td>{{ loan.loan_date | date:'shortDate' }}</td>
-          <td>{{ loan.due_date | date:'shortDate' }}</td>
-          <td>{{ loan.return_date ? (loan.return_date | date:'shortDate') : 'ยังไม่คืน' }}</td>
-          <td>{{ loan.status }}</td>
+        <tr *ngFor="let loan of loans" [class]="loan.status">
           <td>
-            <div class="action-btn-group">
-              <button class="action-btn return-btn" (click)="returnLoan(loan.id)" [disabled]="loan.status === 'returned'">
-                <span class="material-icons">assignment_turned_in</span> คืน
+            <div class="cell-user">
+              <span class="name">{{ getUserFullName(loan) }}</span>
+              <span class="sub">{{ loan.user_id }}</span>
+            </div>
+          </td>
+          <td>
+            <div class="cell-book">
+              <span class="title">{{ getBookTitle(loan) }}</span>
+              <span class="sub">ID: {{ loan.book_id }}</span>
+            </div>
+          </td>
+          <td>{{ loan.loan_date | date:'mediumDate' }}</td>
+          <td>
+            <div class="cell-date" [class.overdue]="loan.status === 'overdue'">
+              {{ loan.due_date | date:'mediumDate' }}
+            </div>
+          </td>
+          <td>
+            <span class="status-badge" [class]="loan.status">
+              {{ loan.status | uppercase }}
+            </span>
+          </td>
+          <td>
+            <div class="btn-group" *ngIf="loan.status !== 'returned'">
+              <button class="btn-icon return" (click)="returnLoan(loan.id)" title="Return Book">
+                <span class="material-icons">assignment_return</span>
               </button>
-              <button class="action-btn renew-btn" (click)="renewLoan(loan.id, loan.due_date)" [disabled]="loan.status === 'returned'">
-                <span class="material-icons">autorenew</span> ต่ออายุ
+              <button class="btn-icon renew" (click)="renewLoan(loan.id, loan.due_date)" title="Extend Due Date">
+                <span class="material-icons">update</span>
               </button>
             </div>
+            <span class="returned-note" *ngIf="loan.status === 'returned'">
+              Returned on {{ loan.return_date | date:'shortDate' }}
+            </span>
           </td>
         </tr>
       </tbody>
     </table>
-  </div>
 
-  <!-- Edit Loan Modal/Form (Optional, if needed for more complex edits) -->
-  <!-- <div *ngIf="selectedLoan" class="edit-loan-modal-overlay">
-    <div class="edit-loan-modal">
-      <h3>แก้ไขการยืม: {{ selectedLoan.id }}</h3>
-      <form (ngSubmit)="saveEditedLoan()" class="loan-form">
-        <div class="form-grid">
-          <div class="form-group">
-            <label for="edit_status">สถานะ</label>
-            <select id="edit_status" [(ngModel)]="editLoanForm.status" name="edit_status">
-              <option value="active">Active</option>
-              <option value="returned">Returned</option>
-              <option value="overdue">Overdue</option>
-              <option value="cancelled">Cancelled</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label for="edit_dueDate">วันที่ครบกำหนดใหม่</label>
-            <input id="edit_dueDate" type="date" [(ngModel)]="editLoanForm.due_date" name="edit_dueDate">
-          </div>
-        </div>
-
-        <div class="form-actions">
-          <button type="button" class="cancel-btn" (click)="cancelEdit()" [disabled]="isSavingEdit">ยกเลิก</button>
-          <button type="submit" [disabled]="isSavingEdit">
-            <span *ngIf="!isSavingEdit">บันทึก</span>
-            <span *ngIf="isSavingEdit">กำลังบันทึก...</span>
-          </button>
-        </div>
-
-        <div *ngIf="errorMessage" class="error-message">{{ errorMessage }}</div>
-        <div *ngIf="successMessage" class="success-message">{{ successMessage }}</div>
-      </form>
+    <div class="empty-state" *ngIf="!loadingLoans && loans.length === 0">
+      <span class="material-icons">inventory</span>
+      <p>No circulation records found</p>
     </div>
-  </div> -->
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast-wrap" *ngIf="toastMessage" [class.error]="toastMessage.type === 'error'">
+  <span class="material-icons">{{ toastMessage.type === 'success' ? 'verified' : 'report_problem' }}</span>
+  <p>{{ toastMessage.message }}</p>
 </div>

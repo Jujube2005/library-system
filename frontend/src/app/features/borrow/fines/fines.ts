@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core'
-import { NgFor, NgIf } from '@angular/common'
+import { NgFor, NgIf, DatePipe } from '@angular/common'
 import { FineApiService } from '../../../services/fine-api.service'
 import { UserApiService } from '../../../services/user-api.service'
 import { Fine } from '../../../models/fine.model'
@@ -8,7 +8,7 @@ import { Profile } from '../../../models/profile.model'
 @Component({
   selector: 'app-fines',
   standalone: true,
-  imports: [NgFor, NgIf],
+  imports: [NgFor, NgIf, DatePipe],
   templateUrl: './fines.html'
 })
 export class FinesComponent implements OnInit {
@@ -20,7 +20,7 @@ export class FinesComponent implements OnInit {
   constructor(
     private fineApi: FineApiService,
     private userApi: UserApiService
-  ) {}
+  ) { }
 
   get isStaff() {
     return this.profile?.role === 'staff'
