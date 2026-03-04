@@ -9,6 +9,43 @@
             <span class="material-icons">{{ isDarkMode ? 'light_mode' : 'dark_mode' }}</span>
         </button>
 
+        <!-- Notification Bell -->
+        <div class="profile-menu-wrap notification-menu-wrap" *ngIf="profile">
+            <button class="notification-btn" (click)="toggleNotificationMenu($event)">
+                <span class="material-icons">notifications_none</span>
+                <span class="badge" *ngIf="unreadCount > 0">{{ unreadCount > 99 ? '99+' : unreadCount }}</span>
+            </button>
+
+            <!-- Notification Dropdown -->
+            <div class="profile-dropdown notification-dropdown" [class.show]="showNotificationMenu">
+                <div class="dropdown-header">
+                    <p class="user-email">Notifications</p>
+                </div>
+                <div class="dropdown-divider"></div>
+
+                <div class="notif-list">
+                    <ng-container *ngIf="notifications.length > 0; else emptyNotifs">
+                        <div class="notif-item" *ngFor="let notif of notifications"
+                            [ngClass]="{'unread': !notif.is_read}" (click)="markAsReadAndGo(notif, $event)">
+                            <div class="notif-title">{{ notif.title }}</div>
+                            <div class="notif-msg">{{ notif.message }}</div>
+                            <div class="notif-time">{{ notif.created_at | date:'short' }}</div>
+                        </div>
+                    </ng-container>
+                    <ng-template #emptyNotifs>
+                        <div class="empty-state">
+                            No notifications yet
+                        </div>
+                    </ng-template>
+                </div>
+
+                <div class="dropdown-divider"></div>
+                <a routerLink="/dashboard/notifications" class="dropdown-item view-all">
+                    View All
+                </a>
+            </div>
+        </div>
+
         <div class="profile-menu-wrap" *ngIf="profile">
             <div class="profile-chip" (click)="toggleProfileMenu($event)">
                 <span class="role-badge">{{ profile.role }}</span>

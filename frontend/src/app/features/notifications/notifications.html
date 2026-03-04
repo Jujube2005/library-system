@@ -1,0 +1,45 @@
+<div class="notifications-container">
+    <div class="page-header">
+        <h1><span class="material-icons">notifications</span> All Notifications</h1>
+        <button class="btn-refresh" (click)="loadNotifications()" title="Refresh Notifications" [disabled]="loading">
+            <span class="material-icons">refresh</span>
+        </button>
+    </div>
+
+    <div class="loading-state" *ngIf="loading">
+        <div class="spinner"></div>
+        <p>Loading notifications...</p>
+    </div>
+
+    <div class="error-state" *ngIf="!loading && error">
+        <span class="material-icons">error_outline</span>
+        <p>{{ error }}</p>
+    </div>
+
+    <div class="notif-list-full" *ngIf="!loading && !error && notifications.length > 0">
+        <div class="notif-card" *ngFor="let notif of notifications" [class.unread]="!notif.is_read"
+            (click)="markAsRead(notif)">
+
+            <div class="notif-icon-wrap" [class.unr]="!notif.is_read">
+                <span class="material-icons">{{ notif.is_read ? 'notifications_none' : 'notifications_active' }}</span>
+            </div>
+
+            <div class="notif-content">
+                <div class="notif-header-info">
+                    <h3 class="notif-title">{{ notif.title }}</h3>
+                    <span class="notif-date">{{ notif.created_at | date:'medium' }}</span>
+                </div>
+                <p class="notif-message">{{ notif.message }}</p>
+            </div>
+
+            <div class="notif-status-icon" *ngIf="!notif.is_read" title="Mark as read">
+                <span class="material-icons">fiber_manual_record</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="empty-state" *ngIf="!loading && !error && notifications.length === 0">
+        <span class="material-icons empty-icon">check_circle_outline</span>
+        <p>You have no notifications. All caught up!</p>
+    </div>
+</div>

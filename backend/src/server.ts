@@ -10,7 +10,7 @@ import fineRouter from './routers/fine-router'
 import staffRouter from './routers/staff-router'
 import adminRouter from './routers/admin-router'
 import reportRouter from './routers/report-router'
-import notificationRouter from './routers/notification-router'
+import notificationRouter from './routes/notificationRoutes'
 
 const app = express()
 

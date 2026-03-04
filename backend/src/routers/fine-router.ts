@@ -3,6 +3,7 @@ import { protect } from '../middleware/auth-middleware'
 import { authorize } from '../middleware/role-middleware'
 import { getMyFines, getAllFines, processPayment } from '../services/fine-service'
 import { supabaseAdmin } from '../config/supabase-admin'
+import { checkAndNotifyFine } from '../utils/notification'
 
 const router = Router()
 
@@ -26,6 +27,7 @@ router.get(
         return
       }
 
+      await checkAndNotifyFine(userId)
       const fines = await getMyFines(supabase, userId)
 
       res.json({ data: fines })
