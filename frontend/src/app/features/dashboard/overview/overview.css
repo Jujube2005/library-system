@@ -19,9 +19,13 @@
 /* Dashboard Layout */
 .dashboard-grid {
     display: grid;
-    grid-template-columns: 1fr 350px;
-    gap: 2rem;
+    grid-template-columns: minmax(0, 1fr) 300px;
+    gap: 1.5rem;
     align-items: start;
+}
+
+.main-stats {
+    min-width: 0;
 }
 
 /* Notification Section */
@@ -34,7 +38,7 @@
 .section-card {
     background: var(--bg-card);
     border: 1px solid var(--border-light);
-    padding: 2rem;
+    padding: 1.5rem;
     border-radius: 8px;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
 }
@@ -57,7 +61,7 @@
 .featured-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 1.5rem;
+    gap: 1rem;
     margin-bottom: 2rem;
 }
 
@@ -70,6 +74,7 @@
     background: var(--bg-hover);
     border-radius: 6px;
     transition: all 0.3s var(--transition-ease);
+    min-width: 0;
 }
 
 .mini-book-card:hover {
@@ -140,7 +145,7 @@
     margin: 0;
     display: flex;
     flex-direction: column;
-    gap: 1.5rem;
+    gap: 1rem;
 }
 
 .notify-item {
@@ -200,4 +205,78 @@
     text-align: center;
     font-style: italic;
     opacity: 0.6;
+}
+
+/* Quick Actions */
+.quick-actions {
+    margin-bottom: 2rem;
+}
+
+.action-form {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.action-subtitle {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text-main);
+    margin: 0 0 0.5rem 0;
+}
+
+.input-field {
+    padding: 0.5rem 0.6rem;
+    border: 1px solid var(--border-light);
+    border-radius: 6px;
+    background: var(--bg-hover);
+    color: var(--text-main);
+    font-size: 0.75rem;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.input-field:focus {
+    outline: none;
+    border-color: var(--accent);
+}
+
+.btn-primary {
+    background: var(--accent);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 0.5rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-primary:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(211, 84, 0, 0.2);
+}
+
+.btn-primary:disabled {
+    opacity: 0.6;
+    cursor: wait;
+}
+
+.divider {
+    border: none;
+    height: 1px;
+    background: var(--border-light);
+    margin: 0.8rem 0;
+}
+
+.form-msg {
+    font-size: 0.75rem;
+    color: #27ae60;
+    margin: 0;
+}
+
+.error-text {
+    color: #e74c3c !important;
 }

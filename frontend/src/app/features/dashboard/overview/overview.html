@@ -51,6 +51,34 @@
     </div>
 
     <div class="side-panel">
+      <!-- Quick Actions for Staff -->
+      <section class="section-card quick-actions">
+        <h2 class="brand-caps">Quick Actions</h2>
+
+        <!-- Borrow Book Form -->
+        <div class="action-form">
+          <h3 class="action-subtitle">Lend a Book</h3>
+          <input type="text" [(ngModel)]="newLoanBookId" placeholder="Book ID" class="input-field" />
+          <input type="text" [(ngModel)]="newLoanUserId" placeholder="User ID / Student ID" class="input-field" />
+          <button (click)="createLoan()" [disabled]="isCreatingLoan" class="btn-primary">
+            {{ isCreatingLoan ? 'Processing...' : 'Lend Book' }}
+          </button>
+          <p class="form-msg" *ngIf="loanMessage" [class.error-text]="loanMessage.includes('❌')">{{ loanMessage }}</p>
+        </div>
+
+        <hr class="divider">
+
+        <!-- Pay Fine Form -->
+        <div class="action-form">
+          <h3 class="action-subtitle">Confirm Payment</h3>
+          <input type="text" [(ngModel)]="payFineId" placeholder="Fine ID" class="input-field" />
+          <button (click)="payFine()" [disabled]="isPayingFine" class="btn-primary">
+            {{ isPayingFine ? 'Processing...' : 'Confirm Pay' }}
+          </button>
+          <p class="form-msg" *ngIf="payMessage" [class.error-text]="payMessage.includes('❌')">{{ payMessage }}</p>
+        </div>
+      </section>
+
       <section class="section-card">
         <h2 class="brand-caps">Journal Log</h2>
 

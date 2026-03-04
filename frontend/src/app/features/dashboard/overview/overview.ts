@@ -5,11 +5,14 @@ import { BookApiService } from '../../../services/book-api.service'
 import { Notification } from '../../../models/notification.model'
 import { Book } from '../../../models/book.model'
 import { RouterLink } from '@angular/router'
+import { FormsModule } from '@angular/forms'
+import { LoanApiService } from '../../../services/loan-api.service'
+import { FineApiService } from '../../../services/fine-api.service'
 
 @Component({
   selector: 'app-dashboard-overview',
   standalone: true,
-  imports: [NgFor, NgIf, DatePipe, RouterLink],
+  imports: [NgFor, NgIf, DatePipe, RouterLink, FormsModule],
   templateUrl: './overview.html',
   styleUrls: ['./overview.css']
 })
@@ -19,9 +22,20 @@ export class DashboardOverviewComponent implements OnInit {
   loading = false
   error = ''
 
+  newLoanUserId = ''
+  newLoanBookId = ''
+  isCreatingLoan = false
+  loanMessage = ''
+
+  payFineId = ''
+  isPayingFine = false
+  payMessage = ''
+
   constructor(
     private notificationApi: NotificationApiService,
     private bookApi: BookApiService,
+    private loanApi: LoanApiService,
+    private fineApi: FineApiService,
     private cdr: ChangeDetectorRef
   ) { }
 
@@ -73,5 +87,50 @@ export class DashboardOverviewComponent implements OnInit {
     }
 
     return coverByTitle[titleKey] || '/default-book-cover.svg'
+  }
+
+  async createLoan() {
+    if (!this.newLoanUserId || !this.newLoanBookId) {
+      this.loanMessage = 'กรุณากรอกรหัสผู้ใช้และรหัสหนังสือให้ครบ'
+      return
+    }
+
+    this.isCreatingLoan = true;
+    this.loanMessage = ''
+    this.cdr.detectChanges()
+
+    try {
+      await this.loanApi.createLoan(this.newLoanUserId, this.newLoanBookId, '')
+      this.loanMessage = '✅ บันทึกการยืมสำเร็จ!'
+      this.newLoanUserId = ''
+      this.newLoanBookId = ''
+    } catch (err: any) {
+      this.loanMessage = '❌ ล้มเหลว: ' + (err.error?.error || err.message)
+    } finally {
+      this.isCreatingLoan = false;
+      this.cdr.detectChanges()
+    }
+  }
+
+  async payFine() {
+    if (!this.payFineId) {
+      this.payMessage = 'กรุณากรอกรหัสรายการค่าปรับ'
+      return
+    }
+
+    this.isPayingFine = true;
+    this.payMessage = '';
+    this.cdr.detectChanges();
+
+    try {
+      await this.fineApi.markAsPaid(this.payFineId);
+      this.payMessage = '✅ บันทึกการชำระเงินสำเร็จ!';
+      this.payFineId = '';
+    } catch (err: any) {
+      this.payMessage = '❌ ล้มเหลว: ' + (err.error?.error || err.message);
+    } finally {
+      this.isPayingFine = false;
+      this.cdr.detectChanges()
+    }
   }
 }

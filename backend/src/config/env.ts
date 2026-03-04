@@ -5,7 +5,6 @@ import path from 'path'
 const nodeEnv = process.env.NODE_ENV || 'development'
 dotenv.config({ path: path.join(process.cwd(), `.env.${nodeEnv}`) })
 dotenv.config() // Fallback to .env
-
 const requiredEnv = [
   'SUPABASE_URL',
   'SUPABASE_ANON_KEY'
