@@ -49,8 +49,13 @@
   <!-- Loan List -->
   <div class="data-table-container">
     <div class="table-header">
-      <h2>Current Circulation</h2>
-      <button class="btn-refresh" (click)="loadLoans()"><span class="material-icons">refresh</span></button>
+      <h2>{{ showActiveOnly ? 'Items Currently on Loan' : 'Full Transaction History' }}</h2>
+      <div class="header-actions">
+        <button class="btn-filter" (click)="toggleActiveFilter()">
+          {{ showActiveOnly ? 'Show History' : 'Hide History' }}
+        </button>
+        <button class="btn-refresh" (click)="loadLoans()"><span class="material-icons">refresh</span></button>
+      </div>
     </div>
 
     <div class="loader-wrap" *ngIf="loadingLoans">

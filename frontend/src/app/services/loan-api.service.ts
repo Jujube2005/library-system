@@ -16,8 +16,15 @@ export interface LoansResponse {
 export class LoanApiService {
   constructor(private api: ApiService) { }
 
-  getAllLoansInSystem() {
-    return this.api.get<LoansResponse>('/api/loans/system');
+  getAllLoansInSystem(status?: string, limit?: number) {
+    let url = '/api/loans/system?';
+    if (status) url += `status=${status}&`;
+    if (limit) url += `limit=${limit}&`;
+    return this.api.get<LoansResponse>(url);
+  }
+
+  getLoanStats() {
+    return this.api.get<{ data: { active: number, overdue: number, returnedToday: number } }>('/api/loans/stats');
   }
 
   getLoanById(id: string) {

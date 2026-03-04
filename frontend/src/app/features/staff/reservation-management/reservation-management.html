@@ -20,6 +20,13 @@
     </div>
 
     <div class="table-container">
+        <div class="table-header">
+            <h2>Current Queue</h2>
+            <button class="btn-toggle" (click)="toggleShowAll()">
+                {{ showAll ? 'Hide Completed' : 'Show History' }}
+            </button>
+        </div>
+
         <div class="loader" *ngIf="loading">
             <div class="spinner"></div>
             <p>Fetching reservation data...</p>
@@ -27,7 +34,7 @@
 
         <div class="error-msg" *ngIf="error">{{ error }}</div>
 
-        <table *ngIf="!loading && !error">
+        <table *ngIf="!loading && !error && filteredReservations.length > 0">
             <thead>
                 <tr>
                     <th>Member</th>
@@ -38,7 +45,7 @@
                 </tr>
             </thead>
             <tbody>
-                <tr *ngFor="let r of reservations" [class]="r.status">
+                <tr *ngFor="let r of filteredReservations" [class]="r.status">
                     <td>
                         <div class="user-info">
                             <span class="name">{{ r.user?.full_name }}</span>
@@ -88,9 +95,9 @@
             </tbody>
         </table>
 
-        <div class="empty-state" *ngIf="!loading && !error && reservations.length === 0">
+        <div class="empty-state" *ngIf="!loading && !error && filteredReservations.length === 0">
             <span class="material-icons">event_busy</span>
-            <p>No reservations found in the system</p>
+            <p>{{ showAll ? 'No reservations found in the system' : 'No active reservations' }}</p>
         </div>
     </div>
 </div>

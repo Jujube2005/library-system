@@ -14,6 +14,7 @@ export class ReservationManagementComponent implements OnInit {
     reservations: any[] = [];
     loading = false;
     error = '';
+    showAll = false; // Toggle to show completed/cancelled reservations
 
     toastMessage: { message: string, type: 'success' | 'error' } | null = null;
     private toastTimeout: any;
@@ -55,6 +56,19 @@ export class ReservationManagementComponent implements OnInit {
                 this.cdr.detectChanges();
             });
         }
+    }
+
+    get filteredReservations() {
+        if (!this.reservations) return [];
+        if (this.showAll) {
+            return this.reservations;
+        }
+        return this.reservations.filter(r => r.status === 'pending' || r.status === 'ready');
+    }
+
+    toggleShowAll() {
+        this.showAll = !this.showAll;
+        this.cdr.detectChanges();
     }
 
     async updateStatus(id: string, status: string) {

@@ -42,8 +42,13 @@
     <div class="card-header">
       <span class="view-tag">Financials</span>
       <h2 class="card-title">Overdue Records</h2>
-      <div class="summary-badge">
-        Total Pending: <span class="highlight">฿{{ totalUnpaid | number }}</span>
+      <div class="summary-badges">
+        <div class="summary-badge warning">
+          Pending: <span class="highlight">฿{{ totalUnpaid | number }}</span>
+        </div>
+        <div class="summary-badge success">
+          Collected: <span class="highlight-green">฿{{ totalPaid | number }}</span>
+        </div>
       </div>
     </div>
 
@@ -52,7 +57,9 @@
         <thead>
           <tr>
             <th>Member</th>
-            <th class="text-right">Amount Due</th>
+            <th>Status</th>
+            <th class="text-right">Amount</th>
+            <th class="text-center">Action</th>
           </tr>
         </thead>
         <tbody>
@@ -63,7 +70,18 @@
                 <small class="user-id">ID: {{ f.user_id.substring(0,8) }}...</small>
               </div>
             </td>
-            <td class="text-right error-text">฿{{ f.amount }}</td>
+            <td>
+              <span class="mini-status" [class]="f.status">{{ f.status }}</span>
+            </td>
+            <td class="text-right" [class.error-text]="f.status === 'unpaid'"
+              [class.success-text]="f.status === 'paid'">
+              ฿{{ f.amount }}
+            </td>
+            <td class="text-center">
+              <button *ngIf="f.status === 'unpaid'" class="btn-pay" (click)="payFine(f.id)">
+                Confirm Pay
+              </button>
+            </td>
           </tr>
         </tbody>
       </table>

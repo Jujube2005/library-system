@@ -16,6 +16,9 @@ export class LoanManagementComponent implements OnInit {
   loadingLoans = false;
   loansError = '';
 
+  loanStats = { active: 0, overdue: 0, returnedToday: 0 };
+  showActiveOnly = true; // Default to active/overdue only for better performance
+
   // For Toast
   toastMessage: { message: string, type: 'success' | 'error' } | null = null;
   private toastTimeout: any;
@@ -45,29 +48,37 @@ export class LoanManagementComponent implements OnInit {
   }
 
   get stats() {
-    const active = this.loans.filter(l => l.status === 'active').length;
-    const overdue = this.loans.filter(l => l.status === 'overdue').length;
-    const returnedToday = this.loans.filter(l => {
-      if (l.status !== 'returned' || !l.return_date) return false;
-      const today = new Date().toISOString().split('T')[0];
-      return l.return_date.startsWith(today);
-    }).length;
-
-    return { active, overdue, returnedToday };
+    return this.loanStats;
   }
 
   async loadLoans() {
     this.loadingLoans = true;
     this.loansError = '';
     try {
-      const response = await this.loanApi.getAllLoansInSystem();
-      this.loans = response.data;
+      // 1. Get stats for the headers
+      const statsRes = await this.loanApi.getLoanStats();
+      this.loanStats = statsRes.data;
+
+      // 2. Get loan list (filtered if needed)
+      const limit = this.showActiveOnly ? 200 : 500;
+      const response = await this.loanApi.getAllLoansInSystem(undefined, limit);
+
+      if (this.showActiveOnly) {
+        this.loans = response.data.filter(l => l.status === 'active' || l.status === 'overdue');
+      } else {
+        this.loans = response.data;
+      }
     } catch (err: any) {
       this.loansError = err.message || 'ไม่สามารถโหลดรายการการยืมได้';
     } finally {
       this.loadingLoans = false;
       this.cdr.detectChanges();
     }
+  }
+
+  toggleActiveFilter() {
+    this.showActiveOnly = !this.showActiveOnly;
+    void this.loadLoans();
   }
 
   async createLoan() {
@@ -94,11 +105,19 @@ export class LoanManagementComponent implements OnInit {
 
   async returnLoan(loanId: string) {
     try {
-      await this.loanApi.returnLoan(loanId);
-      this.showToast('บันทึกการคืนสำเร็จ');
+      const res = await this.loanApi.returnLoan(loanId);
+      const fineAmount = (res.data as any).fine?.amount;
+
+      if (fineAmount > 0) {
+        this.showToast(`คืนสำเร็จ! มีค่าปรับจำนวน ${fineAmount} บาท`, 'success');
+      } else {
+        this.showToast('บันทึกการคืนสำเร็จ', 'success');
+      }
+
       void this.loadLoans();
     } catch (err: any) {
-      this.showToast(err.message || 'Error', 'error');
+      const msg = err.error?.error || err.message || 'Error';
+      this.showToast(msg, 'error');
     }
   }
 

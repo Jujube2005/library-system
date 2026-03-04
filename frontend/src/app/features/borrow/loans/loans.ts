@@ -1,5 +1,5 @@
-import { Component, OnInit } from '@angular/core'
-import { NgFor, NgIf } from '@angular/common'
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core'
+import { NgFor, NgIf, DatePipe, UpperCasePipe } from '@angular/common'
 import { LoanApiService } from '../../../services/loan-api.service'
 import { UserApiService } from '../../../services/user-api.service'
 import { Loan } from '../../../models/loan.model'
@@ -8,8 +8,9 @@ import { Profile } from '../../../models/profile.model'
 @Component({
   selector: 'app-loans',
   standalone: true,
-  imports: [NgFor, NgIf],
-  templateUrl: './loans.html'
+  imports: [NgFor, NgIf, DatePipe, UpperCasePipe],
+  templateUrl: './loans.html',
+  styleUrls: ['./loans.css']
 })
 export class LoansComponent implements OnInit {
   loans: Loan[] = []
@@ -19,8 +20,9 @@ export class LoansComponent implements OnInit {
 
   constructor(
     private loanApi: LoanApiService,
-    private userApi: UserApiService
-  ) {}
+    private userApi: UserApiService,
+    private cdr: ChangeDetectorRef
+  ) { }
 
   get isStaff() {
     return this.profile?.role === 'staff'
@@ -48,17 +50,13 @@ export class LoansComponent implements OnInit {
     this.error = ''
 
     try {
-      if (this.isStaff) {
-        const res = await this.loanApi.getAllLoansInSystem()
-        this.loans = res.data
-      } else {
-        const res = await this.loanApi.getMyLoans()
-        this.loans = res.data
-      }
+      const res = await this.loanApi.getMyLoans()
+      this.loans = res.data
     } catch {
       this.error = 'ไม่สามารถดึงรายการยืมหนังสือได้'
     } finally {
       this.loading = false
+      this.cdr.detectChanges()
     }
   }
 
@@ -72,6 +70,8 @@ export class LoansComponent implements OnInit {
       this.loans = this.loans.map(l => (l.id === loan.id ? { ...l, ...updated } : l))
     } catch {
       this.error = 'ไม่สามารถต่ออายุการยืมได้ (ตรวจสอบสิทธิ์หรือสถานะการยืม)'
+    } finally {
+      this.cdr.detectChanges()
     }
   }
 
@@ -83,6 +83,8 @@ export class LoansComponent implements OnInit {
       await this.loadLoans()
     } catch {
       this.error = 'ไม่สามารถบันทึกการคืนหนังสือได้'
+    } finally {
+      this.cdr.detectChanges()
     }
   }
 }

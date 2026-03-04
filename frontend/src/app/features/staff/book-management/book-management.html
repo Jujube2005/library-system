@@ -156,9 +156,14 @@
               </div>
             </td>
             <td>
-              <div class="stock-badge" [class.danger]="book.available_copies === 0">
-                <span class="stock-count">{{ book.available_copies }}</span>
-                <span class="stock-total">/ {{ book.total_copies }} available</span>
+              <div class="stock-status-wrap">
+                <div class="stock-badge" [class.danger]="book.available_copies === 0">
+                  <span class="stock-count">{{ book.available_copies }}</span>
+                  <span class="stock-total">/ {{ book.total_copies }} available</span>
+                </div>
+                <span class="status-pill" [class.out]="book.available_copies === 0">
+                  {{ book.available_copies > 0 ? 'Available' : 'Out of Stock' }}
+                </span>
               </div>
             </td>
             <td class="text-right">

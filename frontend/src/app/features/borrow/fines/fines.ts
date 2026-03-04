@@ -54,13 +54,8 @@ export class FinesComponent implements OnInit {
     this.error = ''
 
     try {
-      if (this.isStaff) {
-        const res = await this.fineApi.getAllFines()
-        this.fines = res.data
-      } else {
-        const res = await this.fineApi.getMyFines()
-        this.fines = res.data
-      }
+      const res = await this.fineApi.getMyFines()
+      this.fines = res.data
     } catch {
       this.error = 'ไม่สามารถดึงรายการค่าปรับได้'
     } finally {

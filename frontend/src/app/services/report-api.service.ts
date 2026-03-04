@@ -8,9 +8,11 @@ export interface PopularBookItem {
 }
 
 export interface OverdueFineItem {
+  id: string
   user_id: string
   user_name: string | null
   amount: number
+  status: string
 }
 
 interface PopularBooksResponse {
@@ -21,6 +23,8 @@ interface OverdueFinesResponse {
   data: OverdueFineItem[]
   summary: {
     total_unpaid: number
+    total_paid: number
+    total_revenue: number
   }
 }
 
@@ -28,7 +32,7 @@ interface OverdueFinesResponse {
   providedIn: 'root'
 })
 export class ReportApiService {
-  constructor(private api: ApiService) {}
+  constructor(private api: ApiService) { }
 
   getPopularBooks() {
     return this.api.get<PopularBooksResponse>('/api/reports/popular-books')

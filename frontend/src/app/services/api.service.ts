@@ -77,11 +77,12 @@ export class ApiService {
     })
 
     if (!res.ok) {
-      const errorData = await res.json().catch(() => ({}))
-      const err = new Error(`Request failed: ${res.status}`)
-        ; (err as any).status = res.status
-        ; (err as any).error = errorData
-      throw err
+      const errorData = await res.json().catch(() => ({}));
+      const serverMsg = errorData.error || errorData.message || `Request failed: ${res.status}`;
+      const err = new Error(serverMsg);
+      (err as any).status = res.status;
+      (err as any).error = errorData;
+      throw err;
     }
 
     return res.json() as Promise<T>
