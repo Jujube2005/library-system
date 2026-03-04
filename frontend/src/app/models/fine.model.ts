@@ -6,5 +6,9 @@ export interface Fine {
   status: string
   created_at: string
   updated_at?: string
+  user?: {
+    full_name: string
+    email: string
+  }
 }
 

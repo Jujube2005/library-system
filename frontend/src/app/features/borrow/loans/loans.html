@@ -41,6 +41,10 @@
           <span class="label">Due Date</span>
           <span class="value">{{ l.due_date | date:'mediumDate' }}</span>
         </div>
+        <div class="detail-row fine-alert" *ngIf="l.current_fine && l.current_fine > 0">
+          <span class="label">Estimated Fine</span>
+          <span class="value">{{ l.current_fine }} THB</span>
+        </div>
       </div>
 
       <div class="card-actions" *ngIf="l.status === 'active'">

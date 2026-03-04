@@ -1,36 +1,24 @@
-import express from 'express'
-import cors from 'cors'
 import { createClient } from '@supabase/supabase-js'
-import dotenv from 'dotenv'
+import * as dotenv from 'dotenv'
+import * as path from 'path'
 
-dotenv.config()
+dotenv.config({ path: path.join(__dirname, '.env.development') })
 
-const app = express()
-app.use(cors())
+const supabaseUrl = process.env['SUPABASE_URL']
+const supabaseKey = process.env['SUPABASE_SERVICE_ROLE_KEY']
 
-const supabase = createClient(
-    process.env.SUPABASE_URL!,
-    process.env.SUPABASE_ANON_KEY!
-)
+const supabase = createClient(supabaseUrl!, supabaseKey!)
 
-app.get('/diag', async (req, res) => {
-    try {
-        const { data: books, error: booksError } = await supabase.from('books').select('*').limit(1)
-        const { data: profiles, error: profilesError } = await supabase.from('profiles').select('*').limit(1)
-        const { data: reservations, error: reservationsError } = await supabase.from('reservations').select('*').limit(1)
-        const { data: fines, error: finesError } = await supabase.from('fines').select('*').limit(1)
+async function diag() {
+    console.log('--- Database Diagnostics ---')
+    const { count, error: fineCountErr } = await supabase.from('fines').select('*', { count: 'exact', head: true })
+    console.log('Fines Count:', count, fineCountErr ? `Error: ${fineCountErr.message}` : '(OK)')
 
-        res.json({
-            books: { data: books, error: booksError },
-            profiles: { data: profiles, error: profilesError },
-            reservations: { data: reservations, error: reservationsError },
-            fines: { data: fines, error: finesError }
-        })
-    } catch (err: any) {
-        res.json({ error: err.message })
-    }
-})
+    const { data: fines, error: finesErr } = await supabase.from('fines').select('id, status, amount, user_id')
+    if (finesErr) console.error('Fines Query Error:', finesErr.message)
+    else console.log('Fines Data:', fines)
 
-app.listen(4001, () => {
-    console.log('Diagnostic server running on http://localhost:4001')
-})
+    const { data: profiles, error: profErr } = await supabase.from('profiles').select('id, full_name, role')
+    console.log('Total Profiles:', profiles?.length, profErr ? profErr.message : '')
+}
+diag()

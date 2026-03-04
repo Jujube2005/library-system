@@ -8,7 +8,7 @@ import { Profile } from '../../../models/profile.model'
 @Component({
   selector: 'app-loans',
   standalone: true,
-  imports: [NgFor, NgIf, DatePipe, UpperCasePipe],
+  imports: [NgFor, NgIf, DatePipe],
   templateUrl: './loans.html',
   styleUrls: ['./loans.css']
 })

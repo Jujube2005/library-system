@@ -65,6 +65,10 @@ export const routes: Routes = [
       {
         path: 'reservation-management',
         loadComponent: () => import('./features/staff/reservation-management/reservation-management').then(m => m.ReservationManagementComponent)
+      },
+      {
+        path: 'fine-management',
+        loadComponent: () => import('./features/staff/fine-management/fine-management').then(m => m.FineManagementComponent)
       }
     ]
   },

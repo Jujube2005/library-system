@@ -18,4 +18,5 @@ export interface Loan {
   // Joined data (optional, for display purposes)
   books?: Book;
   user?: Profile[]; // Changed from Profile to Profile[] to match backend
+  current_fine?: number;
 }

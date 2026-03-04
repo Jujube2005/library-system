@@ -193,6 +193,11 @@
     font-weight: 600;
 }
 
+.detail-row.fine-alert .value {
+    color: #f59e0b;
+    font-weight: 700;
+}
+
 .card-actions {
     display: flex;
     gap: 0.75rem;
