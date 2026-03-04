@@ -21,7 +21,8 @@ router.get('/my', auth_middleware_1.protect, (0, role_middleware_1.authorize)('s
         res.json({ data: fines });
     }
     catch (error) {
-        res.status(400).json({ error: error.message });
+        console.error('Fines Query Error:', error);
+        res.status(400).json({ error: error.message, details: error.details });
     }
 });
 router.get('/', auth_middleware_1.protect, (0, role_middleware_1.authorize)('staff'), async (req, res) => {

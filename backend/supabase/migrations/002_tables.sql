@@ -80,17 +80,3 @@ CREATE TABLE public.reservations (
   updated_at TIMESTAMPTZ DEFAULT NOW(),
   UNIQUE(book_id, user_id)
 );
-
--- =========================
--- NOTIFICATIONS
--- =========================
-
-CREATE TABLE public.notifications (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id UUID NOT NULL REFERENCES profiles(id),
-  notification_type TEXT,
-  message TEXT,
-  is_read BOOLEAN DEFAULT false,
-  created_at TIMESTAMPTZ DEFAULT NOW(),
-  updated_at TIMESTAMPTZ DEFAULT NOW()
-);

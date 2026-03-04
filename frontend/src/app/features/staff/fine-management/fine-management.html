@@ -1,0 +1,77 @@
+<div class="fines-container">
+    <div class="page-header">
+        <h1><span class="material-icons">payments</span> Fine Management (Staff)</h1>
+        <button class="btn-refresh" (click)="loadFines()" title="Refresh All Fines" [disabled]="loading">
+            <span class="material-icons">refresh</span>
+        </button>
+    </div>
+
+    <div class="summary-cards" *ngIf="!loading && !error && fines.length">
+        <div class="summary-card outstanding">
+            <span class="label">System Outstanding Total</span>
+            <span class="value">{{ outstandingTotal | number:'1.2-2' }} THB</span>
+        </div>
+        <div class="summary-card">
+            <span class="label">Total Invoices</span>
+            <span class="value">{{ fines.length }}</span>
+        </div>
+    </div>
+
+    <div class="loading-state" *ngIf="loading">
+        <div class="spinner"></div>
+        <p>Loading all library fines...</p>
+    </div>
+
+    <div class="error-state" *ngIf="!loading && error">
+        <span class="material-icons">error_outline</span>
+        <p>{{ error }}</p>
+    </div>
+
+    <div class="table-wrapper" *ngIf="!loading && !error && fines.length">
+        <table>
+            <thead>
+                <tr>
+                    <th>User Information</th>
+                    <th>Amount</th>
+                    <th>Status</th>
+                    <th>Date Assigned</th>
+                    <th>Payment Date</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let f of fines">
+                    <td>
+                        <div class="user-cell">
+                            <span class="user-name">{{ f.user?.full_name || 'N/A' }}</span>
+                            <span class="user-email">{{ f.user?.email || 'N/A' }}</span>
+                        </div>
+                    </td>
+                    <td>
+                        <span class="amount-value">{{ f.amount | number:'1.2-2' }} THB</span>
+                    </td>
+                    <td>
+                        <span class="status-badge status-{{ f.status }}">
+                            {{ f.status }}
+                        </span>
+                    </td>
+                    <td>{{ f.created_at | date:'mediumDate' }}</td>
+                    <td>
+                        {{ f.status === 'paid' ? (f.updated_at | date:'medium') : '-' }}
+                    </td>
+                    <td>
+                        <button class="btn-pay" *ngIf="f.status === 'unpaid'" (click)="markAsPaid(f)"
+                            [disabled]="loading">
+                            Mark as Paid
+                        </button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="empty-state" *ngIf="!loading && !error && !fines.length">
+        <span class="material-icons">check_circle_outline</span>
+        <p>No fines found in the system.</p>
+    </div>
+</div>

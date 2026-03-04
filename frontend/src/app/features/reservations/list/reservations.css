@@ -1,0 +1,185 @@
+.reservations-container {
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+.reservations-header {
+    margin-bottom: 3rem;
+}
+
+.page-title {
+    font-size: 3rem;
+    margin-top: 0.5rem;
+}
+
+.view-tag {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.3em;
+    color: var(--accent);
+    font-weight: 600;
+}
+
+/* List Style */
+.reservation-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.reservation-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-light);
+    border-radius: 12px;
+    padding: 1.5rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: all 0.3s var(--transition-ease);
+}
+
+.reservation-card:hover {
+    transform: translateX(10px);
+    border-color: var(--accent);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+}
+
+.book-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    flex: 1;
+}
+
+.res-category {
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--text-muted);
+}
+
+.res-title {
+    font-family: var(--font-display);
+    font-size: 1.4rem;
+    margin: 0;
+}
+
+.res-author {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+}
+
+.status-section {
+    display: flex;
+    align-items: center;
+    gap: 3rem;
+}
+
+.meta-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    text-align: right;
+    min-width: 150px;
+}
+
+.meta-label {
+    font-size: 0.6rem;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    letter-spacing: 0.05em;
+}
+
+.meta-value {
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+
+/* Badge System */
+.status-badge {
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    font-weight: 600;
+}
+
+.status-pending {
+    background: rgba(243, 156, 18, 0.1);
+    color: #f39c12;
+}
+
+.status-ready {
+    background: rgba(46, 204, 113, 0.1);
+    color: #2ecc71;
+}
+
+.status-cancelled {
+    background: rgba(149, 165, 166, 0.1);
+    color: #95a5a6;
+}
+
+.status-fulfilled {
+    background: rgba(52, 152, 219, 0.1);
+    color: #3498db;
+}
+
+.cancel-btn {
+    background: none;
+    border: 1px solid rgba(231, 76, 60, 0.3);
+    color: #e74c3c;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 0.75rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.cancel-btn:hover {
+    background: #e74c3c;
+    color: white;
+}
+
+/* Skeleton */
+.skeleton-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.skeleton-card {
+    height: 100px;
+    background: var(--bg-hover);
+    border-radius: 12px;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 5rem 0;
+}
+
+.empty-icon {
+    font-size: 4rem;
+    opacity: 0.1;
+    margin-bottom: 2rem;
+    display: block;
+}
+
+@media (max-width: 768px) {
+    .reservation-card {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1.5rem;
+    }
+
+    .status-section {
+        width: 100%;
+        justify-content: space-between;
+        gap: 1rem;
+    }
+
+    .meta-info {
+        text-align: left;
+    }
+}

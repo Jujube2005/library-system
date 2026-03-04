@@ -1,0 +1,308 @@
+<div class="book-management-wrapper">
+  <header class="page-header">
+    <div class="header-main">
+      <span class="view-tag">Management</span>
+      <h1 class="page-title">Resource <br>Catalog</h1>
+    </div>
+
+    <div class="stats-overview">
+      <div class="stat-card">
+        <span class="stat-value">{{ stats.total }}</span>
+        <span class="stat-label">Total Titles</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-value accent">{{ stats.available }}</span>
+        <span class="stat-label">In Stock</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-value">{{ stats.categories }}</span>
+        <span class="stat-label">Genres</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="action-bar">
+    <button class="btn-primary" (click)="toggleAddForm()">
+      <span class="material-icons">{{ showAddForm ? 'close' : 'add' }}</span>
+      {{ showAddForm ? 'Cancel Entry' : 'Add New Book' }}
+    </button>
+
+    <div class="utility-btns">
+      <button class="btn-outline" (click)="triggerImport()">
+        <span class="material-icons">upload_file</span>
+        CSV Import
+      </button>
+      <button class="btn-outline" (click)="exportToCSV()">
+        <span class="material-icons">download</span>
+        Export
+      </button>
+      <input type="file" id="csvImportInput" accept=".csv" style="display: none" (change)="onFileImport($event)">
+    </div>
+  </div>
+
+  <!-- Collapsible Add Form -->
+  <div class="form-drawer" [class.open]="showAddForm">
+    <form (ngSubmit)="createBook()" class="premium-form">
+      <div class="form-grid">
+        <div class="input-field">
+          <label>Book Title <span class="required">*</span></label>
+          <input [(ngModel)]="newBook.title" name="title" placeholder="e.g. Clean Code" required />
+        </div>
+        <div class="input-field">
+          <label>Author / Editor <span class="required">*</span></label>
+          <input [(ngModel)]="newBook.author" name="author" placeholder="Robert C. Martin" required />
+        </div>
+        <div class="input-field">
+          <label>ISBN-13</label>
+          <input [(ngModel)]="newBook.isbn" name="isbn" placeholder="978-..." />
+        </div>
+        <div class="input-field">
+          <label>Genre / Category <span class="required">*</span></label>
+          <select [(ngModel)]="newBook.category" name="category" required>
+            <option value="" disabled selected>Select category</option>
+            <option *ngFor="let cat of categories" [value]="cat">{{cat}}</option>
+          </select>
+        </div>
+        <div class="input-field">
+          <label>Archive Location <span class="required">*</span></label>
+          <select [(ngModel)]="newBook.shelf_location" name="shelf_location" required>
+            <option value="" disabled selected>Select shelf</option>
+            <option *ngFor="let loc of shelfLocations" [value]="loc">{{loc}}</option>
+          </select>
+        </div>
+        <div class="input-field">
+          <label>Initial Stock <span class="required">*</span></label>
+          <input type="number" [(ngModel)]="newBook.total_copies" name="total_copies" min="1" required />
+        </div>
+      </div>
+
+      <div class="upload-section">
+        <label class="upload-zone" for="cover_upload">
+          <input type="file" id="cover_upload" (change)="onFileSelected($event, false)" accept="image/*" />
+          <div class="upload-content" *ngIf="!imagePreview && !newBook.image_url">
+            <span class="material-icons">cloud_upload</span>
+            <p>Drag & drop or <span>Browse cover</span></p>
+          </div>
+          <img *ngIf="imagePreview || newBook.image_url" [src]="imagePreview || newBook.image_url"
+            class="form-preview" />
+        </label>
+        <div class="upload-meta" *ngIf="isUploadingCover">
+          <div class="spinner-mini"></div>
+          <span>Uploading asset...</span>
+        </div>
+      </div>
+
+      <div class="form-footer">
+        <button type="submit" class="btn-submit" [disabled]="isSubmitting || !newBook.title || !newBook.author">
+          {{ isSubmitting ? 'Processing...' : 'Register Volume' }}
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <section class="catalog-registry">
+    <div class="registry-header">
+      <div class="search-wrap">
+        <span class="material-icons">search</span>
+        <input [(ngModel)]="searchQuery" (ngModelChange)="applyFilter()"
+          placeholder="Search by title, AI author or ISBN..." />
+      </div>
+
+      <div class="filter-wrap">
+        <select [(ngModel)]="selectedCategory" (ngModelChange)="applyFilter()">
+          <option value="">All Categories</option>
+          <option *ngFor="let cat of categories" [value]="cat">{{cat}}</option>
+        </select>
+        <select [(ngModel)]="sortOption" (ngModelChange)="applyFilter()">
+          <option value="title.asc">Title (A-Z)</option>
+          <option value="copies.desc">Stock High</option>
+          <option value="copies.asc">Low Stock</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="table-frame">
+      <table class="premium-table">
+        <thead>
+          <tr>
+            <th>Volume</th>
+            <th>Digital ID / ISBN</th>
+            <th>Archival Details</th>
+            <th>Stock Status</th>
+            <th class="text-right">Operations</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let book of books">
+            <td class="volume-cell">
+              <div class="vol-info">
+                <img [src]="getBookCover(book)" class="vol-img" (error)="onImgError($event)" />
+                <div class="vol-meta">
+                  <span class="vol-title">{{ book.title }}</span>
+                  <span class="vol-author">by {{ book.author }}</span>
+                </div>
+              </div>
+            </td>
+            <td>
+              <code class="isbn-code">{{ book.isbn || 'NO-ISBN' }}</code>
+              <div class="book-id-tag">REF: {{ book.id.substring(0,8) }}</div>
+            </td>
+            <td>
+              <div class="detail-row">
+                <span class="material-icons">folder</span> {{ book.category }}
+              </div>
+              <div class="detail-row">
+                <span class="material-icons">location_on</span> {{ book.shelf_location }}
+              </div>
+            </td>
+            <td>
+              <div class="stock-status-wrap">
+                <div class="stock-badge" [class.danger]="book.available_copies === 0">
+                  <span class="stock-count">{{ book.available_copies }}</span>
+                  <span class="stock-total">/ {{ book.total_copies }} available</span>
+                </div>
+                <span class="status-pill" [class.out]="book.available_copies === 0">
+                  {{ book.available_copies > 0 ? 'Available' : 'Out of Stock' }}
+                </span>
+              </div>
+            </td>
+            <td class="text-right">
+              <div class="ops-menu">
+                <button (click)="editBook(book)" title="Edit"><span class="material-icons">edit</span></button>
+                <button (click)="viewHistory(book)" title="History"><span class="material-icons">history</span></button>
+                <button (click)="printBarcode(book)" title="Print"><span class="material-icons">print</span></button>
+                <button (click)="updateCopies(book.id, book.title, 1)" class="btn-add" title="Add Copy"><span
+                    class="material-icons">add_circle</span></button>
+                <button (click)="deleteBook(book.id, book.title)" class="btn-del" title="Delete"><span
+                    class="material-icons">delete_outline</span></button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="empty-state" *ngIf="!loadingBooks && books.length === 0">
+        <span class="material-icons">inventory_2</span>
+        <p>No resources match your current selection</p>
+      </div>
+    </div>
+
+    <!-- Pagination -->
+    <div class="registry-footer" *ngIf="totalPages > 1 && !loadingBooks">
+      <button class="nav-btn" [disabled]="currentPage === 1" (click)="changePage(currentPage - 1)">
+        <span class="material-icons">west</span> Previous
+      </button>
+      <div class="page-indicator">
+        Sequence <span>{{ currentPage }}</span> of {{ totalPages }}
+      </div>
+      <button class="nav-btn" [disabled]="currentPage === totalPages" (click)="changePage(currentPage + 1)">
+        Next <span class="material-icons">east</span>
+      </button>
+    </div>
+  </section>
+</div>
+
+<!-- Edit Book Modal (Drawer style) -->
+<div class="modal-backdrop" *ngIf="selectedBook" (click)="cancelEdit()"></div>
+<div class="modal-drawer" [class.active]="selectedBook">
+  <div class="drawer-header">
+    <h3>Refine Resource</h3>
+    <button (click)="cancelEdit()"><span class="material-icons">close</span></button>
+  </div>
+
+  <div class="drawer-content">
+    <form (ngSubmit)="saveEditedBook()" class="premium-form">
+      <!-- Reusing same form grid -->
+      <div class="input-field">
+        <label>Book Title</label>
+        <input [(ngModel)]="editBookForm.title" name="e_title" required />
+      </div>
+      <div class="input-field">
+        <label>Author</label>
+        <input [(ngModel)]="editBookForm.author" name="e_author" required />
+      </div>
+      <div class="input-field">
+        <label>ISBN</label>
+        <input [(ngModel)]="editBookForm.isbn" name="e_isbn" required />
+      </div>
+      <div class="input-field">
+        <label>Category</label>
+        <select [(ngModel)]="editBookForm.category" name="e_category" required>
+          <option *ngFor="let cat of categories" [value]="cat">{{cat}}</option>
+        </select>
+      </div>
+      <div class="input-field">
+        <label>Shelf Location</label>
+        <select [(ngModel)]="editBookForm.shelf_location" name="e_shelf_location" required>
+          <option *ngFor="let loc of shelfLocations" [value]="loc">{{loc}}</option>
+        </select>
+      </div>
+
+      <div class="upload-section">
+        <label class="upload-zone" for="edit_cover_upload">
+          <input type="file" id="edit_cover_upload" (change)="onFileSelected($event, true)" accept="image/*" />
+          <img [src]="editBookForm.image_url || '/default-book-cover.svg'" class="form-preview" />
+          <div class="overlay-hint">Change Cover</div>
+        </label>
+      </div>
+
+      <div class="form-footer">
+        <button type="submit" class="btn-submit" [disabled]="isSavingEdit">Commit Changes</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- History Drawer (Similar to Edit) -->
+<div class="modal-backdrop" *ngIf="isShowingHistory" (click)="closeHistoryView()"></div>
+<div class="modal-drawer history-drawer" [class.active]="isShowingHistory">
+  <div class="drawer-header">
+    <div class="header-titles">
+      <h3>Transaction History</h3>
+      <p>{{ selectedBookForHistory?.title }}</p>
+    </div>
+    <button (click)="closeHistoryView()"><span class="material-icons">close</span></button>
+  </div>
+
+  <div class="drawer-content">
+    <div class="history-list" *ngIf="historyData.length">
+      <div class="history-item" *ngFor="let h of historyData">
+        <div class="h-user">
+          <span class="material-icons">account_circle</span>
+          <div class="u-meta">
+            <span class="u-name">{{ h.user?.full_name || 'System User' }}</span>
+            <span class="u-email">{{ h.user?.email }}</span>
+          </div>
+        </div>
+        <div class="h-timeline">
+          <div class="t-node">
+            <span class="t-label">Borrowed</span>
+            <span class="t-date">{{ h.loan_date | date:'mediumDate' }}</span>
+          </div>
+          <div class="t-node">
+            <span class="t-label">Due</span>
+            <span class="t-date">{{ h.due_date | date:'mediumDate' }}</span>
+          </div>
+          <div class="t-node" *ngIf="h.return_date">
+            <span class="t-label">Returned</span>
+            <span class="t-date">{{ h.return_date | date:'mediumDate' }}</span>
+          </div>
+        </div>
+        <div class="h-status" [class.returned]="h.status === 'returned'">
+          {{ h.status }}
+        </div>
+      </div>
+    </div>
+
+    <div class="empty-state" *ngIf="!loadingHistory && historyData.length === 0">
+      <span class="material-icons">history_toggle_off</span>
+      <p>No transactions recorded for this volume</p>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast-wrap" *ngIf="toastMessage" [class.error]="toastMessage.type === 'error'">
+  <span class="material-icons">{{ toastMessage.type === 'success' ? 'verified' : 'report_problem' }}</span>
+  <p>{{ toastMessage.message }}</p>
+</div>

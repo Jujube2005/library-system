@@ -38,9 +38,10 @@ export async function updateMyProfile(req: AuthenticatedRequest, res: Response):
   try {
     const userId = req.user?.id
     const supabase = req.supabase
-    const { full_name, phone } = req.body as {
+    const { full_name, phone, student_id } = req.body as {
       full_name?: string
       phone?: string
+      student_id?: string
     }
 
     if (!userId) {
@@ -55,8 +56,9 @@ export async function updateMyProfile(req: AuthenticatedRequest, res: Response):
 
     const profile = await userService.updateMyProfile(supabase as any, userId, {
       full_name,
-      phone
-    })
+      phone,
+      student_id
+    }, req.user?.role || 'student') // เพิ่ม ?. และกำหนดค่า default เป็น 'student'
 
     res.json(profile)
   } catch (error) {

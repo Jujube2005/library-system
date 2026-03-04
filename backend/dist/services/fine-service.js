@@ -4,10 +4,24 @@ exports.calculateCurrentFine = exports.processPayment = exports.getAllFines = ex
 const getMyFines = async (supabase, userId) => {
     const { data, error } = await supabase
         .from('fines')
-        .select('id, loan_id, amount, status, created_at, updated_at, paid_at')
+        .select(`
+      id, 
+      loan_id, 
+      amount, 
+      status, 
+      created_at, 
+      updated_at, 
+      loan:loans (
+        id,
+        book:books (
+          title
+        )
+      )
+    `)
         .eq('user_id', userId);
     if (error) {
-        throw new Error('ไม่สามารถดึงข้อมูลค่าปรับได้');
+        console.error('Supabase getMyFines Error:', error);
+        throw error;
     }
     return data;
 };
@@ -15,9 +29,27 @@ exports.getMyFines = getMyFines;
 const getAllFines = async (supabase) => {
     const { data, error } = await supabase
         .from('fines')
-        .select('id, loan_id, user_id, amount, status, created_at, updated_at, paid_at');
+        .select(`
+      id, 
+      loan_id, 
+      user_id, 
+      amount, 
+      status, 
+      created_at, 
+      updated_at, 
+      user:profiles!user_id (
+        full_name,
+        email
+      ),
+      loan:loans (
+        book:books (
+          title
+        )
+      )
+    `);
     if (error) {
-        throw new Error('ไม่สามารถดึงข้อมูลค่าปรับทั้งหมดได้');
+        console.error('Supabase getAllFines Error:', error);
+        throw new Error('ไม่สามารถดึงข้อมูลค่าปรับทั้งหมดได้: ' + error.message);
     }
     return data;
 };
@@ -38,7 +70,7 @@ const processPayment = async (supabase, fineId) => {
         .from('fines')
         .update({
         status: 'paid',
-        paid_at: new Date()
+        updated_at: new Date()
     })
         .eq('id', fineId)
         .select()

@@ -1,0 +1,101 @@
+<header class="page-header">
+  <span class="view-tag">Administration</span>
+  <h1 class="page-title">Member <br>Registry</h1>
+</header>
+
+<div class="loading-fade" *ngIf="loading">
+  <div class="skeleton-loader" style="height: 400px;"></div>
+</div>
+
+<p class="error-msg" *ngIf="!loading && error">{{ error }}</p>
+
+<div class="members-layout" *ngIf="!loading">
+  <section class="management-card invite-section">
+    <div class="card-header">
+      <h2 class="card-title">Access Invitation</h2>
+      <p class="card-subtitle">Authorize new library members via email</p>
+    </div>
+
+    <div class="invite-form">
+      <div class="input-group">
+        <label>Full Name</label>
+        <input [(ngModel)]="inviteName" placeholder="e.g. John Doe" />
+      </div>
+      <div class="input-group">
+        <label>Email Address</label>
+        <input [(ngModel)]="inviteEmail" placeholder="john@rmuti.ac.th" />
+      </div>
+      <div class="input-group">
+        <label>Assigned Privilege</label>
+        <select [(ngModel)]="inviteRole">
+          <option value="student">Student Member</option>
+          <option value="instructor">Faculty Instructor</option>
+          <option value="staff">Library Staff</option>
+          <option value="admin">System Admin</option>
+        </select>
+      </div>
+      <button class="btn-invite" (click)="invite()" [disabled]="inviting">
+        <span class="material-icons" *ngIf="!inviting">mail_outline</span>
+        {{ inviting ? 'Authenticating...' : 'Send Access Link' }}
+      </button>
+    </div>
+  </section>
+
+  <section class="management-card users-section">
+    <div class="card-header flex-header">
+      <div>
+        <h2 class="card-title">Active Members</h2>
+        <p class="card-subtitle">{{ users.length }} verified users in database</p>
+      </div>
+      <div class="search-box">
+        <span class="material-icons">search</span>
+        <input [(ngModel)]="search" (ngModelChange)="applyFilter()" placeholder="Filter by name, ID or role..." />
+      </div>
+    </div>
+
+    <div class="table-container">
+      <table class="premium-table" *ngIf="filtered.length; else noUsers">
+        <thead>
+          <tr>
+            <th>Member Details</th>
+            <th>Digital ID</th>
+            <th>Role / Access</th>
+            <th class="text-right">Account Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let u of filtered">
+            <td>
+              <div class="member-info">
+                <span class="member-name">{{ u.full_name }}</span>
+                <small class="member-email">{{ u.email }}</small>
+              </div>
+            </td>
+            <td><code>{{ u.student_id || 'EXTERNAL' }}</code></td>
+            <td>
+              <div class="role-selector">
+                <select [ngModel]="u.role" (ngModelChange)="changeRole(u, $event)" [disabled]="savingUserId === u.id">
+                  <option value="student">Student</option>
+                  <option value="instructor">Instructor</option>
+                  <option value="staff">Staff</option>
+                  <option value="admin">Admin</option>
+                </select>
+                <div class="spinner-mini" *ngIf="savingUserId === u.id"></div>
+              </div>
+            </td>
+            <td class="text-right">
+              <button class="status-toggle" [class.active]="u.is_active" (click)="toggleActive(u)">
+                {{ u.is_active ? 'ENABLED' : 'DISABLED' }}
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <ng-template #noUsers>
+        <div class="empty-state">
+          <p>No matching members found.</p>
+        </div>
+      </ng-template>
+    </div>
+  </section>
+</div>

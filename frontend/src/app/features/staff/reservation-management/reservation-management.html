@@ -1,0 +1,109 @@
+<div class="reservation-mgmt">
+    <div class="page-header">
+        <h1>Reservation Management</h1>
+        <p>Monitor and process book pickup requests from members</p>
+    </div>
+
+    <div class="status-overview">
+        <div class="stat-card pending">
+            <span class="label">Pending Queue</span>
+            <span class="value">{{ pendingCount }}</span>
+        </div>
+        <div class="stat-card ready">
+            <span class="label">Ready for Pickup</span>
+            <span class="value">{{ readyCount }}</span>
+        </div>
+        <div class="stat-card completed">
+            <span class="label">Completed Today</span>
+            <span class="value">{{ completedCount }}</span>
+        </div>
+    </div>
+
+    <div class="table-container">
+        <div class="table-header">
+            <h2>Current Queue</h2>
+            <button class="btn-toggle" (click)="toggleShowAll()">
+                {{ showAll ? 'Hide Completed' : 'Show History' }}
+            </button>
+        </div>
+
+        <div class="loader" *ngIf="loading">
+            <div class="spinner"></div>
+            <p>Fetching reservation data...</p>
+        </div>
+
+        <div class="error-msg" *ngIf="error">{{ error }}</div>
+
+        <table *ngIf="!loading && !error && filteredReservations.length > 0">
+            <thead>
+                <tr>
+                    <th>Member</th>
+                    <th>Book Details</th>
+                    <th>Status</th>
+                    <th>Date Reserved</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let r of filteredReservations" [class]="r.status">
+                    <td>
+                        <div class="user-info">
+                            <span class="name">{{ r.user?.full_name }}</span>
+                            <span class="id">{{ r.user?.student_id }}</span>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="book-info">
+                            <span class="title">{{ r.book?.title }}</span>
+                            <span class="shelf">Shelf: {{ r.book?.shelf_location }}</span>
+                        </div>
+                    </td>
+                    <td>
+                        <span class="status-badge" [class]="r.status">
+                            {{ r.status | uppercase }}
+                        </span>
+                    </td>
+                    <td>
+                        {{ r.reserved_at | date:'mediumDate' }}
+                        <div *ngIf="r.expires_at" style="font-size: 0.7rem; color: #e67e22; margin-top: 4px;">
+                            Pickup: {{ r.expires_at | date:'mediumDate' }}
+                        </div>
+                    </td>
+                    <td>
+                        <div class="action-group" *ngIf="r.status === 'pending'">
+                            <button class="btn-ready" (click)="updateStatus(r.id, 'ready')">
+                                <span class="material-icons">check_circle</span>
+                                Mark Ready
+                            </button>
+                            <button class="btn-cancel" (click)="updateStatus(r.id, 'cancelled')">
+                                Cancel
+                            </button>
+                        </div>
+
+                        <div class="action-group" *ngIf="r.status === 'ready'">
+                            <button class="btn-collect" (click)="confirmCollection(r)">
+                                <span class="material-icons">handshake</span>
+                                Confirm Pickup
+                            </button>
+                        </div>
+
+                        <span class="done-text" *ngIf="r.status === 'completed'">
+                            Pickup Completed
+                        </span>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="empty-state" *ngIf="!loading && !error && filteredReservations.length === 0">
+            <span class="material-icons">event_busy</span>
+            <p>{{ showAll ? 'No reservations found in the system' : 'No active reservations' }}</p>
+        </div>
+    </div>
+</div>
+
+<!-- Toast -->
+<div class="toast-wrap" *ngIf="toastMessage" [class.error]="toastMessage.type === 'error'">
+    <span class="material-icons">{{ toastMessage.type === 'success' ? 'verified' : 'report_problem' }}</span>
+    <p>{{ toastMessage.message }}</p>
+</div>

@@ -62,7 +62,9 @@ export const updateMyProfile = async (
   updates: {
     full_name?: string
     phone?: string
-  }
+    student_id?: string
+  },
+  userRole: string // เพิ่ม userRole เข้ามา
 ) => {
   const payload: Record<string, unknown> = {}
 
@@ -72,6 +74,14 @@ export const updateMyProfile = async (
 
   if (typeof updates.phone === 'string') {
     payload.phone = updates.phone
+  }
+
+  if (typeof updates.student_id === 'string') {
+    // อนุญาตให้อัปเดต student_id ได้เฉพาะ staff เท่านั้น
+    if (userRole !== 'staff') {
+      throw new Error('คุณไม่มีสิทธิ์แก้ไขรหัสนักศึกษา/เจ้าหน้าที่')
+    }
+    payload.student_id = updates.student_id
   }
 
   if (Object.keys(payload).length === 0) {

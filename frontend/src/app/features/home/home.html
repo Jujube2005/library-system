@@ -1,0 +1,83 @@
+<div class="gallery-wrapper" [class.dark-mode]="isDarkMode">
+    <!-- Parallax Background -->
+    <div class="parallax-bg" [style.transform]="'translateY(-50%) translateX(' + bgOffset + '%)'">
+        {{ slides[currentIndex].context }}
+    </div>
+
+    <!-- Header -->
+    <header class="header-nav">
+        <div class="brand-text">RMUTI</div>
+        <nav class="nav-group">
+            <a href="#" class="nav-link" (click)="handleResourcesClick($event)">Resources</a>
+            <a href="#" class="nav-link" (click)="handleStaffClick($event)">Staff</a>
+            <a routerLink="/login" class="nav-link">Member</a>
+            <button class="nav-link" (click)="toggleDarkMode()">
+                <span class="material-icons" style="font-size: 1.2rem;">
+                    {{ isDarkMode ? 'light_mode' : 'dark_mode' }}
+                </span>
+            </button>
+        </nav>
+    </header>
+
+    <!-- Main Showcase -->
+    <main class="main-stage">
+        <div class="info-section">
+            <div class="h-separator"></div>
+
+            <div class="slide-up-content reveal-anim delay-h1">
+                <h1 class="main-title">Digital Gateway</h1>
+            </div>
+
+            <div class="slide-up-content reveal-anim delay-p">
+                <p class="main-desc">
+                    ศูนย์รวมทรัพยากรสารสนเทศและบริการห้องสมุดออนไลน์ มหาวิทยาลัยเทคโนโลยีราชมงคลอีสาน
+                    ให้คุณเข้าถึงคลังหนังสือ งานวิจัย และฐานข้อมูลวิชาการได้ทุกที่ ทุกเวลา
+                </p>
+            </div>
+
+            <div class="slide-up-content reveal-anim delay-meta">
+                <div class="hero-cta">
+                    <button class="btn-primary" (click)="handleResourcesClick($event)">
+                        Explore Archive
+                    </button>
+                    <span class="cta-hint">Over 1,400+ volumes available</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Center-Focused Slider -->
+        <div class="slider-stage" (wheel)="onScroll($event)">
+            <div class="image-track" [style.transform]="getTrackTransform()">
+                <div *ngFor="let slide of slides; let i = index" class="image-card" [class.active]="i === currentIndex"
+                    (click)="currentIndex = i">
+                    <img [src]="slide.image" [alt]="slide.context">
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- UI Overlay Controls -->
+    <div class="stage-controls">
+        <button class="nav-arrow" (click)="prevSlide()">
+            <span class="material-icons">west</span>
+        </button>
+        <div class="index-display">
+            {{ currentIndex + 1 < 10 ? '0' + (currentIndex + 1) : currentIndex + 1 }} <span
+                style="opacity: 0.3; margin: 0 10px;">/</span>
+                {{ slides.length < 10 ? '0' + slides.length : slides.length }} </div>
+                    <button class="nav-arrow" (click)="nextSlide()">
+                        <span class="material-icons">east</span>
+                    </button>
+        </div>
+
+        <!-- Footer -->
+        <footer class="footer-info">
+            <div class="address-text">
+                มหาวิทยาลัยเทคโนโลยีราชมงคลอีสาน<br>
+                744 ถนนสุรนารายณ์ ต.ในเมือง อ.เมือง จ.นครราชสีมา 30000
+            </div>
+            <div class="copyright">
+                &copy; {{ year }} RMUTI Library Archive. All Rights Reserved.
+            </div>
+        </footer>
+    </div>

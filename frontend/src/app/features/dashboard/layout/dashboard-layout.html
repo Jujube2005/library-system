@@ -1,0 +1,18 @@
+<div class="dashboard-wrapper">
+  <!-- Extracted Navbar -->
+  <app-navbar [profile]="profile" [isDarkMode]="isDarkMode" (toggleTheme)="toggleDarkMode()" (logoutNeeded)="logout()">
+  </app-navbar>
+
+  <div class="main-container">
+    <!-- Extracted Sidebar -->
+    <app-sidebar [isStaff]="isStaff" (logoutNeeded)="logout()">
+    </app-sidebar>
+
+    <!-- Content Area -->
+    <main class="content-stage">
+      <div class="stage-inner">
+        <router-outlet></router-outlet>
+      </div>
+    </main>
+  </div>
+</div>

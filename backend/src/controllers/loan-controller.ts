@@ -1,7 +1,7 @@
 import { Request, Response } from 'express'
 import * as loanService from '../services/loan-service'
 import { calculateCurrentFine } from '../services/fine-service'
-import * as staffService from '../services/staff-service'
+import { Loan } from '../types/loan'
 
 export const createLoan = async (req: any, res: Response) => {
   try {
@@ -21,7 +21,7 @@ export const createLoan = async (req: any, res: Response) => {
       return
     }
 
-    const result = await staffService.recordBorrowByStaff(staffId, userId, bookId)
+    const result = await loanService.createLoan(userId, bookId, staffId)
 
     res.status(201).json({
       data: result
@@ -49,12 +49,25 @@ export const viewMyLoans = async (req: any, res: Response) => {
   }
 }
 
-export const viewAllLoans = async (_req: Request, res: Response) => {
+export const viewAllLoans = async (req: Request, res: Response) => {
   try {
-    const allLoans = await loanService.getAllLoansInSystem()
+    const { status, limit } = req.query as { status?: string, limit?: string }
+    const allLoans = await loanService.getAllLoansInSystem({
+      status,
+      limit: limit ? parseInt(limit) : undefined
+    })
     res.json({
       data: allLoans
     })
+  } catch (error: any) {
+    res.status(500).json({ error: error.message })
+  }
+}
+
+export const getLoanStats = async (_req: Request, res: Response) => {
+  try {
+    const stats = await loanService.getLoanStats()
+    res.json({ data: stats })
   } catch (error: any) {
     res.status(500).json({ error: error.message })
   }
@@ -69,7 +82,7 @@ export const returnLoan = async (req: Request, res: Response) => {
       return
     }
 
-    const result = await staffService.recordReturnByStaff(id)
+    const result = await loanService.returnLoan(id)
 
     res.status(200).json({
       data: result
@@ -96,5 +109,58 @@ export const renewLoanHandler = async (req: any, res: Response) => {
     })
   } catch (error: any) {
     res.status(400).json({ error: error.message })
+  }
+}
+
+export const renewLoanByStaff = async (req: Request, res: Response) => {
+  try {
+    const staffId = (req as any).user?.id as string | undefined
+    const { id } = req.params
+    const { new_due_date } = req.body as { new_due_date?: string }
+
+    if (!staffId) {
+      res.status(401).json({ error: 'UNAUTHENTICATED' })
+      return
+    }
+    if (!id) {
+      res.status(400).json({ error: 'MISSING_LOAN_ID' })
+      return
+    }
+    if (!new_due_date) {
+      res.status(400).json({ error: 'MISSING_NEW_DUE_DATE' })
+      return
+    }
+
+    const result = await loanService.renewLoanByStaff(id, new_due_date, staffId)
+
+    res.status(200).json({
+      data: result
+    })
+  } catch (error: any) {
+    res.status(400).json({ error: error.message })
+  }
+}
+
+export const getLoanById = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params
+
+    if (!id) {
+      res.status(400).json({ error: 'MISSING_LOAN_ID' })
+      return
+    }
+
+    const loan = await loanService.getLoanById(id)
+
+    if (!loan) {
+      res.status(404).json({ error: 'LOAN_NOT_FOUND' })
+      return
+    }
+
+    res.status(200).json({
+      data: loan
+    })
+  } catch (error: any) {
+    res.status(500).json({ error: error.message })
   }
 }

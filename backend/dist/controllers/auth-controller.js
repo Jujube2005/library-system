@@ -1,11 +1,17 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.login = login;
+exports.register = register;
 exports.logout = logout;
 const auth_service_1 = require("../services/auth-service");
 async function login(req, res) {
     const { email, password } = req.body;
     const result = await (0, auth_service_1.login)(email ?? '', password ?? '');
+    res.json(result);
+}
+async function register(req, res) {
+    const { email, password, fullName, phone, studentId, role } = req.body;
+    const result = await (0, auth_service_1.register)(email ?? '', password ?? '', fullName ?? '', phone ?? '', studentId, role);
     res.json(result);
 }
 async function logout(req, res) {

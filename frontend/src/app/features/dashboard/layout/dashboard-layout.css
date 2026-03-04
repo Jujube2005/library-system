@@ -1,0 +1,32 @@
+.dashboard-wrapper {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--bg-color);
+  transition: background-color 0.8s ease;
+}
+
+/* Main Layout Grid */
+.main-container {
+  display: flex;
+  flex: 1;
+}
+
+/* Content Stage */
+.content-stage {
+  flex: 1;
+  background-color: var(--panel-bg);
+  padding: 3rem 4rem;
+  overflow-y: auto;
+}
+
+.stage-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+@media (max-width: 1024px) {
+  .content-stage {
+    padding: 2rem;
+  }
+}

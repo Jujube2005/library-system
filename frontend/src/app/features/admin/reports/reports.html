@@ -1,0 +1,96 @@
+<h1>Overview & Reports</h1>
+
+<div class="loading-fade" *ngIf="loading">
+  <div class="skeleton-loader" style="height: 100px; margin-bottom: 2rem;"></div>
+  <div class="skeleton-loader" style="height: 300px;"></div>
+</div>
+
+<p class="error-msg" *ngIf="!loading && error">{{ error }}</p>
+
+<div class="reports-grid" *ngIf="!loading && !error">
+  <section class="report-card">
+    <div class="card-header">
+      <span class="view-tag">Insights</span>
+      <h2 class="card-title">Popular Collections</h2>
+    </div>
+
+    <div class="table-container">
+      <table class="premium-table" *ngIf="popularBooks.length; else noPopular">
+        <thead>
+          <tr>
+            <th>Book Title</th>
+            <th class="text-right">Total Loans</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let b of popularBooks">
+            <td class="font-medium">{{ b.title || 'Untitled Volume ' + b.book_id }}</td>
+            <td class="text-right accent-text">{{ b.loan_count }}</td>
+          </tr>
+        </tbody>
+      </table>
+      <ng-template #noPopular>
+        <div class="empty-state">
+          <span class="material-icons">query_stats</span>
+          <p>No loan data available yet</p>
+        </div>
+      </ng-template>
+    </div>
+  </section>
+
+  <section class="report-card">
+    <div class="card-header">
+      <span class="view-tag">Financials</span>
+      <h2 class="card-title">Overdue Records</h2>
+      <div class="summary-badges">
+        <div class="summary-badge warning">
+          Pending: <span class="highlight">฿{{ totalUnpaid | number }}</span>
+        </div>
+        <div class="summary-badge success">
+          Collected: <span class="highlight-green">฿{{ totalPaid | number }}</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="table-container">
+      <table class="premium-table" *ngIf="overdueFines.length; else noFines">
+        <thead>
+          <tr>
+            <th>Member</th>
+            <th>Status</th>
+            <th class="text-right">Amount</th>
+            <th class="text-center">Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let f of overdueFines">
+            <td>
+              <div class="user-info">
+                <span class="user-name">{{ f.user_name || 'System User' }}</span>
+                <small class="user-id">ID: {{ f.user_id.substring(0,8) }}...</small>
+              </div>
+            </td>
+            <td>
+              <span class="mini-status" [class]="f.status">{{ f.status }}</span>
+            </td>
+            <td class="text-right" [class.error-text]="f.status === 'unpaid'"
+              [class.success-text]="f.status === 'paid'">
+              ฿{{ f.amount }}
+            </td>
+            <td class="text-center">
+              <button *ngIf="f.status === 'unpaid'" class="btn-pay" (click)="payFine(f.id)">
+                Confirm Pay
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <ng-template #noFines>
+        <div class="empty-state">
+          <span class="material-icons">verified_user</span>
+          <p>All clear! No overdue fines</p>
+        </div>
+      </ng-template>
+    </div>
+  </section>
+</div>

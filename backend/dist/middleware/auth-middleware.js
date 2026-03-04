@@ -7,9 +7,11 @@ const protect = async (req, res, next) => {
     const authHeader = req.headers.authorization;
     const token = authHeader?.startsWith('Bearer ') ? authHeader.slice(7).trim() : null;
     if (!token) {
+        console.log('No token found in request');
         res.status(401).json({ message: 'Unauthorized' });
         return;
     }
+    console.log('Validating token...');
     const supabase = (0, supabase_js_1.createClient)(env_1.env.supabaseUrl, env_1.env.supabaseAnonKey, {
         global: {
             headers: {
@@ -40,6 +42,7 @@ const protect = async (req, res, next) => {
         id: profile.id,
         role: profile.role
     };
+    console.log(`Authenticated: ${profile.id} (${profile.role})`);
     req.supabase = supabase;
     next();
 };

@@ -1,0 +1,240 @@
+.reservation-mgmt {
+    padding: 2rem;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.page-header {
+    margin-bottom: 3rem;
+}
+
+.page-header h1 {
+    font-size: 2.5rem;
+    color: var(--text-main);
+    margin-bottom: 0.5rem;
+}
+
+.page-header p {
+    color: var(--text-muted);
+}
+
+.status-overview {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 3rem;
+}
+
+.stat-card {
+    background: var(--bg-card);
+    padding: 1.5rem;
+    border-radius: 16px;
+    border-left: 5px solid var(--border-light);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+}
+
+.stat-card.pending {
+    border-left-color: #f39c12;
+}
+
+.stat-card.ready {
+    border-left-color: #2ecc71;
+}
+
+.stat-card.completed {
+    border-left-color: #3498db;
+}
+
+.stat-card .label {
+    display: block;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.stat-card .value {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--text-main);
+}
+
+.table-container {
+    background: var(--bg-card);
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+    overflow: hidden;
+}
+
+.table-header {
+    padding: 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--border-light);
+}
+
+.table-header h2 {
+    font-size: 1.2rem;
+    color: var(--text-main);
+    margin: 0;
+}
+
+.btn-toggle {
+    background: var(--bg-hover);
+    color: var(--text-main);
+    padding: 0.5rem 1rem;
+    font-weight: 600;
+}
+
+.btn-toggle:hover {
+    background: var(--border-light);
+}
+
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th {
+    text-align: left;
+    padding: 1.5rem;
+    background: var(--bg-hover);
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    color: var(--text-muted);
+}
+
+td {
+    padding: 1.5rem;
+    border-bottom: 1px solid var(--border-light);
+}
+
+.user-info,
+.book-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.user-info .name,
+.book-info .title {
+    font-weight: 600;
+    color: var(--text-main);
+}
+
+.user-info .id,
+.book-info .shelf {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+}
+
+.status-badge {
+    padding: 0.4rem 0.8rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 700;
+}
+
+.status-badge.pending {
+    background: rgba(243, 156, 18, 0.1);
+    color: #f39c12;
+}
+
+.status-badge.ready {
+    background: rgba(46, 204, 113, 0.1);
+    color: #2ecc71;
+}
+
+.status-badge.completed {
+    background: rgba(52, 152, 219, 0.1);
+    color: #3498db;
+}
+
+.action-group {
+    display: flex;
+    gap: 0.5rem;
+}
+
+button {
+    padding: 0.6rem 1rem;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    font-size: 0.85rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.2s;
+}
+
+.btn-ready {
+    background: #2ecc71;
+    color: white;
+}
+
+.btn-collect {
+    background: var(--accent);
+    color: white;
+}
+
+.btn-cancel {
+    background: transparent;
+    color: #e74c3c;
+    border: 1px solid #e74c3c;
+}
+
+button:hover {
+    opacity: 0.9;
+    transform: translateY(-1px);
+}
+
+.done-text {
+    color: #2ecc71;
+    font-weight: 600;
+    font-size: 0.85rem;
+}
+
+.empty-state {
+    padding: 5rem;
+    text-align: center;
+    color: var(--text-muted);
+}
+
+.empty-state i {
+    font-size: 4rem;
+    opacity: 0.2;
+}
+
+/* Toast Custom */
+.toast-wrap {
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    background: var(--text-main);
+    color: white;
+    padding: 1rem 2rem;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    z-index: 2000;
+    animation: slideLeft 0.5s ease-out;
+}
+
+.toast-wrap.error {
+    background: #e74c3c;
+}
+
+@keyframes slideLeft {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
