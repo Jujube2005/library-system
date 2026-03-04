@@ -164,6 +164,31 @@ export class BookManagementComponent implements OnInit {
     this.successMessage = '';
   }
 
+  getBookCover(book: Book): string {
+    if (book.image_url) return book.image_url;
+    if (book.cover_image_url) return book.cover_image_url;
+
+    const titleKey = (book.title || '').trim().toLowerCase()
+    const coverByTitle: Record<string, string> = {
+      'เพราะเป็นวัยรุ่นจึงเจ็บปวด': '/book1.jpg',
+      'กล้าที่จะถูกเกลียด': '/book2.jpg',
+      'i decided to live as myself': '/book3.jpg',
+      'อยากตายแต่ก็อยากกินต๊อกบกกี #2': '/book4.jpg',
+      'sapiens: a brief history of humankind': '/book5.jpg',
+      'sapiens a brief history of humankind': '/book5.jpg',
+      'the intelligent investor': '/book6.jpg',
+      'ต้นส้มแสนรัก': '/book7.jpg',
+      'ก็แค่ปล่อยมันไป': '/book8jpg.jpg',
+      'เจ้าชายน้อย': '/book9.jpg'
+    }
+
+    return coverByTitle[titleKey] || '/default-book-cover.svg'
+  }
+
+  onImgError(event: any) {
+    event.target.src = '/default-book-cover.svg';
+  }
+
   // Filter replaced by server-side applyFilter()
 
 

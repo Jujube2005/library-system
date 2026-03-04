@@ -136,7 +136,7 @@
           <tr *ngFor="let book of books">
             <td class="volume-cell">
               <div class="vol-info">
-                <img [src]="book.image_url || '/default-book-cover.svg'" class="vol-img" />
+                <img [src]="getBookCover(book)" class="vol-img" (error)="onImgError($event)" />
                 <div class="vol-meta">
                   <span class="vol-title">{{ book.title }}</span>
                   <span class="vol-author">by {{ book.author }}</span>
