@@ -1,0 +1,17 @@
+import { createClient } from '@supabase/supabase-js'
+import * as dotenv from 'dotenv'
+import * as path from 'path'
+
+dotenv.config({ path: path.join(process.cwd(), '.env.development') })
+
+const supabaseUrl = process.env['SUPABASE_URL']
+const supabaseKey = process.env['SUPABASE_SERVICE_ROLE_KEY']
+
+const supabase = createClient(supabaseUrl!, supabaseKey!)
+
+async function checkUser() {
+    const userId = 'b5cff582-a14e-40a4-8a62-c20b9ad50e36'
+    const { data: profile } = await supabase.from('profiles').select('*').eq('id', userId).single()
+    console.log('User Profile:', profile)
+}
+checkUser()

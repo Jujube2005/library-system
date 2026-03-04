@@ -49,12 +49,25 @@ export const viewMyLoans = async (req: any, res: Response) => {
   }
 }
 
-export const viewAllLoans = async (_req: Request, res: Response) => {
+export const viewAllLoans = async (req: Request, res: Response) => {
   try {
-    const allLoans = await loanService.getAllLoansInSystem()
+    const { status, limit } = req.query as { status?: string, limit?: string }
+    const allLoans = await loanService.getAllLoansInSystem({
+      status,
+      limit: limit ? parseInt(limit) : undefined
+    })
     res.json({
       data: allLoans
     })
+  } catch (error: any) {
+    res.status(500).json({ error: error.message })
+  }
+}
+
+export const getLoanStats = async (_req: Request, res: Response) => {
+  try {
+    const stats = await loanService.getLoanStats()
+    res.json({ data: stats })
   } catch (error: any) {
     res.status(500).json({ error: error.message })
   }

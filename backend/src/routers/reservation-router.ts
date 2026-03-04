@@ -126,6 +126,7 @@ router.get(
         .from('reservations')
         .select('*')
         .order('reserved_at', { ascending: false })
+        .limit(100)
 
       if (resvError) {
         res.status(400).json({ error: resvError.message })

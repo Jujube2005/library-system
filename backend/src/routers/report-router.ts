@@ -1,6 +1,7 @@
 import { Router, Response } from 'express'
 import { protect } from '../middleware/auth-middleware'
 import { authorize } from '../middleware/role-middleware'
+import { supabaseAdmin } from '../config/supabase-admin'
 
 const router = Router()
 
@@ -8,14 +9,7 @@ router.use(protect, authorize('staff'))
 
 router.get('/popular-books', async (req: any, res: Response) => {
   try {
-    const supabase = req.supabase
-
-    if (!supabase) {
-      res.status(500).json({ error: 'Supabase client not available' })
-      return
-    }
-
-    const { data, error } = await supabase
+    const { data, error } = await supabaseAdmin
       .from('loans')
       .select('book_id, books ( title )')
 
@@ -49,40 +43,44 @@ router.get('/popular-books', async (req: any, res: Response) => {
 
 router.get('/overdue-fines', async (req: any, res: Response) => {
   try {
-    const supabase = req.supabase
-
-    if (!supabase) {
-      res.status(500).json({ error: 'Supabase client not available' })
-      return
-    }
-
-    const { data, error } = await supabase
+    const { data: fines, error } = await supabaseAdmin
       .from('fines')
-      .select('amount, status, user_id, profiles ( full_name )')
-      .eq('status', 'unpaid')
+      .select('id, amount, status, user_id, profiles ( full_name )')
+      .order('created_at', { ascending: false })
 
     if (error) {
       res.status(500).json({ error: error.message })
       return
     }
 
-    let total = 0
+    let totalUnpaid = 0
+    let totalPaid = 0
 
-    const items = (data ?? []).map((row: any) => {
+    const items = (fines ?? []).map((row: any) => {
       const amount = Number(row.amount ?? 0)
-      total += amount
+      const status = row.status as string
+
+      if (status === 'unpaid') {
+        totalUnpaid += amount
+      } else if (status === 'paid') {
+        totalPaid += amount
+      }
 
       return {
+        id: row.id,
         user_id: row.user_id as string,
         user_name: row.profiles?.full_name ?? null,
-        amount
+        amount,
+        status
       }
     })
 
     res.json({
       data: items,
       summary: {
-        total_unpaid: total
+        total_unpaid: totalUnpaid,
+        total_paid: totalPaid,
+        total_revenue: totalPaid
       }
     })
   } catch (error: any) {

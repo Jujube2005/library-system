@@ -1,14 +1,15 @@
-import { Router, Request, Response } from 'express'
+import { Router, Response } from 'express'
 import { protect } from '../middleware/auth-middleware'
 import { authorize } from '../middleware/role-middleware'
 import { getMyFines, getAllFines, processPayment } from '../services/fine-service'
+import { supabaseAdmin } from '../config/supabase-admin'
 
 const router = Router()
 
 router.get(
   '/my',
   protect,
-  authorize('student', 'instructor'),
+  authorize('student', 'instructor', 'staff'),
   async (req: any, res: Response) => {
     try {
       const supabase = req.supabase
@@ -30,7 +31,7 @@ router.get(
       res.json({ data: fines })
     } catch (error: any) {
       console.error('Fines Query Error:', error)
-      res.status(400).json({ error: error.message, details: error.details })
+      res.status(400).json({ error: error.message })
     }
   }
 )
@@ -41,15 +42,7 @@ router.get(
   authorize('staff'),
   async (req: any, res: Response) => {
     try {
-      const supabase = req.supabase
-
-      if (!supabase) {
-        res.status(500).json({ error: 'Supabase client not available' })
-        return
-      }
-
-      const fines = await getAllFines(supabase)
-
+      const fines = await getAllFines(supabaseAdmin)
       res.json({ data: fines })
     } catch (error: any) {
       res.status(400).json({ error: error.message })
@@ -63,13 +56,6 @@ router.patch(
   authorize('staff'),
   async (req: any, res: Response) => {
     try {
-      const supabase = req.supabase
-
-      if (!supabase) {
-        res.status(500).json({ error: 'Supabase client not available' })
-        return
-      }
-
       const { id } = req.params
 
       if (!id) {
@@ -77,7 +63,7 @@ router.patch(
         return
       }
 
-      const fine = await processPayment(supabase, id)
+      const fine = await processPayment(supabaseAdmin, id)
 
       res.json({ data: fine })
     } catch (error: any) {

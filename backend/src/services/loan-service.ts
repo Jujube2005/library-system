@@ -1,5 +1,6 @@
 import { createClient } from '@supabase/supabase-js'
 import { supabase } from "../config/supabase"
+import { supabaseAdmin } from '../config/supabase-admin'
 import { env } from '../config/env'
 import { createNotification } from './notification-service'
 import { Loan } from '../types/loan'
@@ -17,14 +18,21 @@ const getLoanRulesForRole = (role: string) => {
 }
 
 export const createLoan = async (userIdentifier: string, bookId: string, staffId: string): Promise<Loan> => {
-  const supabaseAdmin = createClient(env.supabaseUrl, env.supabaseServiceRoleKey as string)
-
   // 1. Resolve User (Could be UUID, Student ID, or Email)
+  const isUserUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(userIdentifier);
+  const userQuery = isUserUUID
+    ? `id.eq.${userIdentifier},student_id.eq.${userIdentifier},email.eq.${userIdentifier}`
+    : `student_id.eq.${userIdentifier},email.eq.${userIdentifier}`;
+
   let { data: profile, error: profileError } = await supabaseAdmin
     .from('profiles')
     .select('id, role, student_id, email')
-    .or(`id.eq.${userIdentifier},student_id.eq.${userIdentifier},email.eq.${userIdentifier}`)
+    .or(userQuery)
     .single()
+
+  if (profileError && profileError.code !== 'PGRST116') {
+    console.error('Profile fetch error:', profileError);
+  }
 
   if (!profile) {
     throw new Error('ไม่พบข้อมูลผู้ใช้เป้าหมาย (กรุณาเช็ค ID, รหัสนักศึกษา หรือ อีเมล)')
@@ -48,10 +56,16 @@ export const createLoan = async (userIdentifier: string, bookId: string, staffId
   }
 
   // 2. Resolve Book (Could be UUID or ISBN)
+  const isBookUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(bookId);
+  const cleanIsbn = bookId.replace(/[-\s]/g, '');
+  const bookQuery = isBookUUID
+    ? `id.eq.${bookId},isbn.eq.${bookId},isbn.eq.${cleanIsbn}`
+    : `isbn.eq.${bookId},isbn.eq.${cleanIsbn}`;
+
   let { data: book, error: bookError } = await supabaseAdmin
     .from('books')
     .select('id, available_copies, isbn')
-    .or(`id.eq.${bookId},isbn.eq.${bookId},isbn.eq.${bookId.replace(/[-\s]/g, '')}`)
+    .or(bookQuery)
     .single()
 
   if (!book) {
@@ -96,84 +110,146 @@ export const createLoan = async (userIdentifier: string, bookId: string, staffId
     throw new Error('ไม่สามารถบันทึกการยืมได้')
   }
 
+  // Cancel any active/pending reservations for this user and this book
+  try {
+    const { data: reservation } = await supabaseAdmin
+      .from('reservations')
+      .select('id')
+      .eq('user_id', userId)
+      .eq('book_id', resolvedBookId)
+      .in('status', ['pending', 'active'])
+      .single();
+
+    if (reservation) {
+      await supabaseAdmin
+        .from('reservations')
+        .update({ status: 'completed' })
+        .eq('id', reservation.id);
+    }
+  } catch (resErr) {
+    // Ignore error if no pending reservation
+  }
+
   return data
 }
 
 export const returnLoan = async (loanId: string): Promise<{ loan: Loan, fine: any }> => {
-  const supabaseAdmin = createClient(env.supabaseUrl, env.supabaseServiceRoleKey as string)
-
-  const { error: rpcError } = await supabaseAdmin
-    .rpc('process_return', { p_loan_id: loanId })
-
-  if (rpcError) {
-    throw new Error('ไม่สามารถประมวลผลการคืนหนังสือได้')
-  }
-
+  // 1. Fetch current loan data
   const { data: loan, error: loanError } = await supabaseAdmin
     .from('loans')
-    .select('*')
+    .select('*, book:books(total_copies, available_copies)')
     .eq('id', loanId)
     .single()
 
   if (loanError || !loan) {
-    throw new Error('ไม่พบข้อมูลการยืมหลังคืนหนังสือ')
+    throw new Error('ไม่พบข้อมูลการยืม')
   }
 
-  const { data: fine } = await supabaseAdmin
-    .from('fines')
-    .select('*')
-    .eq('loan_id', loanId)
-    .single()
+  if (loan.status === 'returned') {
+    throw new Error('หนังสือเล่มนี้ถูกคืนไปแล้ว')
+  }
 
-  if (fine && fine.amount > 0) {
-    const userId = loan.user_id as string | undefined
+  const today = new Date().toISOString().slice(0, 10)
+  const dueDate = new Date(loan.due_date)
+  const returnDate = new Date(today)
 
-    if (userId) {
-      try {
+  // 2. Process Return in JS
+  // Update Loan
+  const { error: updateLoanError } = await supabaseAdmin
+    .from('loans')
+    .update({
+      return_date: today,
+      status: 'returned'
+    })
+    .eq('id', loanId)
+
+  if (updateLoanError) {
+    throw new Error('ไม่สามารถอัปเดตสถานะการยืมได้: ' + updateLoanError.message)
+  }
+
+  // Update Book Stock
+  const book = (loan as any).book
+  if (book) {
+    const newAvailable = Math.min(book.available_copies + 1, book.total_copies)
+    await supabaseAdmin
+      .from('books')
+      .update({ available_copies: newAvailable, status: 'available' })
+      .eq('id', loan.book_id)
+  }
+
+  // Calculate Fine
+  let fine = null
+  const diffTime = returnDate.getTime() - dueDate.getTime()
+  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
+  const overdueDays = Math.max(0, diffDays)
+  const fineAmount = overdueDays * 5
+
+  if (fineAmount > 0) {
+    try {
+      // Check if fine already exists to avoid conflict errors
+      const { data: existingFine } = await supabaseAdmin
+        .from('fines')
+        .select('id')
+        .eq('loan_id', loanId)
+        .single()
+
+      if (existingFine) {
+        const { data } = await supabaseAdmin
+          .from('fines')
+          .update({ amount: fineAmount, status: 'unpaid' })
+          .eq('id', existingFine.id)
+          .select().single()
+        fine = data
+      } else {
+        const { data } = await supabaseAdmin
+          .from('fines')
+          .insert({ loan_id: loanId, user_id: loan.user_id, amount: fineAmount, status: 'unpaid' })
+          .select().single()
+        fine = data
+      }
+
+      if (fine) {
         await createNotification(supabaseAdmin as any, {
-          userId,
+          userId: loan.user_id,
           type: 'overdue_fine',
           message: `คุณมีค่าปรับ ${Number(fine.amount)} บาทจากการคืนหนังสือเกินกำหนด`
-        })
-      } catch {
+        }).catch(() => { })
       }
+    } catch (fineErr: any) {
+      console.error('[ERR] Fine process failed:', fineErr.message)
     }
   }
 
-  // 3. Handle Reservations: Check if anyone is waiting for this book
+  // 3. Handle Reservations
   try {
     const { data: nextReservation } = await supabaseAdmin
       .from('reservations')
       .select('id, user_id, book:books(title)')
       .eq('book_id', loan.book_id)
-      .eq('status', 'pending')
+      .in('status', ['pending', 'active'])
       .order('reserved_at', { ascending: true })
       .limit(1)
       .single();
 
     if (nextReservation) {
-      // Notify the person who reserved it
       await createNotification(supabaseAdmin as any, {
         userId: nextReservation.user_id,
         type: 'reservation_ready',
-        message: `หนังสือ "${(nextReservation.book as any).title}" ที่คุณจองไว้ คืนเข้าระบบแล้วและพร้อมให้คุณมารับ!`
-      });
+        message: `หนังสือ "${(nextReservation.book as any).title}" ที่คุณจองไว้ พร้อมให้คุณมารับแล้ว!`
+      }).catch(() => { });
 
-      // Update reservation status to ready
-      await supabaseAdmin
-        .from('reservations')
-        .update({ status: 'ready' })
-        .eq('id', nextReservation.id);
+      await supabaseAdmin.from('reservations').update({ status: 'ready' }).eq('id', nextReservation.id);
     }
-  } catch (resvErr) {
-    // Ignore if no reservations or error
-  }
+  } catch (resvErr) { }
 
-  return { loan, fine }
+  // Fetch updated loan
+  const { data: finalLoan } = await supabaseAdmin.from('loans').select('*').eq('id', loanId).single();
+
+  return { loan: finalLoan || loan, fine }
 }
 
 export const renewLoan = async (loanId: string, userId: string) => {
-  const { data: loan, error: fetchError } = await supabase
+  const { data: loan, error: fetchError } = await supabaseAdmin
     .from('loans')
     .select('*')
     .eq('id', loanId)
@@ -193,7 +269,7 @@ export const renewLoan = async (loanId: string, userId: string) => {
   const currentDueDate = new Date(loan.due_date)
   currentDueDate.setDate(currentDueDate.getDate() + 14)
 
-  const { data, error: updateError } = await supabase
+  const { data, error: updateError } = await supabaseAdmin
     .from('loans')
     .update({
       due_date: currentDueDate.toISOString().slice(0, 10)
@@ -210,8 +286,6 @@ export const renewLoan = async (loanId: string, userId: string) => {
 }
 
 export const renewLoanByStaff = async (loanId: string, newDueDate: string, staffId: string): Promise<Loan> => {
-  const supabaseAdmin = createClient(env.supabaseUrl, env.supabaseServiceRoleKey as string)
-
   const { data: loan, error: fetchError } = await supabaseAdmin
     .from('loans')
     .select('*')
@@ -240,7 +314,7 @@ export const renewLoanByStaff = async (loanId: string, newDueDate: string, staff
 }
 
 export const getLoansByUser = async (userId: string) => {
-  const { data: loansData, error } = await supabase
+  const { data: loansData, error } = await supabaseAdmin
     .from('loans')
     .select('*')
     .eq('user_id', userId)
@@ -256,7 +330,7 @@ export const getLoansByUser = async (userId: string) => {
 
   const bookIds = [...new Set(loansData.map((l: any) => l.book_id))]
 
-  const { data: booksData } = await supabase
+  const { data: booksData } = await supabaseAdmin
     .from('books')
     .select('id, title, author')
     .in('id', bookIds)
@@ -271,11 +345,35 @@ export const getLoansByUser = async (userId: string) => {
   return merged
 }
 
-export const getAllLoansInSystem = async (): Promise<Loan[]> => {
-  const { data: loansData, error: loansError } = await supabase
+export const getLoanStats = async () => {
+  const { count: activeCount } = await supabaseAdmin.from('loans').select('id', { count: 'exact', head: true }).eq('status', 'active');
+  const { count: overdueCount } = await supabaseAdmin.from('loans').select('id', { count: 'exact', head: true }).eq('status', 'overdue');
+
+  const today = new Date().toISOString().split('T')[0];
+  const { count: returnedCount } = await supabaseAdmin.from('loans')
+    .select('id', { count: 'exact', head: true })
+    .eq('status', 'returned')
+    .gte('return_date', `${today}T00:00:00`);
+
+  return {
+    active: activeCount || 0,
+    overdue: overdueCount || 0,
+    returnedToday: returnedCount || 0
+  };
+};
+
+export const getAllLoansInSystem = async (options?: { status?: string, limit?: number }): Promise<Loan[]> => {
+  let query = supabaseAdmin
     .from('loans')
     .select('*')
+
+  if (options?.status) {
+    query = query.eq('status', options.status);
+  }
+
+  const { data: loansData, error: loansError } = await query
     .order('due_date', { ascending: true })
+    .limit(options?.limit || 200) // Default to 200 for performance
 
   if (loansError) {
     console.error('GetAllLoansInSystem Error:', loansError)
@@ -290,8 +388,8 @@ export const getAllLoansInSystem = async (): Promise<Loan[]> => {
   const bookIds = [...new Set(loansData.map(l => l.book_id))]
 
   const [usersRes, booksRes] = await Promise.all([
-    supabase.from('profiles').select('id, full_name, role, email, is_active').in('id', userIds),
-    supabase.from('books').select('id, title').in('id', bookIds)
+    supabaseAdmin.from('profiles').select('id, full_name, role, email, is_active').in('id', userIds),
+    supabaseAdmin.from('books').select('id, title').in('id', bookIds)
   ])
 
   const userMap = new Map(usersRes.data?.map(u => [u.id, u]))
@@ -307,7 +405,7 @@ export const getAllLoansInSystem = async (): Promise<Loan[]> => {
 };
 
 export const getLoanById = async (loanId: string): Promise<Loan | null> => {
-  const { data: loan, error } = await supabase
+  const { data: loan, error } = await supabaseAdmin
     .from('loans')
     .select('*')
     .eq('id', loanId)
@@ -322,8 +420,8 @@ export const getLoanById = async (loanId: string): Promise<Loan | null> => {
   if (!loan) return null;
 
   const [usersRes, booksRes] = await Promise.all([
-    supabase.from('profiles').select('id, full_name, role, email, is_active').eq('id', loan.user_id).single(),
-    supabase.from('books').select('id, title, author, isbn, category, shelf_location').eq('id', loan.book_id).single()
+    supabaseAdmin.from('profiles').select('id, full_name, role, email, is_active').eq('id', loan.user_id).single(),
+    supabaseAdmin.from('books').select('id, title, author, isbn, category, shelf_location').eq('id', loan.book_id).single()
   ])
 
   return {

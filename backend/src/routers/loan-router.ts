@@ -8,7 +8,8 @@ import {
   returnLoan,
   renewLoanHandler,
   renewLoanByStaff,
-  getLoanById
+  getLoanById,
+  getLoanStats
 } from '../controllers/loan-controller'
 
 const router = Router()
@@ -18,6 +19,7 @@ router.get('/my', protect, viewMyLoans)
 router.patch('/:id/renew', protect, renewLoanHandler)
 
 // Staff routes
+router.get('/stats', protect, authorize('staff'), getLoanStats)
 router.get('/system', protect, authorize('staff'), viewAllLoans)
 router.get('/', protect, authorize('staff'), viewAllLoans)
 router.get('/:id', protect, authorize('staff'), getLoanById)
