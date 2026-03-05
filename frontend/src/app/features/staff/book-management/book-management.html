@@ -8,15 +8,15 @@
     <div class="stats-overview">
       <div class="stat-card">
         <span class="stat-value">{{ stats.total }}</span>
-        <span class="stat-label">Total Titles</span>
+        <span class="stat-label">จำนวนหนังสือทั้งหมด</span>
       </div>
       <div class="stat-card">
         <span class="stat-value accent">{{ stats.available }}</span>
-        <span class="stat-label">In Stock</span>
+        <span class="stat-label">พร้อมให้บริการ</span>
       </div>
       <div class="stat-card">
         <span class="stat-value">{{ stats.categories }}</span>
-        <span class="stat-label">Genres</span>
+        <span class="stat-label">หมวดหมู่</span>
       </div>
     </div>
   </header>
@@ -24,17 +24,17 @@
   <div class="action-bar">
     <button class="btn-primary" (click)="toggleAddForm()">
       <span class="material-icons">{{ showAddForm ? 'close' : 'add' }}</span>
-      {{ showAddForm ? 'Cancel Entry' : 'Add New Book' }}
+      {{ showAddForm ? 'ยกเลิก' : 'เพิ่มหนังสือใหม่' }}
     </button>
 
     <div class="utility-btns">
       <button class="btn-outline" (click)="triggerImport()">
         <span class="material-icons">upload_file</span>
-        CSV Import
+        นำเข้าข้อมูล (CSV)
       </button>
       <button class="btn-outline" (click)="exportToCSV()">
         <span class="material-icons">download</span>
-        Export
+        ส่งออกข้อมูล (CSV)
       </button>
       <input type="file" id="csvImportInput" accept=".csv" style="display: none" (change)="onFileImport($event)">
     </div>
@@ -105,18 +105,18 @@
       <div class="search-wrap">
         <span class="material-icons">search</span>
         <input [(ngModel)]="searchQuery" (ngModelChange)="applyFilter()"
-          placeholder="Search by title, AI author or ISBN..." />
+          placeholder="ค้นหาชื่อหนังสือ, ผู้แต่ง, หรือ ISBN..." />
       </div>
 
       <div class="filter-wrap">
         <select [(ngModel)]="selectedCategory" (ngModelChange)="applyFilter()">
-          <option value="">All Categories</option>
+          <option value="">ทุกหมวดหมู่</option>
           <option *ngFor="let cat of categories" [value]="cat">{{cat}}</option>
         </select>
         <select [(ngModel)]="sortOption" (ngModelChange)="applyFilter()">
-          <option value="title.asc">Title (A-Z)</option>
-          <option value="copies.desc">Stock High</option>
-          <option value="copies.asc">Low Stock</option>
+          <option value="title.asc">ชื่อหนังสือ (A-Z)</option>
+          <option value="copies.desc">จำนวนเล่ม มาก-น้อย</option>
+          <option value="copies.asc">จำนวนเล่ม น้อย-มาก</option>
         </select>
       </div>
     </div>
@@ -125,11 +125,11 @@
       <table class="premium-table">
         <thead>
           <tr>
-            <th>Volume</th>
-            <th>Digital ID / ISBN</th>
-            <th>Archival Details</th>
-            <th>Stock Status</th>
-            <th class="text-right">Operations</th>
+            <th>ข้อมูลหนังสือ</th>
+            <th>รหัส/ISBN</th>
+            <th>หมวดหมู่/สถานที่เก็บ</th>
+            <th>สถานะหนังสือ</th>
+            <th class="text-right">จัดการ</th>
           </tr>
         </thead>
         <tbody>
@@ -159,21 +159,23 @@
               <div class="stock-status-wrap">
                 <div class="stock-badge" [class.danger]="book.available_copies === 0">
                   <span class="stock-count">{{ book.available_copies }}</span>
-                  <span class="stock-total">/ {{ book.total_copies }} available</span>
+                  <span class="stock-total">/ {{ book.total_copies }} เล่ม</span>
                 </div>
                 <span class="status-pill" [class.out]="book.available_copies === 0">
-                  {{ book.available_copies > 0 ? 'Available' : 'Out of Stock' }}
+                  {{ book.available_copies > 0 ? 'ว่างให้ยืม' : 'โดนยืมหมดแล้ว' }}
                 </span>
               </div>
             </td>
             <td class="text-right">
               <div class="ops-menu">
-                <button (click)="editBook(book)" title="Edit"><span class="material-icons">edit</span></button>
-                <button (click)="viewHistory(book)" title="History"><span class="material-icons">history</span></button>
-                <button (click)="printBarcode(book)" title="Print"><span class="material-icons">print</span></button>
-                <button (click)="updateCopies(book.id, book.title, 1)" class="btn-add" title="Add Copy"><span
+                <button (click)="editBook(book)" title="แก้ไข"><span class="material-icons">edit</span></button>
+                <button (click)="viewHistory(book)" title="ประวัติการยืม"><span
+                    class="material-icons">history</span></button>
+                <button (click)="printBarcode(book)" title="พิมพ์บาร์โค้ด"><span
+                    class="material-icons">print</span></button>
+                <button (click)="updateCopies(book.id, book.title, 1)" class="btn-add" title="เพิ่มจำนวนเล่ม"><span
                     class="material-icons">add_circle</span></button>
-                <button (click)="deleteBook(book.id, book.title)" class="btn-del" title="Delete"><span
+                <button (click)="deleteBook(book.id, book.title)" class="btn-del" title="ลบข้อมูลหนังสือ"><span
                     class="material-icons">delete_outline</span></button>
               </div>
             </td>

@@ -1,21 +1,21 @@
 <div class="staff-loan-mgmt">
   <div class="page-header">
-    <h1>Loan & Circulation</h1>
-    <p>Record new loans, process returns, and manage overdue items</p>
+    <h1>จัดการการยืม-คืน</h1>
+    <p>บันทึกการยืมใหม่, ทำรายการคืน, และจัดการหนังสือที่เกินกำหนด</p>
   </div>
 
   <!-- Stats Overview -->
   <div class="stats-overview">
     <div class="stat-card active">
-      <span class="label">Active Loans</span>
+      <span class="label">กำลังถูกยืม (รายการ)</span>
       <span class="value">{{ stats.active }}</span>
     </div>
     <div class="stat-card danger">
-      <span class="label">Overdue Items</span>
+      <span class="label">เกินกำหนด (รายการ)</span>
       <span class="value">{{ stats.overdue }}</span>
     </div>
     <div class="stat-card success">
-      <span class="label">Returned Today</span>
+      <span class="label">คืนแล้ววันนี้ (รายการ)</span>
       <span class="value">{{ stats.returnedToday }}</span>
     </div>
   </div>
@@ -25,7 +25,7 @@
     <h2><span class="material-icons">add_box</span> บันทึกการยืมใหม่ (Quick Loan)</h2>
     <form (ngSubmit)="createLoan()" class="quick-form">
       <div class="input-group">
-        <label>ผู้ยืม (Student ID / Email / UUID)</label>
+        <label>ผู้ยืม (รหัสนักศึกษา / อีเมล / User ID)</label>
         <div class="icon-input">
           <span class="material-icons">person_search</span>
           <input type="text" [(ngModel)]="newLoan.userId" name="userId" placeholder="กรอกรหัสนักศึกษา หรือ อีเมล"
@@ -33,7 +33,7 @@
         </div>
       </div>
       <div class="input-group">
-        <label>หนังสือ (Book ID / ISBN)</label>
+        <label>หนังสือ (รหัสหนังสือ / ISBN)</label>
         <div class="icon-input">
           <span class="material-icons">menu_book</span>
           <input type="text" [(ngModel)]="newLoan.bookId" name="bookId" placeholder="กรอก ISBN หรือ รหัสหนังสือ"
@@ -41,7 +41,7 @@
         </div>
       </div>
       <button type="submit" class="btn-submit" [disabled]="isCreatingLoan">
-        Record Loan
+        {{ isCreatingLoan ? 'กำลังบันทึก...' : 'บันทึกการยืม' }}
       </button>
     </form>
   </div>
@@ -49,10 +49,10 @@
   <!-- Loan List -->
   <div class="data-table-container">
     <div class="table-header">
-      <h2>{{ showActiveOnly ? 'Items Currently on Loan' : 'Full Transaction History' }}</h2>
+      <h2>{{ showActiveOnly ? 'รายการที่ยังไม่ส่งคืน' : 'ประวัติการทำรายการทั้งหมด' }}</h2>
       <div class="header-actions">
         <button class="btn-filter" (click)="toggleActiveFilter()">
-          {{ showActiveOnly ? 'Show History' : 'Hide History' }}
+          {{ showActiveOnly ? 'แสดงประวัติ' : 'ซ่อนประวัติ' }}
         </button>
         <button class="btn-refresh" (click)="loadLoans()"><span class="material-icons">refresh</span></button>
       </div>
@@ -60,7 +60,7 @@
 
     <div class="loader-wrap" *ngIf="loadingLoans">
       <div class="spinner"></div>
-      <p>Scanning records...</p>
+      <p>กำลังค้นหาข้อมูล...</p>
     </div>
 
     <div class="error-box" *ngIf="loansError">{{ loansError }}</div>
@@ -68,12 +68,12 @@
     <table *ngIf="!loadingLoans && loans.length > 0">
       <thead>
         <tr>
-          <th>Member</th>
-          <th>Book Details</th>
-          <th>Loan Date</th>
-          <th>Due Date</th>
-          <th>Status</th>
-          <th>Actions</th>
+          <th>สมาชิก</th>
+          <th>ข้อมูลหนังสือ</th>
+          <th>วันที่ยืม</th>
+          <th>กำหนดคืน</th>
+          <th>สถานะ</th>
+          <th>จัดการ</th>
         </tr>
       </thead>
       <tbody>
@@ -81,13 +81,13 @@
           <td>
             <div class="cell-user">
               <span class="name">{{ getUserFullName(loan) }}</span>
-              <span class="sub">{{ loan.user_id }}</span>
+              <span class="sub" *ngIf="false">{{ loan.user_id }}</span>
             </div>
           </td>
           <td>
             <div class="cell-book">
               <span class="title">{{ getBookTitle(loan) }}</span>
-              <span class="sub">ID: {{ loan.book_id }}</span>
+              <span class="sub" *ngIf="false">ID: {{ loan.book_id }}</span>
             </div>
           </td>
           <td>{{ loan.loan_date | date:'mediumDate' }}</td>
@@ -103,15 +103,15 @@
           </td>
           <td>
             <div class="btn-group" *ngIf="loan.status !== 'returned'">
-              <button class="btn-icon return" (click)="returnLoan(loan.id)" title="Return Book">
+              <button class="btn-icon return" (click)="returnLoan(loan.id)" title="คืนหนังสือ">
                 <span class="material-icons">assignment_return</span>
               </button>
-              <button class="btn-icon renew" (click)="renewLoan(loan.id, loan.due_date)" title="Extend Due Date">
+              <button class="btn-icon renew" (click)="renewLoan(loan.id, loan.due_date)" title="ขยายเวลายืมต่อ">
                 <span class="material-icons">update</span>
               </button>
             </div>
             <span class="returned-note" *ngIf="loan.status === 'returned'">
-              Returned on {{ loan.return_date | date:'shortDate' }}
+              คืนเมื่อ: {{ loan.return_date | date:'shortDate' }}
             </span>
           </td>
         </tr>
@@ -120,7 +120,7 @@
 
     <div class="empty-state" *ngIf="!loadingLoans && loans.length === 0">
       <span class="material-icons">inventory</span>
-      <p>No circulation records found</p>
+      <p>ไม่พบประวัติการยืม-คืน</p>
     </div>
   </div>
 </div>

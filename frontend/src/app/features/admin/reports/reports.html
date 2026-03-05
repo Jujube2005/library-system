@@ -1,4 +1,4 @@
-<h1>Overview & Reports</h1>
+<h1>ภาพรวมและรายงาน</h1>
 
 <div class="loading-fade" *ngIf="loading">
   <div class="skeleton-loader" style="height: 100px; margin-bottom: 2rem;"></div>
@@ -10,21 +10,21 @@
 <div class="reports-grid" *ngIf="!loading && !error">
   <section class="report-card">
     <div class="card-header">
-      <span class="view-tag">Insights</span>
-      <h2 class="card-title">Popular Collections</h2>
+      <span class="view-tag">ข้อมูลเชิงลึก</span>
+      <h2 class="card-title">หนังสือยอดนิยม</h2>
     </div>
 
     <div class="table-container">
       <table class="premium-table" *ngIf="popularBooks.length; else noPopular">
         <thead>
           <tr>
-            <th>Book Title</th>
-            <th class="text-right">Total Loans</th>
+            <th>ชื่อหนังสือ</th>
+            <th class="text-right">จำนวนการยืม (ครั้ง)</th>
           </tr>
         </thead>
         <tbody>
           <tr *ngFor="let b of popularBooks">
-            <td class="font-medium">{{ b.title || 'Untitled Volume ' + b.book_id }}</td>
+            <td class="font-medium">{{ b.title || 'Untitled Volume' }}</td>
             <td class="text-right accent-text">{{ b.loan_count }}</td>
           </tr>
         </tbody>
@@ -32,7 +32,7 @@
       <ng-template #noPopular>
         <div class="empty-state">
           <span class="material-icons">query_stats</span>
-          <p>No loan data available yet</p>
+          <p>ยังไม่มีข้อมูลการยืม</p>
         </div>
       </ng-template>
     </div>
@@ -40,14 +40,14 @@
 
   <section class="report-card">
     <div class="card-header">
-      <span class="view-tag">Financials</span>
-      <h2 class="card-title">Overdue Records</h2>
+      <span class="view-tag">การเงิน</span>
+      <h2 class="card-title">บันทึกค่าปรับและค้างชำระ</h2>
       <div class="summary-badges">
         <div class="summary-badge warning">
-          Pending: <span class="highlight">฿{{ totalUnpaid | number }}</span>
+          ค้างชำระ: <span class="highlight">฿{{ totalUnpaid | number }}</span>
         </div>
         <div class="summary-badge success">
-          Collected: <span class="highlight-green">฿{{ totalPaid | number }}</span>
+          ชำระแล้ว: <span class="highlight-green">฿{{ totalPaid | number }}</span>
         </div>
       </div>
     </div>
@@ -56,10 +56,10 @@
       <table class="premium-table" *ngIf="overdueFines.length; else noFines">
         <thead>
           <tr>
-            <th>Member</th>
-            <th>Status</th>
-            <th class="text-right">Amount</th>
-            <th class="text-center">Action</th>
+            <th>สมาชิก</th>
+            <th>สถานะ</th>
+            <th class="text-right">จำนวนเงิน</th>
+            <th class="text-center">จัดการ</th>
           </tr>
         </thead>
         <tbody>
@@ -67,7 +67,7 @@
             <td>
               <div class="user-info">
                 <span class="user-name">{{ f.user_name || 'System User' }}</span>
-                <small class="user-id">ID: {{ f.user_id.substring(0,8) }}...</small>
+                <small class="user-id" *ngIf="false">ID: {{ f.user_id.substring(0,8) }}...</small>
               </div>
             </td>
             <td>
@@ -79,7 +79,7 @@
             </td>
             <td class="text-center">
               <button *ngIf="f.status === 'unpaid'" class="btn-pay" (click)="payFine(f.id)">
-                Confirm Pay
+                ยืนยันการชำระ
               </button>
             </td>
           </tr>
@@ -88,7 +88,7 @@
       <ng-template #noFines>
         <div class="empty-state">
           <span class="material-icons">verified_user</span>
-          <p>All clear! No overdue fines</p>
+          <p>ยอดเยี่ยม! ไม่มีรายการค้างชำระ</p>
         </div>
       </ng-template>
     </div>

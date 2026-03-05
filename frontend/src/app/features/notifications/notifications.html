@@ -1,14 +1,14 @@
 <div class="notifications-container">
     <div class="page-header">
-        <h1><span class="material-icons">notifications</span> All Notifications</h1>
-        <button class="btn-refresh" (click)="loadNotifications()" title="Refresh Notifications" [disabled]="loading">
+        <h1><span class="material-icons">notifications</span> การแจ้งเตือนทั้งหมด</h1>
+        <button class="btn-refresh" (click)="loadNotifications()" title="รีเฟรชการแจ้งเตือน" [disabled]="loading">
             <span class="material-icons">refresh</span>
         </button>
     </div>
 
     <div class="loading-state" *ngIf="loading">
         <div class="spinner"></div>
-        <p>Loading notifications...</p>
+        <p>กำลังโหลดการแจ้งเตือน...</p>
     </div>
 
     <div class="error-state" *ngIf="!loading && error">
@@ -32,7 +32,7 @@
                 <p class="notif-message">{{ notif.message }}</p>
             </div>
 
-            <div class="notif-status-icon" *ngIf="!notif.is_read" title="Mark as read">
+            <div class="notif-status-icon" *ngIf="!notif.is_read" title="ทำเครื่องหมายว่าอ่านแล้ว">
                 <span class="material-icons">fiber_manual_record</span>
             </div>
         </div>
@@ -40,6 +40,6 @@
 
     <div class="empty-state" *ngIf="!loading && !error && notifications.length === 0">
         <span class="material-icons empty-icon">check_circle_outline</span>
-        <p>You have no notifications. All caught up!</p>
+        <p>คุณไม่มีการแจ้งเตือนใด ๆ การอัปเดตทั้งหมดได้อ่านครบแล้ว!</p>
     </div>
 </div>

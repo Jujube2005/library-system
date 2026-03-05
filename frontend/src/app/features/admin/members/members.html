@@ -1,6 +1,6 @@
 <header class="page-header">
-  <span class="view-tag">Administration</span>
-  <h1 class="page-title">Member <br>Registry</h1>
+  <span class="view-tag">การดูแลระบบ</span>
+  <h1 class="page-title">ทะเบียนสมาชิก</h1>
 </header>
 
 <div class="loading-fade" *ngIf="loading">
@@ -12,31 +12,31 @@
 <div class="members-layout" *ngIf="!loading">
   <section class="management-card invite-section">
     <div class="card-header">
-      <h2 class="card-title">Access Invitation</h2>
-      <p class="card-subtitle">Authorize new library members via email</p>
+      <h2 class="card-title">เชิญผู้ใช้งานใหม่</h2>
+      <p class="card-subtitle">ส่งคำเชิญสมาชิกห้องสมุดใหม่ผ่านอีเมล</p>
     </div>
 
     <div class="invite-form">
       <div class="input-group">
-        <label>Full Name</label>
-        <input [(ngModel)]="inviteName" placeholder="e.g. John Doe" />
+        <label>ชื่อ-นามสกุล</label>
+        <input [(ngModel)]="inviteName" placeholder="เช่น นายตัวอย่าง ทดสอบ" />
       </div>
       <div class="input-group">
-        <label>Email Address</label>
-        <input [(ngModel)]="inviteEmail" placeholder="john@rmuti.ac.th" />
+        <label>อีเมล</label>
+        <input [(ngModel)]="inviteEmail" placeholder="student@rmuti.ac.th" />
       </div>
       <div class="input-group">
-        <label>Assigned Privilege</label>
+        <label>ระดับสิทธิ์การใช้งาน</label>
         <select [(ngModel)]="inviteRole">
-          <option value="student">Student Member</option>
-          <option value="instructor">Faculty Instructor</option>
-          <option value="staff">Library Staff</option>
-          <option value="admin">System Admin</option>
+          <option value="student">นักศึกษา (Student)</option>
+          <option value="instructor">อาจารย์ (Instructor)</option>
+          <option value="staff">เจ้าหน้าที่ (Staff)</option>
+          <option value="admin">ผู้ดูแลระบบ (Admin)</option>
         </select>
       </div>
       <button class="btn-invite" (click)="invite()" [disabled]="inviting">
         <span class="material-icons" *ngIf="!inviting">mail_outline</span>
-        {{ inviting ? 'Authenticating...' : 'Send Access Link' }}
+        {{ inviting ? 'กำลังตรวจสอบ...' : 'ส่งลิงก์คำเชิญ' }}
       </button>
     </div>
   </section>
@@ -44,12 +44,12 @@
   <section class="management-card users-section">
     <div class="card-header flex-header">
       <div>
-        <h2 class="card-title">Active Members</h2>
-        <p class="card-subtitle">{{ users.length }} verified users in database</p>
+        <h2 class="card-title">สมาชิกในระบบ</h2>
+        <p class="card-subtitle">มีผู้ใช้ยืนยันตัวตนแล้ว {{ users.length }} รายการ</p>
       </div>
       <div class="search-box">
         <span class="material-icons">search</span>
-        <input [(ngModel)]="search" (ngModelChange)="applyFilter()" placeholder="Filter by name, ID or role..." />
+        <input [(ngModel)]="search" (ngModelChange)="applyFilter()" placeholder="ค้นหาด้วยชื่อ, รหัส หรือสิทธิ์..." />
       </div>
     </div>
 
@@ -57,10 +57,10 @@
       <table class="premium-table" *ngIf="filtered.length; else noUsers">
         <thead>
           <tr>
-            <th>Member Details</th>
-            <th>Digital ID</th>
-            <th>Role / Access</th>
-            <th class="text-right">Account Status</th>
+            <th>ข้อมูลสมาชิก</th>
+            <th>รหัสนักศึกษา/รหัสบัตร</th>
+            <th>สิทธิ์การใช้งาน</th>
+            <th class="text-right">สถานะบัญชี</th>
           </tr>
         </thead>
         <tbody>
@@ -85,7 +85,7 @@
             </td>
             <td class="text-right">
               <button class="status-toggle" [class.active]="u.is_active" (click)="toggleActive(u)">
-                {{ u.is_active ? 'ENABLED' : 'DISABLED' }}
+                {{ u.is_active ? 'เปิดใช้งาน' : 'ระงับการใช้งาน' }}
               </button>
             </td>
           </tr>
@@ -93,7 +93,7 @@
       </table>
       <ng-template #noUsers>
         <div class="empty-state">
-          <p>No matching members found.</p>
+          <p>ไม่พบสมาชิกที่ตรงกับคำค้นหา</p>
         </div>
       </ng-template>
     </div>

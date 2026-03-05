@@ -1,25 +1,25 @@
 <div class="fines-container">
     <div class="page-header">
-        <h1><span class="material-icons">payments</span> Fine Management (Staff)</h1>
-        <button class="btn-refresh" (click)="loadFines()" title="Refresh All Fines" [disabled]="loading">
+        <h1><span class="material-icons">payments</span> จัดการค่าปรับ (สำหรับเจ้าหน้าที่)</h1>
+        <button class="btn-refresh" (click)="loadFines()" title="โหลดข้อมูลใหม่" [disabled]="loading">
             <span class="material-icons">refresh</span>
         </button>
     </div>
 
     <div class="summary-cards" *ngIf="!loading && !error && fines.length">
         <div class="summary-card outstanding">
-            <span class="label">System Outstanding Total</span>
-            <span class="value">{{ outstandingTotal | number:'1.2-2' }} THB</span>
+            <span class="label">ยอดค้างชำระทั้งหมดในระบบ</span>
+            <span class="value">{{ outstandingTotal | number:'1.2-2' }} บาท</span>
         </div>
         <div class="summary-card">
-            <span class="label">Total Invoices</span>
+            <span class="label">จำนวนใบแจ้งหนี้รวม</span>
             <span class="value">{{ fines.length }}</span>
         </div>
     </div>
 
     <div class="loading-state" *ngIf="loading">
         <div class="spinner"></div>
-        <p>Loading all library fines...</p>
+        <p>กำลังค้นหาข้อมูลหนี้สินทั้งหมดในระบบ...</p>
     </div>
 
     <div class="error-state" *ngIf="!loading && error">
@@ -31,12 +31,12 @@
         <table>
             <thead>
                 <tr>
-                    <th>User Information</th>
-                    <th>Amount</th>
-                    <th>Status</th>
-                    <th>Date Assigned</th>
-                    <th>Payment Date</th>
-                    <th>Action</th>
+                    <th>ข้อมูลผู้ยืม</th>
+                    <th>จำนวนเงิน</th>
+                    <th>สถานะ</th>
+                    <th>วันที่บันทึกค่าปรับ</th>
+                    <th>วันที่ชำระเงิน</th>
+                    <th>จัดการ</th>
                 </tr>
             </thead>
             <tbody>
@@ -48,7 +48,7 @@
                         </div>
                     </td>
                     <td>
-                        <span class="amount-value">{{ f.amount | number:'1.2-2' }} THB</span>
+                        <span class="amount-value">{{ f.amount | number:'1.2-2' }} บาท</span>
                     </td>
                     <td>
                         <span class="status-badge status-{{ f.status }}">
@@ -62,7 +62,7 @@
                     <td>
                         <button class="btn-pay" *ngIf="f.status === 'unpaid'" (click)="markAsPaid(f)"
                             [disabled]="loading">
-                            Mark as Paid
+                            ชำระเงินแล้ว
                         </button>
                     </td>
                 </tr>
@@ -72,6 +72,6 @@
 
     <div class="empty-state" *ngIf="!loading && !error && !fines.length">
         <span class="material-icons">check_circle_outline</span>
-        <p>No fines found in the system.</p>
+        <p>ไม่พบรายการค่าปรับในระบบ</p>
     </div>
 </div>

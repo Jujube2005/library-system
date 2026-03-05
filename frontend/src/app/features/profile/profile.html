@@ -1,8 +1,8 @@
 <div class="profile-container">
     <header class="profile-header">
         <div class="header-content">
-            <span class="view-tag">Account</span>
-            <h1 class="page-title">Profile </h1>
+            <span class="view-tag">บัญชีผู้ใช้</span>
+            <h1 class="page-title">โปรไฟล์</h1>
         </div>
         <button class="edit-toggle-btn" (click)="toggleEdit()" [disabled]="loading || saving">
             <span class="material-icons">{{ isEditing ? 'close' : 'edit' }}</span>
@@ -13,7 +13,8 @@
     <div class="status-indicator" *ngIf="loading">
         <div class="skeleton-form">
             <div class="skeleton" style="width: 30%; height: 20px; margin-bottom: 2rem;"></div>
-            <div class="skeleton" style="width: 100%; height: 50px; margin-bottom: 1rem;" *ngFor="let i of [1,2,3,4]"></div>
+            <div class="skeleton" style="width: 100%; height: 50px; margin-bottom: 1rem;" *ngFor="let i of [1,2,3,4]">
+            </div>
         </div>
     </div>
 
@@ -33,7 +34,7 @@
                     <span class="material-icons">person</span>
                 </div>
                 <div class="avatar-info">
-                    <h2 class="user-name">{{ profile.full_name || 'Member' }}</h2>
+                    <h2 class="user-name">{{ profile.full_name || 'สมาชิก' }}</h2>
                     <span class="user-role brand-caps">{{ profile.role }}</span>
                 </div>
             </div>
@@ -42,7 +43,7 @@
                 <div class="meta-item">
                     <span class="material-icons">event</span>
                     <div class="meta-text">
-                        <label>Joined</label>
+                        <label>วันที่เข้าร่วม</label>
                         <span>{{ profile.created_at | date:'longDate' }}</span>
                     </div>
                 </div>
@@ -50,7 +51,7 @@
                     <span class="material-icons">badge</span>
                     <div class="meta-text">
                         <label>ID</label>
-                        <span>{{ profile.student_id || 'Not Assigned' }}</span>
+                        <span>{{ profile.student_id || 'ยังไม่ระบุ' }}</span>
                     </div>
                 </div>
             </div>
@@ -59,10 +60,10 @@
         <!-- Main Form Section -->
         <main class="profile-main">
             <div class="profile-section">
-                <h3 class="section-title brand-caps">Personal Information</h3>
+                <h3 class="section-title brand-caps">ข้อมูลส่วนตัว</h3>
                 <div class="form-grid">
                     <div class="form-group" [class.readonly]="!isEditing">
-                        <label>Full Name</label>
+                        <label>ชื่อ-นามสกุล</label>
                         <div class="input-wrapper">
                             <span class="material-icons input-icon">person_outline</span>
                             <input [(ngModel)]="editFullName" [disabled]="!isEditing" class="form-input" />
@@ -70,7 +71,7 @@
                     </div>
 
                     <div class="form-group readonly">
-                        <label>Email Address</label>
+                        <label>อีเมล</label>
                         <div class="input-wrapper">
                             <span class="material-icons input-icon">mail_outline</span>
                             <input [value]="profile.email" disabled class="form-input" />
@@ -78,7 +79,7 @@
                     </div>
 
                     <div class="form-group" [class.readonly]="!isEditing">
-                        <label>Phone Number</label>
+                        <label>เบอร์โทรศัพท์</label>
                         <div class="input-wrapper">
                             <span class="material-icons input-icon">phone_iphone</span>
                             <input [(ngModel)]="editPhone" [disabled]="!isEditing" class="form-input" />
@@ -86,7 +87,7 @@
                     </div>
 
                     <div class="form-group" [class.readonly]="!isEditing || !isStaff">
-                        <label>Student / Staff ID</label>
+                        <label>รหัสนักศึกษา / รหัสพนักงาน</label>
                         <div class="input-wrapper">
                             <span class="material-icons input-icon">badge</span>
                             <input [(ngModel)]="editStudentId" [disabled]="!isEditing || !isStaff" class="form-input" />
@@ -104,15 +105,15 @@
             </div>
 
             <div class="profile-section">
-                <h3 class="section-title brand-caps">Account Security</h3>
+                <h3 class="section-title brand-caps">ความปลอดภัยของบัญชี</h3>
                 <div class="form-grid">
                     <div class="form-group readonly">
-                        <label>System Role</label>
+                        <label>ระดับสิทธิ์ผู้ใช้งาน</label>
                         <div class="input-wrapper">
                             <span class="material-icons input-icon">verified_user</span>
                             <input [value]="profile.role" disabled class="form-input" />
                         </div>
-                        <span class="hint-text">Data is synchronized with the university central system.</span>
+                        <span class="hint-text">ข้อมูลซิงค์กับระบบส่วนกลางของมหาวิทยาลัย</span>
                     </div>
                 </div>
             </div>

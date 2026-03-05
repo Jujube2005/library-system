@@ -10,7 +10,8 @@
 
             <div class="form-main">
                 <h1 class="welcome-text">
-                    {{ role === 'staff' ? 'Staff' : 'Create' }} <br>Account
+                    {{ role === 'staff' ? 'ลงทะเบียน' : 'สร้างบัญชี' }} <br>{{ role === 'staff' ? 'เจ้าหน้าที่' :
+                    'สมาชิกใหม่' }}
                 </h1>
                 <p class="sub-text">
                     <ng-container *ngIf="role === 'staff'">
@@ -32,8 +33,9 @@
                         </div>
 
                         <div class="input-field">
-                            <label>{{ role === 'staff' ? 'รหัสเจ้าหน้าที่ (Staff ID)' : 'รหัสนักศึกษา (Student ID - optional)' }}</label>
-                            <input type="text" [(ngModel)]="studentId" name="studentId" 
+                            <label>{{ role === 'staff' ? 'รหัสเจ้าหน้าที่ (Staff ID)' : 'รหัสนักศึกษา (Student ID -
+                                optional)' }}</label>
+                            <input type="text" [(ngModel)]="studentId" name="studentId"
                                 [placeholder]="role === 'staff' ? 'STAFF-XXXX' : '64XXXXXXXX'" />
                         </div>
 
@@ -81,10 +83,10 @@
 
         <!-- Visual Section -->
         <section class="visual-section">
-            <img src="/library.jpg" alt="RMUTI Library">
+            <img src="/library.jpg" alt="ห้องสมุด RMUTI">
             <div class="glass-caption">
-                <span class="glass-tag">Philosophy</span>
-                <h2 class="glass-title">Knowledge is the <br>ultimate luxury.</h2>
+                <span class="glass-tag">ปรัชญา</span>
+                <h2 class="glass-title">ความรู้คือ<br>ความมั่งคั่งที่แท้จริง</h2>
             </div>
         </section>
 

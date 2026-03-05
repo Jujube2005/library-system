@@ -19,7 +19,7 @@
             <!-- Notification Dropdown -->
             <div class="profile-dropdown notification-dropdown" [class.show]="showNotificationMenu">
                 <div class="dropdown-header">
-                    <p class="user-email">Notifications</p>
+                    <p class="user-email">การแจ้งเตือน</p>
                 </div>
                 <div class="dropdown-divider"></div>
 
@@ -34,14 +34,14 @@
                     </ng-container>
                     <ng-template #emptyNotifs>
                         <div class="empty-state">
-                            No notifications yet
+                            ไม่มีการแจ้งเตือน
                         </div>
                     </ng-template>
                 </div>
 
                 <div class="dropdown-divider"></div>
                 <a routerLink="/dashboard/notifications" class="dropdown-item view-all">
-                    View All
+                    ดูทั้งหมด
                 </a>
             </div>
         </div>
@@ -49,7 +49,7 @@
         <div class="profile-menu-wrap" *ngIf="profile">
             <div class="profile-chip" (click)="toggleProfileMenu($event)">
                 <span class="role-badge">{{ profile.role }}</span>
-                <span class="user-name">{{ profile.full_name || 'User' }}</span>
+                <span class="user-name">{{ profile.full_name || 'ผู้ใช้งาน' }}</span>
                 <span class="material-icons dropdown-arrow">expand_more</span>
             </div>
 
@@ -60,11 +60,11 @@
                 <div class="dropdown-divider"></div>
                 <a routerLink="/dashboard/profile" class="dropdown-item">
                     <span class="material-icons">person_outline</span>
-                    Profile Settings
+                    ตั้งค่าโปรไฟล์
                 </a>
                 <button (click)="logout()" class="dropdown-item logout-link">
                     <span class="material-icons">logout</span>
-                    Sign Out
+                    ออกจากระบบ
                 </button>
             </div>
         </div>

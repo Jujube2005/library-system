@@ -1,31 +1,31 @@
 <div class="fines-container">
   <div class="page-header">
-    <h1><span class="material-icons">account_balance_wallet</span> My Fines</h1>
-    <button class="btn-refresh" (click)="loadFines()" title="Refresh My Fines" [disabled]="loading">
+    <h1><span class="material-icons">account_balance_wallet</span> ค่าปรับของฉัน</h1>
+    <button class="btn-refresh" (click)="loadFines()" title="รีเฟรชข้อมูล" [disabled]="loading">
       <span class="material-icons">refresh</span>
     </button>
   </div>
 
-  <div class="summary-cards" *ngIf="!loading && !error && fines.length">
+  <div class="summary-cards" *ngIf="!loading && !error && (fines.length > 0 || estimatedFines.length > 0)">
     <div class="summary-card outstanding">
-      <span class="label">Total Amount to Pay</span>
-      <span class="value">{{ outstandingTotal | number:'1.2-2' }} THB</span>
+      <span class="label">ยอดค้างชำระทั้งหมด</span>
+      <span class="value">{{ outstandingTotal | number:'1.2-2' }} บาท</span>
     </div>
     <div class="summary-card" *ngIf="estimatedFines.length">
-      <span class="label">Overdue Books (Active)</span>
-      <span class="value">{{ estimatedFines.length }}</span>
+      <span class="label">หนังสือที่ส่งคืนล่าช้า</span>
+      <span class="value">{{ estimatedFines.length }} รายการ</span>
     </div>
   </div>
 
   <div class="table-wrapper in-progress-fines" *ngIf="!loading && !error && estimatedFines.length">
-    <div class="section-badge warning">Active Fines (Not yet returned)</div>
+    <div class="section-badge warning">ค่าปรับรอชำระ (ยังไม่ส่งคืนหนังสือ)</div>
     <table>
       <thead>
         <tr>
-          <th>Book Title</th>
-          <th>Due Date</th>
-          <th>Days Past Due</th>
-          <th>Estimated Fine</th>
+          <th>ชื่อหนังสือ</th>
+          <th>วันครบกำหนด</th>
+          <th>เกินกำหนดมาแล้ว</th>
+          <th>ค่าปรับโดยประมาณ</th>
         </tr>
       </thead>
       <tbody>
@@ -33,10 +33,10 @@
           <td class="book-title">{{ f.book_title }}</td>
           <td>{{ f.due_date | date:'mediumDate' }}</td>
           <td class="days-overdue">
-            {{ (f.amount / 5) | number:'1.0-0' }} days
+            {{ (f.amount / 5) | number:'1.0-0' }} วัน
           </td>
           <td>
-            <span class="amount-value orange">{{ f.amount | number:'1.2-2' }} THB</span>
+            <span class="amount-value orange">{{ f.amount | number:'1.2-2' }} บาท</span>
           </td>
         </tr>
       </tbody>
@@ -45,7 +45,7 @@
 
   <div class="loading-state" *ngIf="loading">
     <div class="spinner"></div>
-    <p>Checking your balance...</p>
+    <p>กำลังตรวจสอบยอดค้างชำระ...</p>
   </div>
 
   <div class="error-state" *ngIf="!loading && error">
@@ -54,20 +54,20 @@
   </div>
 
   <div class="table-wrapper" *ngIf="!loading && !error && fines.length">
-    <div class="section-badge success">Fine History (Recorded)</div>
+    <div class="section-badge success">ประวัติค่าปรับ (บันทึกเข้าระบบแล้ว)</div>
     <table>
       <thead>
         <tr>
-          <th>Amount</th>
-          <th>Status</th>
-          <th>Date Recorded</th>
-          <th>Payment Date</th>
+          <th>จำนวนเงิน</th>
+          <th>สถานะ</th>
+          <th>วันที่บันทึก</th>
+          <th>วันที่ชำระเงิน</th>
         </tr>
       </thead>
       <tbody>
         <tr *ngFor="let f of fines">
           <td>
-            <span class="amount-value">{{ f.amount | number:'1.2-2' }} THB</span>
+            <span class="amount-value">{{ f.amount | number:'1.2-2' }} บาท</span>
           </td>
           <td>
             <span class="status-badge status-{{ f.status }}">
@@ -83,8 +83,8 @@
     </table>
   </div>
 
-  <div class="empty-state" *ngIf="!loading && !error && !fines.length">
+  <div class="empty-state" *ngIf="!loading && !error && fines.length === 0 && estimatedFines.length === 0">
     <span class="material-icons">check_circle_outline</span>
-    <p>Good job! You don't have any fines.</p>
+    <p>เยี่ยมมาก! คุณไม่มีค่าปรับค้างชำระ</p>
   </div>
 </div>

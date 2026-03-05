@@ -7,7 +7,7 @@
   <div class="search-section">
     <div class="search-box">
       <span class="material-icons search-icon">search</span>
-      <input [(ngModel)]="q" placeholder="Search title or author..." (keyup.enter)="onSearch()" />
+      <input [(ngModel)]="q" placeholder="ค้นหาชื่อหนังสือ หรือผู้แต่ง..." (keyup.enter)="onSearch()" />
     </div>
 
     <div class="filter-group">
@@ -15,7 +15,7 @@
         <option *ngFor="let cat of categories" [value]="cat.id">{{ cat.name }}</option>
       </select>
       <button class="discover-btn" (click)="onSearch()">
-        <span>Discover</span>
+        <span>ค้นหา</span>
         <span class="material-icons">auto_awesome</span>
       </button>
     </div>
@@ -40,13 +40,13 @@
         <img [src]="getBookCover(b)" [alt]="b.title" class="cover-image" />
       </div>
       <div class="book-info">
-        <span class="book-category">{{ b.category || 'Uncategorized' }}</span>
+        <span class="book-category">{{ b.category || 'ไม่มีหมวดหมู่' }}</span>
         <h3 class="book-title">{{ b.title }}</h3>
-        <span class="book-author">By {{ b.author }}</span>
+        <span class="book-author">แต่งโดย {{ b.author }}</span>
         <div class="book-status">
           <span class="status-dot" [class.available]="b.available_copies > 0"
             [class.unavailable]="b.available_copies === 0"></span>
-          <span>{{ b.available_copies > 0 ? 'Available for Loan' : 'Reserved' }}</span>
+          <span>{{ b.available_copies > 0 ? 'ยืมได้' : 'ถูกยืม/จองแล้ว' }}</span>
         </div>
       </div>
     </a>

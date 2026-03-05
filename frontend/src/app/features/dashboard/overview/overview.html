@@ -1,7 +1,7 @@
 <div class="overview-content">
   <header class="overview-header">
-    <span class="welcome-msg">Dashboard</span>
-    <h1 class="page-title">Management <br>Overview</h1>
+    <span class="welcome-msg">แผงควบคุมหลัก</span>
+    <h1 class="page-title">ภาพรวม<br>ระบบจัดการ</h1>
   </header>
 
   <div class="skeleton-overview" *ngIf="loading">
@@ -24,7 +24,7 @@
   <div class="dashboard-grid loading-fade" *ngIf="!loading">
     <div class="main-stats">
       <section class="section-card featured-section">
-        <h2 class="brand-caps">New Admissions</h2>
+        <h2 class="brand-caps">หนังสือเข้าใหม่</h2>
 
         <div class="featured-grid" *ngIf="featuredBooks.length; else noBooks">
           <a *ngFor="let b of featuredBooks" [routerLink]="['/books', b.id]" class="mini-book-card">
@@ -45,7 +45,7 @@
         </ng-template>
 
         <div class="action-footer">
-          <a routerLink="/books" class="text-btn">View Full Archive →</a>
+          <a routerLink="/books" class="text-btn">ดูรายชื่อหนังสือทั้งหมด →</a>
         </div>
       </section>
     </div>
@@ -53,15 +53,15 @@
     <div class="side-panel">
       <!-- Quick Actions for Staff -->
       <section class="section-card quick-actions">
-        <h2 class="brand-caps">Quick Actions</h2>
+        <h2 class="brand-caps">จัดการด่วน (สำหรับเจ้าหน้าที่)</h2>
 
         <!-- Borrow Book Form -->
         <div class="action-form">
-          <h3 class="action-subtitle">Lend a Book</h3>
-          <input type="text" [(ngModel)]="newLoanBookId" placeholder="Book ID" class="input-field" />
-          <input type="text" [(ngModel)]="newLoanUserId" placeholder="User ID / Student ID" class="input-field" />
+          <h3 class="action-subtitle">ทำรายการยืมหนังสือ</h3>
+          <input type="text" [(ngModel)]="newLoanBookId" placeholder="รหัสหนังสือ (Book ID)" class="input-field" />
+          <input type="text" [(ngModel)]="newLoanUserId" placeholder="รหัสนักศึกษา / User ID" class="input-field" />
           <button (click)="createLoan()" [disabled]="isCreatingLoan" class="btn-primary">
-            {{ isCreatingLoan ? 'Processing...' : 'Lend Book' }}
+            {{ isCreatingLoan ? 'กำลังดำเนินการ...' : 'บันทึกการยืม' }}
           </button>
           <p class="form-msg" *ngIf="loanMessage" [class.error-text]="loanMessage.includes('❌')">{{ loanMessage }}</p>
         </div>
@@ -70,17 +70,17 @@
 
         <!-- Pay Fine Form -->
         <div class="action-form">
-          <h3 class="action-subtitle">Confirm Payment</h3>
-          <input type="text" [(ngModel)]="payFineId" placeholder="Fine ID" class="input-field" />
+          <h3 class="action-subtitle">บันทึกการชำระค่าปรับ</h3>
+          <input type="text" [(ngModel)]="payFineId" placeholder="รหัสค่าปรับ (Fine ID)" class="input-field" />
           <button (click)="payFine()" [disabled]="isPayingFine" class="btn-primary">
-            {{ isPayingFine ? 'Processing...' : 'Confirm Pay' }}
+            {{ isPayingFine ? 'กำลังดำเนินการ...' : 'ยืนยันการชำระเงิน' }}
           </button>
           <p class="form-msg" *ngIf="payMessage" [class.error-text]="payMessage.includes('❌')">{{ payMessage }}</p>
         </div>
       </section>
 
       <section class="section-card">
-        <h2 class="brand-caps">Journal Log</h2>
+        <h2 class="brand-caps">บันทึกระบบล่าสุด</h2>
 
         <ul class="notify-list" *ngIf="notifications.length; else empty">
           <li class="notify-item" *ngFor="let n of notifications">

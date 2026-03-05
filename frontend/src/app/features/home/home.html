@@ -8,9 +8,9 @@
     <header class="header-nav">
         <div class="brand-text">RMUTI</div>
         <nav class="nav-group">
-            <a href="#" class="nav-link" (click)="handleResourcesClick($event)">Resources</a>
-            <a href="#" class="nav-link" (click)="handleStaffClick($event)">Staff</a>
-            <a routerLink="/login" class="nav-link">Member</a>
+            <a href="#" class="nav-link" (click)="handleResourcesClick($event)">ฐานข้อมูลหนังสือ</a>
+            <a href="#" class="nav-link" (click)="handleStaffClick($event)">เจ้าหน้าที่</a>
+            <a routerLink="/login" class="nav-link">เข้าสู่ระบบ</a>
             <button class="nav-link" (click)="toggleDarkMode()">
                 <span class="material-icons" style="font-size: 1.2rem;">
                     {{ isDarkMode ? 'light_mode' : 'dark_mode' }}
@@ -38,9 +38,9 @@
             <div class="slide-up-content reveal-anim delay-meta">
                 <div class="hero-cta">
                     <button class="btn-primary" (click)="handleResourcesClick($event)">
-                        Explore Archive
+                        ค้นหาห้องสมุด
                     </button>
-                    <span class="cta-hint">Over 1,400+ volumes available</span>
+                    <span class="cta-hint">มีทรัพยากรมากกว่า 1,400+ รายการ</span>
                 </div>
             </div>
         </div>

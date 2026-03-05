@@ -1,14 +1,14 @@
 <div class="loans-container">
   <div class="page-header">
-    <h1><span class="material-icons">menu_book</span> My Loans</h1>
-    <button class="btn-refresh" (click)="loadLoans()" title="Refresh List">
+    <h1><span class="material-icons">menu_book</span> รายการยืมของฉัน</h1>
+    <button class="btn-refresh" (click)="loadLoans()" title="รีเฟรชข้อมูล">
       <span class="material-icons">refresh</span>
     </button>
   </div>
 
   <div class="loading-state" *ngIf="loading">
     <div class="spinner"></div>
-    <p>Loading your loans...</p>
+    <p>กำลังโหลดข้อมูล...</p>
   </div>
 
   <div class="error-state" *ngIf="!loading && error">
@@ -18,7 +18,7 @@
 
   <div class="empty-state" *ngIf="!loading && !error && loans.length === 0">
     <span class="material-icons">inventory</span>
-    <p>You don't have any active loans right now.</p>
+    <p>คุณไม่มีรายการยืมหนังสือในขณะนี้</p>
   </div>
 
   <div class="loans-grid" *ngIf="!loading && !error && loans.length > 0">
@@ -26,33 +26,32 @@
       <div class="card-header">
         <div class="book-info">
           <h3>{{ l.books?.title || l.book_id }}</h3>
-          <p *ngIf="isStaff">User: {{ l.user && l.user.length > 0 ? (l.user[0].full_name || l.user[0].email) : l.user_id
-            }}</p>
+          <p *ngIf="isStaff">ผู้ยืม: {{ profile?.full_name || profile?.email || 'บัญชีของฉัน' }}</p>
         </div>
         <div class="status-badge">{{ l.status }}</div>
       </div>
 
       <div class="loan-details">
         <div class="detail-row">
-          <span class="label">Date Borrowed</span>
+          <span class="label">วันที่ยืม</span>
           <span class="value">{{ l.loan_date | date:'mediumDate' }}</span>
         </div>
         <div class="detail-row" [class.overdue-alert]="l.status === 'overdue'">
-          <span class="label">Due Date</span>
+          <span class="label">กำหนดคืน</span>
           <span class="value">{{ l.due_date | date:'mediumDate' }}</span>
         </div>
         <div class="detail-row fine-alert" *ngIf="l.current_fine && l.current_fine > 0">
-          <span class="label">Estimated Fine</span>
-          <span class="value">{{ l.current_fine }} THB</span>
+          <span class="label">ค่าปรับโดยประมาณ</span>
+          <span class="value">{{ l.current_fine }} บาท</span>
         </div>
       </div>
 
       <div class="card-actions" *ngIf="l.status === 'active'">
         <button class="btn btn-renew" *ngIf="!isStaff" (click)="renew(l)" [disabled]="loading">
-          <span class="material-icons">update</span> Renew
+          <span class="material-icons">update</span> ยืมต่อ (Renew)
         </button>
         <button class="btn btn-return" *ngIf="isStaff" (click)="returnLoan(l)" [disabled]="loading">
-          <span class="material-icons">assignment_return</span> Return
+          <span class="material-icons">assignment_return</span> คืนหนังสือ
         </button>
       </div>
     </div>

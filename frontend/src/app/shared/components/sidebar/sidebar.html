@@ -1,63 +1,63 @@
 <aside class="sidebar">
     <nav class="side-nav">
         <div class="nav-section">
-            <span class="section-label">General</span>
+            <span class="section-label">ทั่วไป</span>
             <a routerLink="/dashboard" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }"
                 class="nav-item">
                 <span class="material-icons">dashboard</span>
-                <span class="item-label">Overview</span>
+                <span class="item-label">หน้าแรก</span>
             </a>
             <a routerLink="/books" routerLinkActive="active" class="nav-item">
                 <span class="material-icons">auto_stories</span>
-                <span class="item-label">Catalog</span>
+                <span class="item-label">ค้นหาหนังสือ</span>
             </a>
         </div>
 
         <div class="nav-section">
-            <span class="section-label">Personal</span>
+            <span class="section-label">ส่วนตัว</span>
             <a routerLink="/dashboard/loans" routerLinkActive="active" class="nav-item">
                 <span class="material-icons">history_edu</span>
-                <span class="item-label">My Loans</span>
+                <span class="item-label">การยืมของฉัน</span>
             </a>
             <a routerLink="/dashboard/reservations" routerLinkActive="active" class="nav-item">
                 <span class="material-icons">bookmark_border</span>
-                <span class="item-label">Reservations</span>
+                <span class="item-label">การจอง</span>
             </a>
             <a routerLink="/dashboard/fines" routerLinkActive="active" class="nav-item">
                 <span class="material-icons">payments</span>
-                <span class="item-label">Fines</span>
+                <span class="item-label">ค่าปรับ</span>
             </a>
             <a routerLink="/dashboard/profile" routerLinkActive="active" class="nav-item">
                 <span class="material-icons">person_outline</span>
-                <span class="item-label">Profile Settings</span>
+                <span class="item-label">ตั้งค่าโปรไฟล์</span>
             </a>
         </div>
 
         <div class="nav-section" *ngIf="isStaff">
-            <span class="section-label">Management</span>
+            <span class="section-label">การจัดการ</span>
             <a routerLink="/dashboard/book-management" routerLinkActive="active" class="nav-item">
                 <span class="material-icons">menu_book</span>
-                <span class="item-label">Book Management</span>
+                <span class="item-label">จัดการหนังสือ</span>
             </a>
             <a routerLink="/dashboard/loan-management" routerLinkActive="active" class="nav-item">
                 <span class="material-icons">assignment_return</span>
-                <span class="item-label">Loan Management</span>
+                <span class="item-label">จัดการการยืม-คืน</span>
             </a>
             <a routerLink="/dashboard/reservation-management" routerLinkActive="active" class="nav-item">
                 <span class="material-icons">event_seat</span>
-                <span class="item-label">Reservation Management</span>
+                <span class="item-label">จัดการการจอง</span>
             </a>
             <a routerLink="/dashboard/fine-management" routerLinkActive="active" class="nav-item">
                 <span class="material-icons">receipt_long</span>
-                <span class="item-label">Fine Management</span>
+                <span class="item-label">จัดการค่าปรับ</span>
             </a>
             <a routerLink="/dashboard/members" routerLinkActive="active" class="nav-item">
                 <span class="material-icons">people_outline</span>
-                <span class="item-label">Members</span>
+                <span class="item-label">จัดการสมาชิก</span>
             </a>
             <a routerLink="/dashboard/reports" routerLinkActive="active" class="nav-item">
                 <span class="material-icons">insert_chart_outlined</span>
-                <span class="item-label">Reports</span>
+                <span class="item-label">รายงาน</span>
             </a>
         </div>
     </nav>
@@ -65,11 +65,11 @@
     <div class="sidebar-footer">
         <a routerLink="/" class="footer-btn">
             <span class="material-icons">home</span>
-            <span>Home</span>
+            <span>กลับหน้าแรก</span>
         </a>
         <button (click)="logout()" class="footer-btn logout-action">
             <span class="material-icons">logout</span>
-            <span>Sign Out</span>
+            <span>ออกจากระบบ</span>
         </button>
     </div>
 </aside>
