@@ -6,9 +6,6 @@
             "destination": "/backend/src/server.ts"
         },
         {
-            "handle": "filesystem"
-        },
-        {
             "source": "/(.*)",
             "destination": "/frontend/dist/frontend/browser/index.html"
         }
