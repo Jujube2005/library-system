@@ -1,8 +1,6 @@
-import { createClient } from '@supabase/supabase-js'
-import { supabaseUrl, supabaseAnonKey } from '../environments'
+import { apiBaseUrl } from '../environments'
 
-if (!supabaseUrl || !supabaseAnonKey) {
-  throw new Error('Supabase configuration is missing')
+export async function getCurrentUser() {
+  const res = await fetch(`${apiBaseUrl}/api/users/me`)
+  return res.json()
 }
-
-export const supabase = createClient(supabaseUrl, supabaseAnonKey)
