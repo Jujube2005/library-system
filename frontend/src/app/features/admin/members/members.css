@@ -217,3 +217,15 @@ code {
         transform: rotate(360deg);
     }
 }
+
+.premium-table th.text-center,
+.premium-table td.text-center {
+    text-align: center !important;
+
+}
+
+.premium-table th.text-right,
+.premium-table td.text-right {
+    text-align: right !important;
+
+}

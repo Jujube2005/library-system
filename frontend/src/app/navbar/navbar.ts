@@ -87,9 +87,16 @@ export class NavbarComponent implements OnInit {
         this.showNotificationMenu = false
     }
 
-    @HostListener('document:click')
-    closeMenus() {
-        this.showProfileMenu = false
-        this.showNotificationMenu = false
+    @HostListener('document:click', ['$event'])
+    closeMenus(event: Event) {
+        const target = event.target as HTMLElement;
+        // Close profile menu if click is outside profile menu wrapper
+        if (this.showProfileMenu && !target.closest('.profile-menu-wrap')) {
+            this.showProfileMenu = false;
+        }
+        // Close notification menu if click is outside notification menu wrapper
+        if (this.showNotificationMenu && !target.closest('.notification-menu-wrap')) {
+            this.showNotificationMenu = false;
+        }
     }
 }

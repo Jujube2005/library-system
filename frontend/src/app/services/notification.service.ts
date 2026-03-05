@@ -20,7 +20,7 @@ interface SingleNotificationResponse {
 })
 export class NotificationService {
     private http = inject(HttpClient);
-    private baseUrl = 'http://localhost:4000/api/notifications';
+    private baseUrl = '/api/notifications';
 
     getNotifications(): Observable<NotificationListResponse> {
         return this.http.get<NotificationListResponse>(this.baseUrl);

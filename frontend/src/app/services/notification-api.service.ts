@@ -14,10 +14,10 @@ interface NotificationResponse {
   providedIn: 'root'
 })
 export class NotificationApiService {
-  constructor(private api: ApiService) {}
+  constructor(private api: ApiService) { }
 
   getMyNotifications() {
-    return this.api.get<NotificationListResponse>('/api/notifications/my')
+    return this.api.get<NotificationListResponse>('/api/notifications')
   }
 
   markAsRead(id: string) {
