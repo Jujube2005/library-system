@@ -2,6 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Notification } from '../models/notification.model';
+import { apiBaseUrl } from '../../environments';
 
 interface NotificationListResponse {
     data: Notification[];
@@ -20,7 +21,7 @@ interface SingleNotificationResponse {
 })
 export class NotificationService {
     private http = inject(HttpClient);
-    private baseUrl = 'http://localhost:4000/api/notifications';
+    private baseUrl = `${apiBaseUrl}/api/notifications`;
 
     getNotifications(): Observable<NotificationListResponse> {
         return this.http.get<NotificationListResponse>(this.baseUrl);

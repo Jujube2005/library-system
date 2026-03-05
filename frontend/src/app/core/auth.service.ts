@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core'
 import { supabase } from '../../lib/supabase'
+import { apiBaseUrl } from '../../environments'
 
 @Injectable({
   providedIn: 'root'
@@ -17,7 +18,7 @@ export class AuthService {
   }
 
   async signUp(email: string, password: string, fullName: string, phone: string, studentId?: string, role: string = 'student') {
-    const res = await fetch('http://localhost:4000/api/auth/register', {
+    const res = await fetch(`${apiBaseUrl}/api/auth/register`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'

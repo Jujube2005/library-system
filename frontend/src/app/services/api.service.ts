@@ -1,11 +1,12 @@
 import { Injectable } from '@angular/core'
 import { AuthService } from '../core/auth.service'
+import { apiBaseUrl } from '../../environments'
 
 @Injectable({
   providedIn: 'root'
 })
 export class ApiService {
-  private baseUrl = 'http://localhost:4000'
+  private baseUrl = apiBaseUrl
 
   constructor(private auth: AuthService) { }
 
