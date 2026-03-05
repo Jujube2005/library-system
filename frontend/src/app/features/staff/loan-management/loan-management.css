@@ -328,3 +328,25 @@ td {
     align-items: stretch;
   }
 }
+
+@media (max-width: 768px) {
+  .stats-overview {
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .action-bar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 1.5rem;
+  }
+
+  .table-scroll {
+    overflow-x: auto;
+  }
+
+  .loan-table th,
+  .loan-table td {
+    white-space: nowrap;
+  }
+}

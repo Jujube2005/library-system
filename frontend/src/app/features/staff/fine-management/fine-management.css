@@ -182,3 +182,14 @@ tr:last-child td {
         transform: rotate(360deg);
     }
 }
+
+@media (max-width: 768px) {
+    .table-wrapper {
+        overflow-x: auto;
+    }
+
+    table th,
+    table td {
+        white-space: nowrap;
+    }
+}

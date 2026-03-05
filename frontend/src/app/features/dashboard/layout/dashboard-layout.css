@@ -30,3 +30,15 @@
     padding: 2rem;
   }
 }
+
+@media (max-width: 768px) {
+  .main-container {
+    flex-direction: column;
+  }
+
+  .content-stage {
+    padding: 1rem;
+    padding-bottom: 80px;
+    /* Space for bottom nav */
+  }
+}

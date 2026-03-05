@@ -729,3 +729,44 @@
     right: -100%;
   }
 }
+
+@media (max-width: 768px) {
+  .stats-overview {
+    flex-direction: column;
+    gap: 1.5rem;
+    width: 100%;
+  }
+
+  .action-bar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 1.5rem;
+  }
+
+  .search-box input {
+    width: 100%;
+  }
+
+  .utility-btns {
+    flex-direction: column;
+  }
+
+  .table-scroll {
+    overflow-x: auto;
+  }
+
+  .book-table th,
+  .book-table td {
+    white-space: nowrap;
+  }
+
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .btn-submit {
+    width: 100%;
+    position: static;
+    margin-top: 1rem;
+  }
+}

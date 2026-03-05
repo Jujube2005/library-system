@@ -272,3 +272,38 @@
         padding: 0 1.5rem;
     }
 }
+
+@media (max-width: 768px) {
+    .top-bar {
+        padding: 0 1rem;
+        height: 60px;
+    }
+
+    .brand-caps {
+        font-size: 1rem;
+    }
+
+    .view-tag,
+    .user-name {
+        display: none;
+    }
+
+    .actions {
+        gap: 0.5rem;
+    }
+
+    .profile-chip {
+        padding: 6px;
+    }
+
+    .dropdown-arrow {
+        display: none;
+    }
+
+    .profile-dropdown,
+    .notification-dropdown {
+        width: 280px;
+        right: -10px;
+        /* Adjust dropdown position to fit screen */
+    }
+}

@@ -396,3 +396,42 @@
     align-items: center;
   }
 }
+
+@media (max-width: 768px) {
+  .header-nav {
+    padding: 2rem 1.5rem;
+    flex-direction: row;
+    justify-content: space-between;
+  }
+
+  .nav-group {
+    display: none;
+    /* Hide primary nav links on small mobile or replace with hamburger */
+  }
+
+  .main-stage {
+    padding: 2rem 1.5rem;
+  }
+
+  .main-title {
+    font-size: 3.5rem;
+  }
+
+  .main-desc {
+    font-size: 1rem;
+    padding: 0 1rem;
+  }
+
+  .hero-cta {
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .image-card {
+    min-width: 200px;
+  }
+
+  .slider-stage {
+    min-height: 300px;
+  }
+}
