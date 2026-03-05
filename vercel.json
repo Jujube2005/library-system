@@ -1,0 +1,23 @@
+{
+    "version": 2,
+    "rewrites": [
+        {
+            "source": "/api/(.*)",
+            "destination": "/backend/src/server.ts"
+        },
+        {
+            "handle": "filesystem"
+        },
+        {
+            "source": "/(.*)",
+            "destination": "/frontend/dist/frontend/browser/index.html"
+        }
+    ],
+    "functions": {
+        "backend/src/server.ts": {
+            "runtime": "@vercel/node",
+            "memory": 1024,
+            "maxDuration": 30
+        }
+    }
+}

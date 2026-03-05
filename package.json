@@ -1,5 +1,15 @@
 {
+  "name": "library-system",
+  "private": true,
+  "workspaces": [
+    "frontend",
+    "backend"
+  ],
+  "scripts": {
+    "build": "npm run build --workspace=frontend && npm run build --workspace=backend"
+  },
   "dependencies": {
-    "resend": "^6.9.3"
+    "resend": "^6.9.3",
+    "typescript": "~5.9.2"
   }
 }

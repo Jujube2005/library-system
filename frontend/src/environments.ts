@@ -2,5 +2,5 @@ export const supabaseUrl = 'https://ijdrnvemifppzgsffqjv.supabase.co'
 export const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlqZHJudmVtaWZwcHpnc2ZmcWp2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA4ODkwMzIsImV4cCI6MjA4NjQ2NTAzMn0.lNWPpgg1aqzPd0lHizVwGRVngykEUdwHOD193Ir4Xn0'
 
 // Change this to your production API URL when deploying
-export const apiBaseUrl = 'http://localhost:4000'
+export const apiBaseUrl = '' // No domain needed if same origin (Vercel)
 
