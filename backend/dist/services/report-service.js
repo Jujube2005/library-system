@@ -4,13 +4,16 @@ exports.getMonthlyReport = void 0;
 const supabase_1 = require("../config/supabase");
 const getMonthlyReport = async (month, year) => {
     // ดึงข้อมูลการยืมในช่วงเวลาที่กำหนด
+    const monthStr = month < 10 ? `0${month}` : month;
     const { data, error, count } = await supabase_1.supabase
-        .from('borrowings')
+        .from('loans')
         .select('*', { count: 'exact' })
-        .gte('borrow_date', `${year}-${month}-01`)
-        .lte('borrow_date', `${year}-${month}-31`);
-    if (error)
+        .gte('loan_date', `${year}-${monthStr}-01`)
+        .lte('loan_date', `${year}-${monthStr}-31`);
+    if (error) {
+        console.error('Report Error:', error);
         throw new Error("ไม่สามารถสร้างรายงานได้");
+    }
     // สรุปสถิติเบื้องต้น
     const report = {
         total_borrowed: count,

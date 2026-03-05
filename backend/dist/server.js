@@ -15,14 +15,14 @@ const fine_router_1 = __importDefault(require("./routers/fine-router"));
 const staff_router_1 = __importDefault(require("./routers/staff-router"));
 const admin_router_1 = __importDefault(require("./routers/admin-router"));
 const report_router_1 = __importDefault(require("./routers/report-router"));
-const notification_router_1 = __importDefault(require("./routers/notification-router"));
+const notificationRoutes_1 = __importDefault(require("./routes/notificationRoutes"));
 const app = (0, express_1.default)();
 app.use((req, res, next) => {
     console.log(`${req.method} ${req.url}`);
     next();
 });
 app.use((0, cors_1.default)({
-    origin: 'http://localhost:4200',
+    origin: env_1.env.corsOrigin,
     credentials: true
 }));
 app.use(express_1.default.json());
@@ -35,7 +35,7 @@ app.use('/api/users', user_router_1.default);
 app.use('/api/staff', staff_router_1.default);
 app.use('/api/admin', admin_router_1.default);
 app.use('/api/reports', report_router_1.default);
-app.use('/api/notifications', notification_router_1.default);
+app.use('/api/notifications', notificationRoutes_1.default);
 app.get('/health', (_req, res) => {
     res.json({ status: 'ok' });
 });
@@ -54,6 +54,9 @@ app.get('/api/diag-books', async (req, res) => {
     }
 });
 const port = env_1.env.port;
-app.listen(port, () => {
-    console.log(`API server listening on http://localhost:${port}`);
-});
+if (process.env['NODE_ENV'] !== 'production') {
+    app.listen(port, () => {
+        console.log(`API server listening on http://localhost:${port}`);
+    });
+}
+exports.default = app;

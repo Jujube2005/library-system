@@ -119,20 +119,30 @@ exports.getStatus = getStatus;
 const getBookHistory = async (req, res) => {
     try {
         const { id } = req.params;
-        const publicSupabase = (0, supabase_js_1.createClient)(env_1.env.supabaseUrl, env_1.env.supabaseAnonKey);
-        // Fetch loans for this book
-        const { data, error } = await publicSupabase
+        // Use the service-role client derived from 'protect' or 'supabase' middleware
+        const supabaseClient = req.supabase || (0, supabase_js_1.createClient)(env_1.env.supabaseUrl, env_1.env.supabaseAnonKey);
+        // Fetch loans for this book with user profile details
+        const { data, error } = await supabaseClient
             .from('loans')
-            .select('*, profiles:user_id(first_name, last_name, email)')
+            .select(`
+        *,
+        user:user_id (
+          full_name,
+          email,
+          student_id
+        )
+      `)
             .eq('book_id', id)
-            .order('borrow_date', { ascending: false });
+            .order('loan_date', { ascending: false });
         if (error) {
+            console.error('History Fetch Error:', error);
             res.status(400).json({ error: error.message });
             return;
         }
-        res.json({ data });
+        res.json({ data: data ?? [] });
     }
     catch (error) {
+        console.error('History System Error:', error);
         res.status(500).json({ error: 'Failed to fetch history' });
     }
 };

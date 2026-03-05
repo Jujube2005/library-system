@@ -46,7 +46,7 @@ router.post('/', auth_middleware_1.protect, (0, role_middleware_1.authorize)('st
             return;
         }
         const userId = req.user?.id;
-        const { bookId } = req.body;
+        const { bookId, expiresAt } = req.body;
         if (!userId) {
             res.status(401).json({ error: 'UNAUTHENTICATED' });
             return;
@@ -59,9 +59,10 @@ router.post('/', auth_middleware_1.protect, (0, role_middleware_1.authorize)('st
             .from('reservations')
             .insert({
             user_id: userId,
-            book_id: bookId
+            book_id: bookId,
+            expires_at: expiresAt
         })
-            .select('id, book_id, status, reserved_at')
+            .select('id, book_id, status, reserved_at, expires_at')
             .single();
         if (error) {
             res.status(400).json({ error: error.message });
@@ -85,24 +86,71 @@ router.get('/my', auth_middleware_1.protect, (0, role_middleware_1.authorize)('s
             res.status(401).json({ error: 'UNAUTHENTICATED' });
             return;
         }
-        const { data, error } = await supabase
+        const { data: resvData, error: resvError } = await supabase
             .from('reservations')
-            .select(`
-          *,
-          books (
-            title,
-            author,
-            category
-          )
-        `)
+            .select('*')
             .eq('user_id', userId)
             .order('reserved_at', { ascending: false });
-        if (error) {
-            console.error('Reservations Query Error:', error);
-            res.status(400).json({ error: error.message, details: error.details });
+        if (resvError) {
+            res.status(400).json({ error: resvError.message });
             return;
         }
-        res.json({ data: data ?? [] });
+        if (!resvData || resvData.length === 0) {
+            res.json({ data: [] });
+            return;
+        }
+        const bookIds = [...new Set(resvData.map((r) => r.book_id))];
+        const { data: booksData } = await supabase
+            .from('books')
+            .select('id, title, author, category')
+            .in('id', bookIds);
+        const bookMap = new Map(booksData?.map((b) => [b.id, b]));
+        const merged = resvData.map((r) => ({
+            ...r,
+            books: bookMap.get(r.book_id) // Match the key expected by existing frontend logic
+        }));
+        res.json({ data: merged });
+    }
+    catch (error) {
+        res.status(400).json({ error: error.message });
+    }
+});
+router.get('/all', auth_middleware_1.protect, (0, role_middleware_1.authorize)('staff'), async (req, res) => {
+    try {
+        const supabase = req.supabase;
+        if (!supabase) {
+            res.status(500).json({ error: 'Supabase client not available' });
+            return;
+        }
+        const { data: resvData, error: resvError } = await supabase
+            .from('reservations')
+            .select('*')
+            .order('reserved_at', { ascending: false })
+            .limit(100);
+        if (resvError) {
+            res.status(400).json({ error: resvError.message });
+            return;
+        }
+        if (!resvData || resvData.length === 0) {
+            res.json({ data: [] });
+            return;
+        }
+        // Collect unique IDs
+        const userIds = [...new Set(resvData.map((r) => r.user_id))];
+        const bookIds = [...new Set(resvData.map((r) => r.book_id))];
+        // Fetch related data
+        const [usersRes, booksRes] = await Promise.all([
+            supabase.from('profiles').select('id, full_name, email, student_id').in('id', userIds),
+            supabase.from('books').select('id, title, isbn, shelf_location').in('id', bookIds)
+        ]);
+        const userMap = new Map(usersRes.data?.map((u) => [u.id, u]));
+        const bookMap = new Map(booksRes.data?.map((b) => [b.id, b]));
+        const merged = resvData.map((r) => ({
+            ...r,
+            user: userMap.get(r.user_id) || { full_name: 'Unknown', student_id: 'N/A' },
+            book: bookMap.get(r.book_id) || { title: 'Unknown Book', shelf_location: 'N/A' }
+        }));
+        res.json({ data: merged });
     }
     catch (error) {
         res.status(400).json({ error: error.message });
