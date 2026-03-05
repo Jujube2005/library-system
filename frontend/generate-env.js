@@ -1,0 +1,12 @@
+const fs = require('fs');
+const path = require('path');
+
+const envFileContent = `
+export const supabaseUrl = '${process.env.NEXT_PUBLIC_SUPABASE_URL || ''}';
+export const supabaseAnonKey = '${process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''}';
+export const apiBaseUrl = '${process.env.NEXT_PUBLIC_API_BASE_URL || ''}';
+`;
+
+const targetPath = path.join(__dirname, 'src', 'environments.ts');
+fs.writeFileSync(targetPath, envFileContent);
+console.log('Environment file generated successfully at ' + targetPath);
